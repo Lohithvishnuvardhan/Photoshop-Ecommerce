@@ -1,4 +1,3 @@
-
 import { Link, Outlet } from 'react-router-dom';
 import { Camera, ShoppingCart, User, Search } from 'lucide-react';
 import { useCartStore } from '../store/cart';
@@ -46,14 +45,17 @@ export function Layout() {
 
           <div className="py-4">
             <div className="flex space-x-8">
-              <Link to="/products/cameras" className="text-gray-300 hover:text-white">
+              <Link to="/cameras" className="text-gray-300 hover:text-white">
                 Cameras
               </Link>
-              <Link to="/products/lenses" className="text-gray-300 hover:text-white">
+              <Link to="/lenses" className="text-gray-300 hover:text-white">
                 Lenses
               </Link>
-              <Link to="/products/accessories" className="text-gray-300 hover:text-white">
+              <Link to="/accessories" className="text-gray-300 hover:text-white">
                 Accessories
+              </Link>
+              <Link to="/batteries" className="text-gray-300 hover:text-white">
+                Batteries
               </Link>
               <Link to="/about" className="text-gray-300 hover:text-white">
                 About
@@ -66,7 +68,7 @@ export function Layout() {
         </nav>
       </header>
 
-      <main>
+      <main className="bg-gray-100">
         <Outlet />
       </main>
 
