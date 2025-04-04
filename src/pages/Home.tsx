@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
@@ -24,52 +23,6 @@ export function Home() {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </div>
-        </div>
-      </div>
-
-      {/* Featured Categories */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-3xl font-bold mb-8 text-white">Featured Categories</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <Link
-            to="/products/cameras"
-            className="group relative rounded-lg overflow-hidden bg-gray-800"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32"
-              alt="Cameras"
-              className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300 opacity-75"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center group-hover:bg-opacity-30 transition-all">
-              <h3 className="text-white text-2xl font-bold">Cameras</h3>
-            </div>
-          </Link>
-          <Link
-            to="/products/lenses"
-            className="group relative rounded-lg overflow-hidden bg-gray-800"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1617005082133-548c4dd27f35"
-              alt="Lenses"
-              className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300 opacity-75"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center group-hover:bg-opacity-30 transition-all">
-              <h3 className="text-white text-2xl font-bold">Lenses</h3>
-            </div>
-          </Link>
-          <Link
-            to="/products/accessories"
-            className="group relative rounded-lg overflow-hidden bg-gray-800"
-          >
-            <img
-              src="https://images.unsplash.com/photo-1598460880248-71ec6d2d582b"
-              alt="Accessories"
-              className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300 opacity-75"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center group-hover:bg-opacity-30 transition-all">
-              <h3 className="text-white text-2xl font-bold">Accessories</h3>
-            </div>
-          </Link>
         </div>
       </div>
 
