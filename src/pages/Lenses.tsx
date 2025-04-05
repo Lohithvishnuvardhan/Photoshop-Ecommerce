@@ -30,7 +30,7 @@ const lenses = [
     id: 8,
     name: 'Sigma 85mm f/1.4 DG DN Art',
     price: 94990,
-    image: 'https://images.unsplash.com/photo-1617005082133-537b57e75c7f?auto=format&fit=crop&q=80',
+    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSifWzZ5iy0zrSqGmEOnLPrNKwLu8kfYSWEcw&s',
     description: 'Portrait Prime Lens',
     specs: ['11 Rounded Aperture Blades', 'Hypersonic AF Motor', 'Dust & Splash Proof', 'Click/De-Click Aperture Ring']
   },

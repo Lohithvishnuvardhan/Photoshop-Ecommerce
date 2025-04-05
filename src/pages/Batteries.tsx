@@ -5,16 +5,16 @@ const batteries = [
   {
     id: 13,
     name: 'Canon LP-E6NH Battery',
-    price: 14990,
-    image: 'https://images.unsplash.com/photo-1619948543232-c515a389c22d?auto=format&fit=crop&q=80',
-    description: 'High Capacity Battery for Canon EOS R Series',
+    price: 14000,
+    image: 'https://tse3.mm.bing.net/th?id=OIP.1ayEyP_B-fIbGVdA3Zo5jQHaHa&w=474&h=474&c=7' ,
+    description: 'High Capacity Battery for Canon  Series',
     specs: ['2130mAh Capacity', 'Up to 2030 Shots', 'USB-C Charging Compatible', 'Latest Generation']
   },
   {
     id: 14,
     name: 'Sony NP-FZ100 Battery',
     price: 12990,
-    image: 'https://images.unsplash.com/photo-1605648916361-9bc12ad6a569?auto=format&fit=crop&q=80',
+    image: 'https://tse4.mm.bing.net/th?id=OIP.E_Ol9O54N7evC_y-TrEO2gHaHa&w=474&h=474&c=7',
     description: 'Professional Battery for Sony Alpha Cameras',
     specs: ['2280mAh Capacity', 'Up to 710 Shots', 'Info-Lithium Technology', 'Fast Charging Support']
   },
@@ -22,7 +22,7 @@ const batteries = [
     id: 15,
     name: 'Nikon EN-EL15c Battery',
     price: 11990,
-    image: 'https://images.unsplash.com/photo-1605648916350-2a421c26eb0a?auto=format&fit=crop&q=80',
+    image: 'https://www.bhphotovideo.com/images/images2500x2500/nikon_en_el15c_rechargeable_lithium_ion_1578220.jpg',
     description: 'Advanced Battery for Nikon Z Series',
     specs: ['2280mAh Capacity', 'USB Charging', 'Enhanced Performance', 'Long Battery Life']
   },
@@ -30,7 +30,7 @@ const batteries = [
     id: 16,
     name: 'Fujifilm NP-W235 Battery',
     price: 9990,
-    image: 'https://images.unsplash.com/photo-1605648916355-9da045d9e447?auto=format&fit=crop&q=80',
+    image: 'https://www.bhphotovideo.com/images/images2500x2500/fujifilm_16651409_np_w235_li_ion_battery_pack_1548399.jpg',
     description: 'High-Performance Battery for Fujifilm Cameras',
     specs: ['2200mAh Capacity', 'Up to 500 Shots', 'Quick Charging', 'Battery Level Indicator']
   }
