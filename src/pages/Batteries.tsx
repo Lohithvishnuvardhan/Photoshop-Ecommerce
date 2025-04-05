@@ -1,5 +1,5 @@
 import { useCart } from '../context/Cartcontext';
-import toast from 'react-hot-toast';
+
 
 const batteries = [
   {
