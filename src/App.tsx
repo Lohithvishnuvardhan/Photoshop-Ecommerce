@@ -10,6 +10,7 @@ import Batteries from './pages/Batteries';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import { CartProvider } from './context/Cartcontext';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
@@ -29,10 +30,11 @@ function App() {
               <Route path="signup" element={<SignUp />} />
             </Route>
           </Routes>
+          <Toaster />
         </div>
       </Router>
     </CartProvider>
   );
 }
 
-export default App
+export default App;

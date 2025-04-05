@@ -41,14 +41,14 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateQuantity = (id: number, quantity: number) => {
+    if (quantity === 0) {
+      removeFromCart(id);
+      return;
+    }
     setCartItems(items =>
       items.map(item =>
-        item.id === id
-          ? quantity === 0
-            ? null
-            : { ...item, quantity }
-          : item
-      ).filter((item): item is CartItem => item !== null)
+        item.id === id ? { ...item, quantity } : item
+      )
     );
   };
 

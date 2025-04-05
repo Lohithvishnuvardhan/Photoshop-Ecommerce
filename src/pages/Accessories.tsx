@@ -1,4 +1,5 @@
 import { useCart } from '../context/Cartcontext';
+import toast from 'react-hot-toast';
 
 const accessories = [
   {
@@ -21,7 +22,7 @@ const accessories = [
     id: 11,
     name: 'Godox V1 Flash',
     price: 32990,
-    image: 'https://images.unsplash.com/photo-1531706411987-fe42757576f5?auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1623282033815-40b05d96c903?auto=format&fit=crop&q=80',
     description: 'Professional Round Head Flash',
     specs: ['Round Head Design', '2.4GHz Wireless System', '1/8000s High-Speed Sync', 'Magnetic Modifier Mount']
   },
@@ -45,6 +46,14 @@ const formatPrice = (price: number) => {
 
 const Accessories = () => {
   const { addToCart } = useCart();
+
+  const handleAddToCart = (accessory: any) => {
+    addToCart(accessory);
+    toast.success(`${accessory.name} added to cart!`, {
+      position: 'bottom-right',
+      duration: 2000,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 py-12">
@@ -75,7 +84,7 @@ const Accessories = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-gray-900">{formatPrice(accessory.price)}</span>
                   <button 
-                    onClick={() => addToCart(accessory)}
+                    onClick={() => handleAddToCart(accessory)}
                     className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   >
                     Add to Cart

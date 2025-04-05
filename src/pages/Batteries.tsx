@@ -1,4 +1,5 @@
 import { useCart } from '../context/Cartcontext';
+import toast from 'react-hot-toast';
 
 const batteries = [
   {
@@ -13,7 +14,7 @@ const batteries = [
     id: 14,
     name: 'Sony NP-FZ100 Battery',
     price: 12990,
-    image: 'https://images.unsplash.com/photo-1619948543277-c8e4c0f4e5e1?auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1605648916361-9bc12ad6a569?auto=format&fit=crop&q=80',
     description: 'Professional Battery for Sony Alpha Cameras',
     specs: ['2280mAh Capacity', 'Up to 710 Shots', 'Info-Lithium Technology', 'Fast Charging Support']
   },
@@ -21,7 +22,7 @@ const batteries = [
     id: 15,
     name: 'Nikon EN-EL15c Battery',
     price: 11990,
-    image: 'https://images.unsplash.com/photo-1619948543299-6d7b8b8c2d6a?auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1605648916350-2a421c26eb0a?auto=format&fit=crop&q=80',
     description: 'Advanced Battery for Nikon Z Series',
     specs: ['2280mAh Capacity', 'USB Charging', 'Enhanced Performance', 'Long Battery Life']
   },
@@ -29,7 +30,7 @@ const batteries = [
     id: 16,
     name: 'Fujifilm NP-W235 Battery',
     price: 9990,
-    image: 'https://images.unsplash.com/photo-1619948543311-7d21c2f5e2c2?auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1605648916355-9da045d9e447?auto=format&fit=crop&q=80',
     description: 'High-Performance Battery for Fujifilm Cameras',
     specs: ['2200mAh Capacity', 'Up to 500 Shots', 'Quick Charging', 'Battery Level Indicator']
   }
@@ -45,6 +46,14 @@ const formatPrice = (price: number) => {
 
 const Batteries = () => {
   const { addToCart } = useCart();
+
+  const handleAddToCart = (battery: any) => {
+    addToCart(battery);
+    toast.success(`${battery.name} added to cart!`, {
+      position: 'bottom-right',
+      duration: 2000,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 py-12">
@@ -75,7 +84,7 @@ const Batteries = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-gray-900">{formatPrice(battery.price)}</span>
                   <button 
-                    onClick={() => addToCart(battery)}
+                    onClick={() => handleAddToCart(battery)}
                     className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   >
                     Add to Cart

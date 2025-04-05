@@ -1,4 +1,5 @@
 import { useCart } from '../context/Cartcontext';
+import toast from 'react-hot-toast';
 
 const lenses = [
   {
@@ -29,7 +30,7 @@ const lenses = [
     id: 8,
     name: 'Sigma 85mm f/1.4 DG DN Art',
     price: 94990,
-    image: 'https://images.unsplash.com/photo-1493799228716-eee21e33b735?auto=format&fit=crop&q=80',
+    image: 'https://images.unsplash.com/photo-1617005082133-537b57e75c7f?auto=format&fit=crop&q=80',
     description: 'Portrait Prime Lens',
     specs: ['11 Rounded Aperture Blades', 'Hypersonic AF Motor', 'Dust & Splash Proof', 'Click/De-Click Aperture Ring']
   },
@@ -45,6 +46,14 @@ const formatPrice = (price: number) => {
 
 const Lenses = () => {
   const { addToCart } = useCart();
+
+  const handleAddToCart = (lens: any) => {
+    addToCart(lens);
+    toast.success(`${lens.name} added to cart!`, {
+      position: 'bottom-right',
+      duration: 2000,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-100 py-12">
@@ -75,7 +84,7 @@ const Lenses = () => {
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-gray-900">{formatPrice(lens.price)}</span>
                   <button 
-                    onClick={() => addToCart(lens)}
+                    onClick={() => handleAddToCart(lens)}
                     className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   >
                     Add to Cart
