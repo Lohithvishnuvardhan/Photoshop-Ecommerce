@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CreditCard, User, MapPin } from 'lucide-react';
+import { CreditCard, User, MapPin, Plus, Minus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface PaymentProps {
@@ -15,6 +15,7 @@ export function Payment() {
   const location = useLocation();
   const navigate = useNavigate();
   const product = location.state?.product as PaymentProps['product'];
+  const [quantity, setQuantity] = useState(1);
 
   const [formData, setFormData] = useState({
     cardNumber: '',
@@ -39,6 +40,13 @@ export function Payment() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleQuantityChange = (change: number) => {
+    const newQuantity = quantity + change;
+    if (newQuantity >= 1) {
+      setQuantity(newQuantity);
+    }
+  };
+
   if (!product) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -55,6 +63,8 @@ export function Payment() {
     );
   }
 
+  const total = product.price * quantity;
+
   return (
     <div className="min-h-screen bg-gray-100 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -68,9 +78,27 @@ export function Payment() {
                 alt={product.name}
                 className="w-24 h-24 object-cover rounded-md"
               />
-              <div>
+              <div className="flex-1">
                 <h3 className="font-semibold">{product.name}</h3>
                 <p className="text-gray-600">Price: ₹{product.price.toLocaleString()}</p>
+                <div className="flex items-center mt-4 space-x-4">
+                  <button
+                    onClick={() => handleQuantityChange(-1)}
+                    className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <span className="text-lg font-semibold">{quantity}</span>
+                  <button
+                    onClick={() => handleQuantityChange(1)}
+                    className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+                <p className="mt-4 text-lg font-bold text-purple-600">
+                  Total: ₹{total.toLocaleString()}
+                </p>
               </div>
             </div>
           </div>
@@ -199,7 +227,7 @@ export function Payment() {
                 type="submit"
                 className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
-                Pay ₹{product.price.toLocaleString()}
+                Pay ₹{total.toLocaleString()}
               </button>
             </form>
           </div>

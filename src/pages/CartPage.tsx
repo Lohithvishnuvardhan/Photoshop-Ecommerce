@@ -4,7 +4,7 @@ import { Minus, Plus, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
-export function CartPage() {
+const CartPage = () => {
   const { cartItems, removeFromCart, updateQuantity } = useCart();
   const navigate = useNavigate();
 
@@ -114,3 +114,5 @@ export function CartPage() {
     </div>
   );
 }
+
+export default CartPage;

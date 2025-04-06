@@ -4,7 +4,7 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { SignUp } from './pages/SignUp';
 import { Payment } from './pages/Payment';
-import { CartPage } from './pages/CartPage';
+import CartPage from './pages/CartPage';
 import Cameras from './pages/Camera';
 import Lenses from './pages/Lenses';
 import Accessories from './pages/Accessories';
