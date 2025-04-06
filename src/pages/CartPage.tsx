@@ -16,8 +16,8 @@ const CartPage = () => {
     }
   };
 
-  const handleCheckout = (item: any) => {
-    navigate('/payment', { state: { product: item } });
+  const handleCheckout = (items: any) => {
+    navigate('/payment', { state: { items } });
   };
 
   const handleRemove = (item: any) => {
@@ -81,7 +81,7 @@ const CartPage = () => {
 
                 <div className="ml-6 flex items-center space-x-4">
                   <button
-                    onClick={() => handleCheckout(item)}
+                    onClick={() => handleCheckout([item])}
                     className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-2 rounded-lg hover:from-purple-700 hover:to-blue-600"
                   >
                     Buy Now
@@ -103,7 +103,7 @@ const CartPage = () => {
               <span className="text-2xl font-bold text-gray-900">₹{total.toLocaleString()}</span>
             </div>
             <button
-              onClick={() => handleCheckout(cartItems[0])}
+              onClick={() => handleCheckout(cartItems)}
               className="mt-4 w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300"
             >
               Checkout All Items

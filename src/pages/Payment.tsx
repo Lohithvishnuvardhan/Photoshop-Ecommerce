@@ -3,19 +3,31 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { CreditCard, User, MapPin, Plus, Minus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+  description: string;
+}
+
 interface PaymentProps {
-  product?: {
-    name: string;
-    price: number;
-    image: string;
-  };
+  items?: CartItem[];
+  product?: CartItem;
 }
 
 export function Payment() {
   const location = useLocation();
   const navigate = useNavigate();
-  const product = location.state?.product as PaymentProps['product'];
-  const [quantity, setQuantity] = useState(1);
+  const { items, product } = location.state as PaymentProps;
+  const [quantities, setQuantities] = useState<Record<number, number>>(
+    items 
+      ? items.reduce((acc, item) => ({ ...acc, [item.id]: item.quantity }), {})
+      : product 
+        ? { [product.id]: 1 }
+        : {}
+  );
 
   const [formData, setFormData] = useState({
     cardNumber: '',
@@ -40,18 +52,21 @@ export function Payment() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleQuantityChange = (change: number) => {
-    const newQuantity = quantity + change;
-    if (newQuantity >= 1) {
-      setQuantity(newQuantity);
-    }
+  const handleQuantityChange = (itemId: number, change: number) => {
+    setQuantities(prev => {
+      const newQuantity = (prev[itemId] || 1) + change;
+      if (newQuantity >= 1) {
+        return { ...prev, [itemId]: newQuantity };
+      }
+      return prev;
+    });
   };
 
-  if (!product) {
+  if (!items && !product) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900">No product selected</h2>
+          <h2 className="text-2xl font-bold text-gray-900">No items selected</h2>
           <button
             onClick={() => navigate('/')}
             className="mt-4 bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700"
@@ -63,42 +78,56 @@ export function Payment() {
     );
   }
 
-  const total = product.price * quantity;
+  const displayItems = items ?? (product ? [product] : []);
+  const total = displayItems.reduce((sum, item) => 
+    sum + item.price * (quantities[item.id] || 1), 
+    0
+  );
 
   return (
     <div className="min-h-screen bg-gray-100 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Product Summary */}
+          {/* Order Summary */}
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
-            <div className="flex items-center space-x-4">
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-24 h-24 object-cover rounded-md"
-              />
-              <div className="flex-1">
-                <h3 className="font-semibold">{product.name}</h3>
-                <p className="text-gray-600">Price: ₹{product.price.toLocaleString()}</p>
-                <div className="flex items-center mt-4 space-x-4">
-                  <button
-                    onClick={() => handleQuantityChange(-1)}
-                    className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
-                  >
-                    <Minus className="h-4 w-4" />
-                  </button>
-                  <span className="text-lg font-semibold">{quantity}</span>
-                  <button
-                    onClick={() => handleQuantityChange(1)}
-                    className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
+            <div className="space-y-4">
+              {displayItems.map((item) => (
+                <div key={item.id} className="flex items-center space-x-4 pb-4 border-b border-gray-200">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-24 h-24 object-cover rounded-md"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold">{item.name}</h3>
+                    <p className="text-gray-600">Price: ₹{item.price.toLocaleString()}</p>
+                    <div className="flex items-center mt-4 space-x-4">
+                      <button
+                        onClick={() => handleQuantityChange(item.id, -1)}
+                        className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
+                      >
+                        <Minus className="h-4 w-4" />
+                      </button>
+                      <span className="text-lg font-semibold">{quantities[item.id] || 1}</span>
+                      <button
+                        onClick={() => handleQuantityChange(item.id, 1)}
+                        className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </button>
+                    </div>
+                    <p className="mt-2 text-purple-600 font-semibold">
+                      Subtotal: ₹{((quantities[item.id] || 1) * item.price).toLocaleString()}
+                    </p>
+                  </div>
                 </div>
-                <p className="mt-4 text-lg font-bold text-purple-600">
-                  Total: ₹{total.toLocaleString()}
-                </p>
+              ))}
+              <div className="pt-4 border-t border-gray-200">
+                <div className="flex justify-between items-center">
+                  <span className="text-xl font-bold">Total:</span>
+                  <span className="text-2xl font-bold text-purple-600">₹{total.toLocaleString()}</span>
+                </div>
               </div>
             </div>
           </div>
