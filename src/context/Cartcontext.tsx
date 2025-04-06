@@ -5,6 +5,7 @@ interface CartItem {
   name: string;
   price: number;
   image: string;
+  description: string;
   quantity: number;
 }
 
@@ -33,7 +34,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
       return [...items, { ...item, quantity: 1 }];
     });
-    setIsCartOpen(true);
   };
 
   const removeFromCart = (id: number) => {

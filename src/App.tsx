@@ -3,6 +3,8 @@ import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { SignUp } from './pages/SignUp';
+import { Payment } from './pages/Payment';
+import { CartPage } from './pages/CartPage';
 import Cameras from './pages/Camera';
 import Lenses from './pages/Lenses';
 import Accessories from './pages/Accessories';
@@ -28,6 +30,8 @@ function App() {
               <Route path="contact" element={<Contact />} />
               <Route path="login" element={<Login />} />
               <Route path="signup" element={<SignUp />} />
+              <Route path="payment" element={<Payment />} />
+              <Route path="cart" element={<CartPage />} />
             </Route>
           </Routes>
           <Toaster />

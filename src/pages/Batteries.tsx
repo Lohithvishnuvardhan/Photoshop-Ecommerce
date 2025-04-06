@@ -1,4 +1,5 @@
 import { useCart } from '../context/Cartcontext';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const batteries = [
@@ -46,6 +47,7 @@ const formatPrice = (price: number) => {
 
 const Batteries = () => {
   const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   const handleAddToCart = (battery: any) => {
     addToCart(battery);
@@ -53,6 +55,10 @@ const Batteries = () => {
       position: 'bottom-right',
       duration: 2000,
     });
+  };
+
+  const handleBuyNow = (battery: any) => {
+    navigate('/payment', { state: { product: battery } });
   };
 
   return (
@@ -83,12 +89,20 @@ const Batteries = () => {
                 </ul>
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-gray-900">{formatPrice(battery.price)}</span>
-                  <button 
-                    onClick={() => handleAddToCart(battery)}
-                    className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                  >
-                    Add to Cart
-                  </button>
+                  <div className="space-x-4">
+                    <button 
+                      onClick={() => handleAddToCart(battery)}
+                      className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    >
+                      Add to Cart
+                    </button>
+                    <button 
+                      onClick={() => handleBuyNow(battery)}
+                      className="bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    >
+                      Buy Now
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
