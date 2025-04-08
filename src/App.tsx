@@ -11,6 +11,9 @@ import Accessories from './pages/Accessories';
 import Batteries from './pages/Batteries';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import ShippingInfo from './pages/ShippingInfo';
+import Returns from './pages/Returns';
+import FAQ from './pages/FAQ';
 import { CartProvider } from './context/Cartcontext';
 import { Toaster } from 'react-hot-toast';
 
@@ -32,6 +35,9 @@ function App() {
               <Route path="signup" element={<SignUp />} />
               <Route path="payment" element={<Payment />} />
               <Route path="cart" element={<CartPage />} />
+              <Route path="shipping" element={<ShippingInfo />} />
+              <Route path="returns" element={<Returns />} />
+              <Route path="faq" element={<FAQ />} />
             </Route>
           </Routes>
           <Toaster />
@@ -41,4 +47,4 @@ function App() {
   );
 }
 
-export default App;
+export default App
