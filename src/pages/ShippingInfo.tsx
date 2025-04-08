@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { Truck, Package, Clock } from 'lucide-react';
 
 const ShippingInfo = () => {

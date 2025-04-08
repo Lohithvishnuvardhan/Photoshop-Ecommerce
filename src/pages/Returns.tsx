@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { RefreshCw, Shield, CheckCircle } from 'lucide-react';
 
 const Returns = () => {
