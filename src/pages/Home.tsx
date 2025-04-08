@@ -1,7 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Star, Shield, Truck, Clock } from 'lucide-react';
 
 export function Home() {
+  const navigate = useNavigate();
+
   const featuredProducts = [
     {
       id: 1,
@@ -26,6 +28,10 @@ export function Home() {
     }
   ];
 
+  const handleShopNow = () => {
+    navigate('/login');
+  };
+
   return (
     <div className="bg-gray-900">
       {/* Hero Section with Video Background */}
@@ -48,13 +54,13 @@ export function Home() {
               Professional photography equipment for every level of expertise. From beginners to pros, find your perfect gear.
             </p>
             <div className="flex gap-4">
-              <Link
-                to="/cameras"
+              <button
+                onClick={handleShopNow}
                 className="inline-flex items-center bg-gradient-to-r from-purple-600 to-blue-500 text-white px-8 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 Shop Now
                 <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
+              </button>
               <Link
                 to="/about"
                 className="inline-flex items-center bg-white bg-opacity-20 text-white px-8 py-3 rounded-lg hover:bg-opacity-30 transition-all duration-300"
@@ -148,7 +154,7 @@ export function Home() {
         </div>
       </div>
 
-      {/* Newsletter Section with Enhanced Design */}
+      {/* Newsletter Section */}
       <div className="bg-gradient-to-r from-purple-900 to-blue-900 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
@@ -175,7 +181,7 @@ export function Home() {
         </div>
       </div>
 
-      {/* SEO Optimized Content */}
+      {/* SEO Content */}
       <div className="bg-gray-800 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="prose prose-lg text-gray-300 max-w-none">

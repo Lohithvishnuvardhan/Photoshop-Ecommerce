@@ -11,6 +11,7 @@ const SearchBar = () => {
     { name: 'Cameras', path: '/cameras', keywords: ['camera', 'dslr', 'mirrorless', 'canon', 'sony', 'nikon'] },
     { name: 'Lenses', path: '/lenses', keywords: ['lens', 'zoom', 'prime', 'wide', 'telephoto'] },
     { name: 'Accessories', path: '/accessories', keywords: ['tripod', 'flash', 'bag', 'strap', 'filter'] },
+    { name: 'Batteries', path: '/batteries', keywords: ['battery', 'power', 'charger'] },
   ];
 
   const handleSearch = (term: string) => {

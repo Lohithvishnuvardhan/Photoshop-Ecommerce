@@ -11,6 +11,8 @@ export function Login() {
     e.preventDefault();
     // TODO: Implement Supabase authentication
     console.log('Login:', { email, password });
+    // For now, just navigate to home
+    navigate('/');
   };
 
   return (
