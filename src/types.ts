@@ -19,4 +19,23 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  token?: string;
+}
+
+export interface OrderItem {
+  name: string;
+  quantity: number;
+  image: string;
+  price: number;
+  product: string;
+}
+
+export interface Order {
+  _id: string;
+  user: string;
+  orderItems: OrderItem[];
+  totalPrice: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
 }

@@ -5,11 +5,26 @@ dotenv.config();
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect('mongodb+srv://Lohith:Lohith@cluster0.uubp61g.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
+    const conn = await mongoose.connect(process.env.MONGODB_URI || 'mongodb+srv://Lohith:Lohith@cluster0.uubp61g.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0', {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+    
     console.log(`MongoDB Connected: ${conn.connection.host}`);
+    
+    // Add connection event listeners
+    mongoose.connection.on('connected', () => {
+      console.log('Mongoose connected to MongoDB');
+    });
+
+    mongoose.connection.on('error', (err) => {
+      console.error('Mongoose connection error:', err);
+    });
+
+    mongoose.connection.on('disconnected', () => {
+      console.log('Mongoose disconnected from MongoDB');
+    });
+
   } catch (error) {
     console.error(`Error: ${error.message}`);
     process.exit(1);

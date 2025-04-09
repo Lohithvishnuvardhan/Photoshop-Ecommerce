@@ -8,12 +8,26 @@ import orderRoutes from './routes/orderRoutes.js';
 
 dotenv.config();
 
+// Connect to MongoDB
 connectDB();
 
 const app = express();
 
-app.use(cors());
+// CORS configuration
+app.use(cors({
+  origin: 'http://localhost:5173', // Replace with your frontend URL
+  credentials: true
+}));
+
 app.use(express.json());
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'ok',
+    mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
 
 app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
