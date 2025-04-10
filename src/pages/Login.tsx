@@ -1,18 +1,28 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Camera, Lock, Mail } from 'lucide-react';
+import { useAuth } from '../hooks/useAuth';
+import toast from 'react-hot-toast';
 
 export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const { signIn } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement Supabase authentication
-    console.log('Login:', { email, password });
-    // For now, just navigate to home
-    navigate('/');
+    try {
+      const { error } = await signIn(email, password);
+      if (error) {
+        toast.error(error.message);
+      } else {
+        toast.success('Successfully logged in!');
+        navigate('/');
+      }
+    } catch (err) {
+      toast.error('Failed to login. Please try again.');
+    }
   };
 
   return (
