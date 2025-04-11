@@ -1,5 +1,13 @@
 import { create } from 'zustand';
-import { CartItem, Product } from '../types';
+import { supabase } from '../lib/supabase';
+import { Database } from '../types/supabase';
+
+type Product = Database['public']['Tables']['products']['Row'];
+
+interface CartItem {
+  product: Product;
+  quantity: number;
+}
 
 interface CartStore {
   items: CartItem[];
@@ -8,6 +16,7 @@ interface CartStore {
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   total: number;
+  checkout: () => Promise<void>;
 }
 
 export const useCartStore = create<CartStore>((set, get) => ({
@@ -45,4 +54,27 @@ export const useCartStore = create<CartStore>((set, get) => ({
       0
     );
   },
+  checkout: async () => {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError) throw userError;
+    if (!user) throw new Error('User not authenticated');
+
+    const items = get().items;
+    const total = get().total;
+
+    const order = {
+      user_id: user.id,
+      total_amount: total,
+      items: items.map(item => ({
+        product_id: item.product.id,
+        quantity: item.quantity,
+        unit_price: item.product.price
+      }))
+    };
+
+    const { error } = await supabase.rpc('create_order', order);
+    if (error) throw error;
+
+    set({ items: [] });
+  }
 }));
