@@ -1,5 +1,5 @@
 export interface Product {
-  id: string;
+  _id: string;
   name: string;
   category: string;
   price: number;
@@ -16,25 +16,24 @@ export interface CartItem {
 }
 
 export interface User {
-  id: string;
+  _id: string;
   email: string;
   name: string;
+  isAdmin: boolean;
   token?: string;
 }
 
 export interface OrderItem {
-  name: string;
-  quantity: number;
-  image: string;
-  price: number;
   product: string;
+  quantity: number;
+  price: number;
 }
 
 export interface Order {
   _id: string;
   user: string;
-  orderItems: OrderItem[];
-  totalPrice: number;
+  items: OrderItem[];
+  totalAmount: number;
   status: string;
   createdAt: string;
   updatedAt: string;

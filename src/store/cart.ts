@@ -1,8 +1,15 @@
 import { create } from 'zustand';
-import { supabase } from '../lib/supabase';
-import { Database } from '../types/supabase';
+import api from '../api';
 
-type Product = Database['public']['Tables']['products']['Row'];
+interface Product {
+  _id: string;
+  name: string;
+  price: number;
+  description: string;
+  category: string;
+  imageUrl: string;
+  stock: number;
+}
 
 interface CartItem {
   product: Product;
@@ -23,12 +30,12 @@ export const useCartStore = create<CartStore>((set, get) => ({
   items: [],
   addItem: (product) => {
     const items = get().items;
-    const existingItem = items.find(item => item.product.id === product.id);
+    const existingItem = items.find(item => item.product._id === product._id);
     
     if (existingItem) {
       set({
         items: items.map(item =>
-          item.product.id === product.id
+          item.product._id === product._id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         ),
@@ -38,12 +45,12 @@ export const useCartStore = create<CartStore>((set, get) => ({
     }
   },
   removeItem: (productId) => {
-    set({ items: get().items.filter(item => item.product.id !== productId) });
+    set({ items: get().items.filter(item => item.product._id !== productId) });
   },
   updateQuantity: (productId, quantity) => {
     set({
       items: get().items.map(item =>
-        item.product.id === productId ? { ...item, quantity } : item
+        item.product._id === productId ? { ...item, quantity } : item
       ),
     });
   },
@@ -55,26 +62,27 @@ export const useCartStore = create<CartStore>((set, get) => ({
     );
   },
   checkout: async () => {
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError) throw userError;
-    if (!user) throw new Error('User not authenticated');
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) throw new Error('Not authenticated');
 
-    const items = get().items;
-    const total = get().total;
+      const items = get().items;
+      const total = get().total;
 
-    const order = {
-      user_id: user.id,
-      total_amount: total,
-      items: items.map(item => ({
-        product_id: item.product.id,
-        quantity: item.quantity,
-        unit_price: item.product.price
-      }))
-    };
+      const order = {
+        items: items.map(item => ({
+          product: item.product._id,
+          quantity: item.quantity,
+          price: item.product.price
+        })),
+        totalAmount: total
+      };
 
-    const { error } = await supabase.rpc('create_order', order);
-    if (error) throw error;
-
-    set({ items: [] });
+      await api.post('/orders', order);
+      set({ items: [] });
+    } catch (error) {
+      console.error('Checkout error:', error);
+      throw error;
+    }
   }
 }));
