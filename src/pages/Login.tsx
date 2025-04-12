@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Camera, Lock, Mail } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
+import * as useAuth from '../hooks/useAuth';
+
 import toast from 'react-hot-toast';
 
 export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn } = useAuth.useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
