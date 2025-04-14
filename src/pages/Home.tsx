@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Star, Shield, Truck, Clock } from 'lucide-react';
 
+ import.meta.env.VITE_API_URL;
 export function Home() {
   const navigate = useNavigate();
 

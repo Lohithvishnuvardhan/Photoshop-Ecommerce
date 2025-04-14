@@ -1,7 +1,9 @@
 // backend/routes/auth.js
 router.post("/signup", async (req, res) => {
   const { email, username, password } = req.body;
-
+  const express = require("express");
+  const router = express.Router();
+  
   const hashedPassword = await bcrypt.hash(password, 10);
   const newUser = new User({ email, username, password: hashedPassword });
 
