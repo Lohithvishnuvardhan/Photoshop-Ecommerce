@@ -14,6 +14,7 @@ import Contact from './pages/Contact';
 import ShippingInfo from './pages/ShippingInfo';
 import Returns from './pages/Returns';
 import FAQ from './pages/FAQ';
+import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute';
 import { CartProvider } from './context/Cartcontext';
 import { Toaster } from 'react-hot-toast';
@@ -54,6 +55,11 @@ function App() {
               <Route path="contact" element={
                 <PrivateRoute>
                   <Contact />
+                </PrivateRoute>
+              } />
+              <Route path="profile" element={
+                <PrivateRoute>
+                  <Profile />
                 </PrivateRoute>
               } />
               <Route path="login" element={<Login />} />
