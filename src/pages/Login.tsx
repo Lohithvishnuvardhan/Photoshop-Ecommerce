@@ -17,7 +17,18 @@ export function Login() {
     try {
       const response = await authAPI.login(email, password);
       if (response.token) {
-        toast.success('Successfully logged in!');
+        // Show a custom success message with styling
+        toast.success('Welcome back! Successfully logged in', {
+          duration: 3000,
+          position: 'top-center',
+          style: {
+            background: '#4C1D95',
+            color: '#ffffff',
+            padding: '16px',
+            borderRadius: '8px',
+          },
+          icon: '👋',
+        });
         navigate('/');
       }
     } catch (error: any) {
