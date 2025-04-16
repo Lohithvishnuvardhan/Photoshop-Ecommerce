@@ -1,7 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Star, Shield, Truck, Clock } from 'lucide-react';
+import { ArrowRight, Star, Shield, Truck, Clock, Camera, Award, Users, DollarSign, Heart } from 'lucide-react';
 
- import.meta.env.VITE_API_URL;
 export function Home() {
   const navigate = useNavigate();
 
@@ -11,22 +10,56 @@ export function Home() {
       name: "Canon EOS R5",
       price: 324900,
       image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80",
-      rating: 4.9
+      rating: 4.9,
+      reviews: 128
     },
     {
       id: 2,
       name: "Sony A7 IV",
       price: 209990,
       image: "https://images.unsplash.com/photo-1621520291095-aa6c7137f048?auto=format&fit=crop&q=80",
-      rating: 4.8
+      rating: 4.8,
+      reviews: 95
     },
     {
       id: 3,
       name: "Nikon Z6 II",
       price: 164990,
       image: "https://images.unsplash.com/photo-1616423640778-28d1b53229bd?auto=format&fit=crop&q=80",
-      rating: 4.7
+      rating: 4.7,
+      reviews: 82
     }
+  ];
+
+  const testimonials = [
+    {
+      name: "Sarah Johnson",
+      role: "Professional Photographer",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80",
+      content: "PhotoPro has been my go-to store for all my photography needs. Their selection and service are unmatched.",
+      rating: 5
+    },
+    {
+      name: "Michael Chen",
+      role: "Wedding Photographer",
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80",
+      content: "The quality of equipment and customer support here is exceptional. Highly recommended!",
+      rating: 5
+    },
+    {
+      name: "Emily Rodriguez",
+      role: "Travel Photographer",
+      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&q=80",
+      content: "Fast shipping, great prices, and amazing selection. PhotoPro is the best in the business.",
+      rating: 5
+    }
+  ];
+
+  const stats = [
+    { icon: Users, label: "Happy Customers", value: "10,000+" },
+    { icon: Camera, label: "Products Available", value: "5,000+" },
+    { icon: Award, label: "Years of Excellence", value: "15+" },
+    { icon: Heart, label: "5-Star Reviews", value: "25,000+" }
   ];
 
   const handleShopNow = () => {
@@ -73,8 +106,23 @@ export function Home() {
         </div>
       </div>
 
+      {/* Statistics Section */}
+      <div className="bg-gray-800 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <div key={index} className="text-center">
+                <stat.icon className="h-8 w-8 text-purple-500 mx-auto mb-4" />
+                <div className="text-3xl font-bold text-white mb-2">{stat.value}</div>
+                <div className="text-gray-400">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Trust Signals */}
-      <div className="bg-gray-800 py-12">
+      <div className="bg-gray-900 py-12 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="flex items-center justify-center">
@@ -99,10 +147,10 @@ export function Home() {
               </div>
             </div>
             <div className="flex items-center justify-center">
-              <Star className="h-8 w-8 text-purple-500 mr-3" />
+              <DollarSign className="h-8 w-8 text-purple-500 mr-3" />
               <div>
-                <h3 className="text-white font-semibold">Premium Quality</h3>
-                <p className="text-gray-400 text-sm">Authorized Retailer</p>
+                <h3 className="text-white font-semibold">Price Match</h3>
+                <p className="text-gray-400 text-sm">Best price guaranteed</p>
               </div>
             </div>
           </div>
@@ -116,11 +164,16 @@ export function Home() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredProducts.map((product) => (
               <div key={product.id} className="bg-gray-800 rounded-lg overflow-hidden transform transition duration-300 hover:scale-105">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="w-full h-64 object-cover"
-                />
+                <div className="relative">
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-64 object-cover"
+                  />
+                  <div className="absolute top-4 right-4 bg-purple-500 text-white px-2 py-1 rounded-full text-sm">
+                    Best Seller
+                  </div>
+                </div>
                 <div className="p-6">
                   <h3 className="text-xl font-semibold text-white mb-2">{product.name}</h3>
                   <div className="flex items-center mb-4">
@@ -135,7 +188,7 @@ export function Home() {
                         fill={i < Math.floor(product.rating) ? 'currentColor' : 'none'}
                       />
                     ))}
-                    <span className="ml-2 text-gray-400">{product.rating}</span>
+                    <span className="ml-2 text-gray-400">({product.reviews} reviews)</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold text-white">
@@ -148,6 +201,36 @@ export function Home() {
                       View Details
                     </Link>
                   </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Testimonials Section */}
+      <div className="bg-gray-800 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-white mb-12 text-center">What Our Customers Say</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className="bg-gray-900 p-6 rounded-lg">
+                <div className="flex items-center mb-4">
+                  <img
+                    src={testimonial.image}
+                    alt={testimonial.name}
+                    className="h-12 w-12 rounded-full object-cover mr-4"
+                  />
+                  <div>
+                    <h3 className="text-white font-semibold">{testimonial.name}</h3>
+                    <p className="text-gray-400 text-sm">{testimonial.role}</p>
+                  </div>
+                </div>
+                <p className="text-gray-300 mb-4">{testimonial.content}</p>
+                <div className="flex">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} className="h-5 w-5 text-yellow-400" fill="currentColor" />
+                  ))}
                 </div>
               </div>
             ))}
@@ -183,7 +266,7 @@ export function Home() {
       </div>
 
       {/* SEO Content */}
-      <div className="bg-gray-800 py-16">
+      <div className="bg-gray-900 py-16 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="prose prose-lg text-gray-300 max-w-none">
             <h2 className="text-3xl font-bold text-white mb-6">Professional Photography Equipment</h2>

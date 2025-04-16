@@ -8,33 +8,81 @@ const accessories = [
     name: 'Peak Design Camera Strap',
     price: 5990,
     image: 'https://images.unsplash.com/photo-1520549233664-03f65c1d1327?auto=format&fit=crop&q=80',
-    description: 'Professional Camera Strap',
-    specs: ['Quick-Release System', 'Adjustable Length', 'Padded Design', 'Aircraft-Grade Aluminum Hardware']
+    description: 'Professional Camera Strap with Quick-Release System',
+    specs: [
+      'Quick-Release System for Easy Attachment',
+      'Adjustable Length from 38" to 57"',
+      'Dual Adjustment Points',
+      'Aircraft-Grade Aluminum Hardware',
+      'Weatherproof Construction',
+      'Lifetime Warranty'
+    ],
+    features: [
+      'Compatible with All Camera Types',
+      'Comfort-Padded Design',
+      'Anti-Slip Technology'
+    ]
   },
   {
     id: 10,
     name: 'Manfrotto MT055XPRO4 Tripod',
     price: 24990,
     image: 'https://images.unsplash.com/photo-1542567455-cd733f23fbb1?auto=format&fit=crop&q=80',
-    description: 'Professional Carbon Fiber Tripod',
-    specs: ['Carbon Fiber Construction', '9kg Load Capacity', '170cm Maximum Height', 'Quick Power Lock System']
+    description: 'Professional Carbon Fiber Tripod with Advanced Features',
+    specs: [
+      'Carbon Fiber Construction',
+      'Maximum Height: 170cm',
+      'Minimum Height: 9cm',
+      'Load Capacity: 9kg',
+      'Weight: 2.1kg',
+      'Quick Power Lock System'
+    ],
+    features: [
+      '90° Column System',
+      'Easy Link Connection',
+      'Bubble Level Included'
+    ]
   },
   {
     id: 11,
     name: 'Godox V1 Flash',
     price: 32990,
     image: 'https://images.unsplash.com/photo-1623282033815-40b05d96c903?auto=format&fit=crop&q=80',
-    description: 'Professional Round Head Flash',
-    specs: ['Round Head Design', '2.4GHz Wireless System', '1/8000s High-Speed Sync', 'Magnetic Modifier Mount']
+    description: 'Professional Round Head Flash with Advanced Features',
+    specs: [
+      'Round Head Design',
+      '2.4GHz Wireless System',
+      '1/8000s High-Speed Sync',
+      'Magnetic Modifier Mount',
+      'Li-ion Battery: 480 Full Power Flashes',
+      'Recycle Time: 1.5s at Full Power'
+    ],
+    features: [
+      'TTL Auto Flash',
+      'Built-in 2.4GHz X System',
+      'AD200 Battery Compatible'
+    ]
   },
   {
     id: 12,
     name: 'Peak Design Everyday Backpack',
     price: 21990,
     image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80',
-    description: 'Professional Camera Backpack',
-    specs: ['30L Capacity', 'Weather-Resistant', 'FlexFold Dividers', 'Laptop Compartment']
-  },
+    description: 'Professional Camera Backpack with Innovative Design',
+    specs: [
+      '30L Capacity',
+      'Weatherproof 400D Nylon Canvas',
+      'Padded Laptop Sleeve (15")',
+      'Tablet Sleeve (12.9")',
+      'Weight: 1.8kg',
+      'External Carry Straps'
+    ],
+    features: [
+      'MagLatch Top Access',
+      'Dual Side Access',
+      'FlexFold Dividers'
+    ]
+  }
 ];
 
 const formatPrice = (price: number) => {
@@ -79,14 +127,31 @@ const Accessories = () => {
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">{accessory.name}</h3>
                 <p className="text-gray-600 mb-4">{accessory.description}</p>
-                <ul className="mb-6 space-y-2">
-                  {accessory.specs.map((spec, index) => (
-                    <li key={index} className="flex items-center text-gray-600">
-                      <span className="mr-2">•</span>
-                      {spec}
-                    </li>
-                  ))}
-                </ul>
+                
+                <div className="mb-4">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Specifications:</h4>
+                  <ul className="space-y-2">
+                    {accessory.specs.map((spec, index) => (
+                      <li key={index} className="flex items-center text-gray-600">
+                        <span className="mr-2">•</span>
+                        {spec}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Key Features:</h4>
+                  <ul className="space-y-2">
+                    {accessory.features.map((feature, index) => (
+                      <li key={index} className="flex items-center text-gray-600">
+                        <span className="mr-2">✓</span>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-gray-900">{formatPrice(accessory.price)}</span>
                   <div className="space-x-4">

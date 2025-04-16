@@ -7,33 +7,81 @@ const batteries = [
     id: 13,
     name: 'Canon LP-E6NH Battery',
     price: 14000,
-    image: 'https://tse3.mm.bing.net/th?id=OIP.1ayEyP_B-fIbGVdA3Zo5jQHaHa&w=474&h=474&c=7' ,
-    description: 'High Capacity Battery for Canon  Series',
-    specs: ['2130mAh Capacity', 'Up to 2030 Shots', 'USB-C Charging Compatible', 'Latest Generation']
+    image: 'https://images.unsplash.com/photo-1621520291095-aa6c7137f048?auto=format&fit=crop&q=80',
+    description: 'High Capacity Battery for Canon EOS R Series',
+    specs: [
+      '2130mAh Capacity',
+      'Up to 2030 Shots per Charge',
+      'USB-C Charging Compatible',
+      'Latest Generation Technology',
+      'Info Communication Function',
+      'Fast Charging Support'
+    ],
+    features: [
+      'Enhanced Heat Resistance',
+      'Improved Performance in Cold',
+      'Real-time Battery Info Display'
+    ]
   },
   {
     id: 14,
     name: 'Sony NP-FZ100 Battery',
     price: 12990,
-    image: 'https://tse4.mm.bing.net/th?id=OIP.E_Ol9O54N7evC_y-TrEO2gHaHa&w=474&h=474&c=7',
+    image: 'https://images.unsplash.com/photo-1563126343-24405c61532d?auto=format&fit=crop&q=80',
     description: 'Professional Battery for Sony Alpha Cameras',
-    specs: ['2280mAh Capacity', 'Up to 710 Shots', 'Info-Lithium Technology', 'Fast Charging Support']
+    specs: [
+      '2280mAh Capacity',
+      'Up to 710 Shots per Charge',
+      'Info-Lithium Technology',
+      'Fast Charging Support',
+      'Operating Temperature: -20°C to +60°C',
+      'Weight: 83g'
+    ],
+    features: [
+      'Accurate Power Indication',
+      'Over-charge Protection',
+      'Memory Effect Free'
+    ]
   },
   {
     id: 15,
     name: 'Nikon EN-EL15c Battery',
     price: 11990,
-    image: 'https://www.bhphotovideo.com/images/images2500x2500/nikon_en_el15c_rechargeable_lithium_ion_1578220.jpg',
+    image: 'https://images.unsplash.com/photo-1621520291095-aa6c7137f048?auto=format&fit=crop&q=80',
     description: 'Advanced Battery for Nikon Z Series',
-    specs: ['2280mAh Capacity', 'USB Charging', 'Enhanced Performance', 'Long Battery Life']
+    specs: [
+      '2280mAh Capacity',
+      'USB Charging Compatible',
+      'Enhanced Performance',
+      'Long Battery Life',
+      'Operating Temperature: -10°C to +40°C',
+      'Weight: 78g'
+    ],
+    features: [
+      'Smart Battery Management',
+      'Overcharge Protection',
+      'Temperature Monitoring'
+    ]
   },
   {
     id: 16,
     name: 'Fujifilm NP-W235 Battery',
     price: 9990,
-    image: 'https://www.bhphotovideo.com/images/images2500x2500/fujifilm_16651409_np_w235_li_ion_battery_pack_1548399.jpg',
+    image: 'https://images.unsplash.com/photo-1563126343-24405c61532d?auto=format&fit=crop&q=80',
     description: 'High-Performance Battery for Fujifilm Cameras',
-    specs: ['2200mAh Capacity', 'Up to 500 Shots', 'Quick Charging', 'Battery Level Indicator']
+    specs: [
+      '2200mAh Capacity',
+      'Up to 500 Shots per Charge',
+      'Quick Charging Support',
+      'Battery Level Indicator',
+      'Operating Temperature: -10°C to +40°C',
+      'Weight: 68g'
+    ],
+    features: [
+      'Advanced Power Management',
+      'Protection Circuit Built-in',
+      'Extended Lifespan Design'
+    ]
   }
 ];
 
@@ -79,14 +127,31 @@ const Batteries = () => {
               <div className="p-6">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">{battery.name}</h3>
                 <p className="text-gray-600 mb-4">{battery.description}</p>
-                <ul className="mb-6 space-y-2">
-                  {battery.specs.map((spec, index) => (
-                    <li key={index} className="flex items-center text-gray-600">
-                      <span className="mr-2">•</span>
-                      {spec}
-                    </li>
-                  ))}
-                </ul>
+                
+                <div className="mb-4">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Specifications:</h4>
+                  <ul className="space-y-2">
+                    {battery.specs.map((spec, index) => (
+                      <li key={index} className="flex items-center text-gray-600">
+                        <span className="mr-2">•</span>
+                        {spec}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Key Features:</h4>
+                  <ul className="space-y-2">
+                    {battery.features.map((feature, index) => (
+                      <li key={index} className="flex items-center text-gray-600">
+                        <span className="mr-2">✓</span>
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold text-gray-900">{formatPrice(battery.price)}</span>
                   <div className="space-x-4">

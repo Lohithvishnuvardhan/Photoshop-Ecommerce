@@ -1,5 +1,6 @@
 import { useCart } from '../context/Cartcontext';
 import { useNavigate } from 'react-router-dom';
+import { Star, Shield, Truck, Clock, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const cameras = [
@@ -9,7 +10,16 @@ const cameras = [
     price: 324900,
     image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80',
     description: '45MP Full-Frame Mirrorless Camera',
-    specs: ['45MP Full-Frame CMOS Sensor', '8K RAW Video Recording', 'Dual Card Slots', 'In-Body Image Stabilization']
+    specs: ['45MP Full-Frame CMOS Sensor', '8K RAW Video Recording', 'Dual Card Slots', 'In-Body Image Stabilization'],
+    rating: 4.9,
+    reviews: 128,
+    inStock: true,
+    features: [
+      'Advanced Dual Pixel CMOS AF II',
+      'Up to 20fps Electronic Shutter',
+      'Subject Detection AF',
+      'Weather-Sealed Construction'
+    ]
   },
   {
     id: 2,
@@ -17,7 +27,16 @@ const cameras = [
     price: 209990,
     image: 'https://images.unsplash.com/photo-1621520291095-aa6c7137f048?auto=format&fit=crop&q=80',
     description: '33MP Full-Frame Mirrorless Camera',
-    specs: ['33MP Full-Frame Sensor', '4K 60p Video', '10fps Continuous Shooting', 'Advanced AF System']
+    specs: ['33MP Full-Frame Sensor', '4K 60p Video', '10fps Continuous Shooting', 'Advanced AF System'],
+    rating: 4.8,
+    reviews: 95,
+    inStock: true,
+    features: [
+      'Real-time Eye AF',
+      'Creative Look Presets',
+      'S-Cinetone Color Science',
+      'Enhanced Heat Dissipation'
+    ]
   },
   {
     id: 3,
@@ -25,7 +44,16 @@ const cameras = [
     price: 164990,
     image: 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?auto=format&fit=crop&q=80',
     description: '24.5MP Full-Frame Mirrorless Camera',
-    specs: ['24.5MP BSI Sensor', 'Dual EXPEED 6 Processors', '14fps Continuous Shooting', 'Dual Memory Card Slots']
+    specs: ['24.5MP BSI Sensor', 'Dual EXPEED 6 Processors', '14fps Continuous Shooting', 'Dual Memory Card Slots'],
+    rating: 4.7,
+    reviews: 82,
+    inStock: true,
+    features: [
+      '273-Point AF System',
+      'ProRes RAW Output',
+      'Weather-Sealed Body',
+      '5-Axis VR Stabilization'
+    ]
   },
   {
     id: 4,
@@ -33,7 +61,16 @@ const cameras = [
     price: 149990,
     image: 'https://images.unsplash.com/photo-1581591524425-c7e0978865fc?auto=format&fit=crop&q=80',
     description: '26.1MP APS-C Mirrorless Camera',
-    specs: ['26.1MP X-Trans Sensor', '6.5-Stop IBIS', '4K/60p Video', '15fps Mechanical Shutter']
+    specs: ['26.1MP X-Trans Sensor', '6.5-Stop IBIS', '4K/60p Video', '15fps Mechanical Shutter'],
+    rating: 4.8,
+    reviews: 76,
+    inStock: true,
+    features: [
+      'Film Simulation Modes',
+      'Vari-angle LCD Screen',
+      'Enhanced Battery Life',
+      'Dual UHS-II Card Slots'
+    ]
   },
 ];
 
@@ -64,31 +101,101 @@ const Cameras = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Professional Cameras</h1>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900">Professional Cameras</h1>
+            <p className="mt-2 text-gray-600">Discover our selection of high-end cameras for professionals</p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center text-green-600">
+              <Truck className="h-5 w-5 mr-2" />
+              <span>Free Shipping</span>
+            </div>
+            <div className="flex items-center text-purple-600">
+              <Shield className="h-5 w-5 mr-2" />
+              <span>Warranty Included</span>
+            </div>
+          </div>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {cameras.map((camera) => (
             <div key={camera.id} className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
-              <div className="aspect-w-16 aspect-h-9">
+              <div className="relative">
                 <img
                   src={camera.image}
                   alt={camera.name}
-                  className="w-full h-[300px] object-cover"
+                  className="w-full h-[400px] object-cover"
                 />
+                <div className="absolute top-4 right-4 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  Best Seller
+                </div>
+                {camera.inStock ? (
+                  <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    In Stock
+                  </div>
+                ) : (
+                  <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    Out of Stock
+                  </div>
+                )}
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{camera.name}</h3>
-                <p className="text-gray-600 mb-4">{camera.description}</p>
-                <ul className="mb-6 space-y-2">
-                  {camera.specs.map((spec, index) => (
-                    <li key={index} className="flex items-center text-gray-600">
-                      <span className="mr-2">•</span>
-                      {spec}
-                    </li>
-                  ))}
-                </ul>
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{camera.name}</h3>
+                    <p className="text-gray-600">{camera.description}</p>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="flex items-center mr-2">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-5 w-5 ${
+                            i < Math.floor(camera.rating)
+                              ? 'text-yellow-400'
+                              : 'text-gray-300'
+                          }`}
+                          fill={i < Math.floor(camera.rating) ? 'currentColor' : 'none'}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-gray-600">({camera.reviews})</span>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold mb-2">Key Features</h4>
+                  <ul className="grid grid-cols-2 gap-2">
+                    {camera.features.map((feature, index) => (
+                      <li key={index} className="flex items-center text-gray-600">
+                        <Camera className="h-4 w-4 text-purple-500 mr-2" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold mb-2">Specifications</h4>
+                  <ul className="grid grid-cols-2 gap-2">
+                    {camera.specs.map((spec, index) => (
+                      <li key={index} className="flex items-center text-gray-600">
+                        <span className="mr-2">•</span>
+                        {spec}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-gray-900">{formatPrice(camera.price)}</span>
+                  <div>
+                    <span className="text-3xl font-bold text-gray-900">{formatPrice(camera.price)}</span>
+                    <div className="flex items-center mt-2 text-sm text-gray-600">
+                      <Clock className="h-4 w-4 mr-1" />
+                      <span>Ships in 24 hours</span>
+                    </div>
+                  </div>
                   <div className="space-x-4">
                     <button 
                       onClick={() => handleAddToCart(camera)}

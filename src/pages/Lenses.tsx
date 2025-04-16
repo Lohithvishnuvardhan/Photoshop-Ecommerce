@@ -1,5 +1,6 @@
 import { useCart } from '../context/Cartcontext';
 import { useNavigate } from 'react-router-dom';
+import { Star, Shield, Truck, Clock, Aperture } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const lenses = [
@@ -9,7 +10,16 @@ const lenses = [
     price: 189990,
     image: 'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&q=80',
     description: 'Professional Standard Zoom Lens',
-    specs: ['Constant f/2.8 Aperture', 'Nano USM AF System', 'Weather-Sealed Design', 'Control Ring']
+    specs: ['Constant f/2.8 Aperture', 'Nano USM AF System', 'Weather-Sealed Design', 'Control Ring'],
+    rating: 4.9,
+    reviews: 156,
+    inStock: true,
+    features: [
+      'L-Series Professional Quality',
+      'Air Sphere Coating (ASC)',
+      'Customizable Control Ring',
+      'Fluorine Coating'
+    ]
   },
   {
     id: 6,
@@ -17,7 +27,16 @@ const lenses = [
     price: 209990,
     image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80',
     description: 'Professional Telephoto Zoom Lens',
-    specs: ['XA Lens Elements', 'Nano AR Coating', 'Dual SSM AF System', 'Dust and Moisture Resistant']
+    specs: ['XA Lens Elements', 'Nano AR Coating', 'Dual SSM AF System', 'Dust and Moisture Resistant'],
+    rating: 4.8,
+    reviews: 142,
+    inStock: true,
+    features: [
+      'Extreme Aspherical Elements',
+      'Focus Range Limiter',
+      'Optical SteadyShot',
+      'Nano AR Coating II'
+    ]
   },
   {
     id: 7,
@@ -25,15 +44,33 @@ const lenses = [
     price: 47990,
     image: 'https://images.unsplash.com/photo-1495512046360-dad6e8b83667?auto=format&fit=crop&q=80',
     description: 'Standard Prime Lens',
-    specs: ['Multi-Focus System', 'Nano Crystal Coat', 'Customizable Control Ring', 'Weather-Sealed']
+    specs: ['Multi-Focus System', 'Nano Crystal Coat', 'Customizable Control Ring', 'Weather-Sealed'],
+    rating: 4.7,
+    reviews: 98,
+    inStock: true,
+    features: [
+      'Stepping Motor AF System',
+      'Programmable Control Ring',
+      'Dust and Drip Resistant',
+      'ED Glass Elements'
+    ]
   },
   {
     id: 8,
     name: 'Sigma 85mm f/1.4 DG DN Art',
     price: 94990,
-    image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSifWzZ5iy0zrSqGmEOnLPrNKwLu8kfYSWEcw&s',
+    image: 'https://images.unsplash.com/photo-1617575521317-d2974f3b56d2?auto=format&fit=crop&q=80',
     description: 'Portrait Prime Lens',
-    specs: ['11 Rounded Aperture Blades', 'Hypersonic AF Motor', 'Dust & Splash Proof', 'Click/De-Click Aperture Ring']
+    specs: ['11 Rounded Aperture Blades', 'Hypersonic AF Motor', 'Dust & Splash Proof', 'Click/De-Click Aperture Ring'],
+    rating: 4.8,
+    reviews: 87,
+    inStock: true,
+    features: [
+      'Super Multi-Layer Coating',
+      'AFL Button',
+      'Manual Focus Lock',
+      'Brass Bayonet Mount'
+    ]
   },
 ];
 
@@ -64,31 +101,101 @@ const Lenses = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Professional Lenses</h1>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900">Professional Lenses</h1>
+            <p className="mt-2 text-gray-600">Premium quality lenses for exceptional image quality</p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center text-green-600">
+              <Truck className="h-5 w-5 mr-2" />
+              <span>Free Shipping</span>
+            </div>
+            <div className="flex items-center text-purple-600">
+              <Shield className="h-5 w-5 mr-2" />
+              <span>5-Year Warranty</span>
+            </div>
+          </div>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {lenses.map((lens) => (
             <div key={lens.id} className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
-              <div className="aspect-w-16 aspect-h-9">
+              <div className="relative">
                 <img
                   src={lens.image}
                   alt={lens.name}
-                  className="w-full h-[300px] object-cover"
+                  className="w-full h-[400px] object-cover"
                 />
+                <div className="absolute top-4 right-4 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  Pro Choice
+                </div>
+                {lens.inStock ? (
+                  <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    In Stock
+                  </div>
+                ) : (
+                  <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                    Out of Stock
+                  </div>
+                )}
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{lens.name}</h3>
-                <p className="text-gray-600 mb-4">{lens.description}</p>
-                <ul className="mb-6 space-y-2">
-                  {lens.specs.map((spec, index) => (
-                    <li key={index} className="flex items-center text-gray-600">
-                      <span className="mr-2">•</span>
-                      {spec}
-                    </li>
-                  ))}
-                </ul>
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{lens.name}</h3>
+                    <p className="text-gray-600">{lens.description}</p>
+                  </div>
+                  <div className="flex items-center">
+                    <div className="flex items-center mr-2">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-5 w-5 ${
+                            i < Math.floor(lens.rating)
+                              ? 'text-yellow-400'
+                              : 'text-gray-300'
+                          }`}
+                          fill={i < Math.floor(lens.rating) ? 'currentColor' : 'none'}
+                        />
+                      ))}
+                    </div>
+                    <span className="text-gray-600">({lens.reviews})</span>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold mb-2">Key Features</h4>
+                  <ul className="grid grid-cols-2 gap-2">
+                    {lens.features.map((feature, index) => (
+                      <li key={index} className="flex items-center text-gray-600">
+                        <Aperture className="h-4 w-4 text-purple-500 mr-2" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold mb-2">Specifications</h4>
+                  <ul className="grid grid-cols-2 gap-2">
+                    {lens.specs.map((spec, index) => (
+                      <li key={index} className="flex items-center text-gray-600">
+                        <span className="mr-2">•</span>
+                        {spec}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-gray-900">{formatPrice(lens.price)}</span>
+                  <div>
+                    <span className="text-3xl font-bold text-gray-900">{formatPrice(lens.price)}</span>
+                    <div className="flex items-center mt-2 text-sm text-gray-600">
+                      <Clock className="h-4 w-4 mr-1" />
+                      <span>Ships in 24 hours</span>
+                    </div>
+                  </div>
                   <div className="space-x-4">
                     <button 
                       onClick={() => handleAddToCart(lens)}
