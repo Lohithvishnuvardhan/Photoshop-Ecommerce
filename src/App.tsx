@@ -14,6 +14,7 @@ import Contact from './pages/Contact';
 import ShippingInfo from './pages/ShippingInfo';
 import Returns from './pages/Returns';
 import FAQ from './pages/FAQ';
+import PrivateRoute from './components/PrivateRoute';
 import { CartProvider } from './context/Cartcontext';
 import { Toaster } from 'react-hot-toast';
 
@@ -25,16 +26,48 @@ function App() {
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
-              <Route path="cameras" element={<Cameras />} />
-              <Route path="lenses" element={<Lenses />} />
-              <Route path="accessories" element={<Accessories />} />
-              <Route path="batteries" element={<Batteries />} />
-              <Route path="about" element={<About />} />
-              <Route path="contact" element={<Contact />} />
+              <Route path="cameras" element={
+                <PrivateRoute>
+                  <Cameras />
+                </PrivateRoute>
+              } />
+              <Route path="lenses" element={
+                <PrivateRoute>
+                  <Lenses />
+                </PrivateRoute>
+              } />
+              <Route path="accessories" element={
+                <PrivateRoute>
+                  <Accessories />
+                </PrivateRoute>
+              } />
+              <Route path="batteries" element={
+                <PrivateRoute>
+                  <Batteries />
+                </PrivateRoute>
+              } />
+              <Route path="about" element={
+                <PrivateRoute>
+                  <About />
+                </PrivateRoute>
+              } />
+              <Route path="contact" element={
+                <PrivateRoute>
+                  <Contact />
+                </PrivateRoute>
+              } />
               <Route path="login" element={<Login />} />
               <Route path="signup" element={<SignUp />} />
-              <Route path="payment" element={<Payment />} />
-              <Route path="cart" element={<CartPage />} />
+              <Route path="payment" element={
+                <PrivateRoute>
+                  <Payment />
+                </PrivateRoute>
+              } />
+              <Route path="cart" element={
+                <PrivateRoute>
+                  <CartPage />
+                </PrivateRoute>
+              } />
               <Route path="shipping" element={<ShippingInfo />} />
               <Route path="returns" element={<Returns />} />
               <Route path="faq" element={<FAQ />} />
@@ -47,4 +80,4 @@ function App() {
   );
 }
 
-export default App
+export default App;
