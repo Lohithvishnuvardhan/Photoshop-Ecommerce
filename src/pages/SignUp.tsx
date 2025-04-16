@@ -4,7 +4,7 @@ import { Camera, Mail, Lock, User } from 'lucide-react';
 import { authAPI } from '../api';
 import toast from 'react-hot-toast';
 
-const SignUp = () => {
+export function SignUp() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -14,12 +14,16 @@ const SignUp = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    
     try {
-      await authAPI.register(name, email, password);
-      toast.success('Registration successful!');
-      navigate('/');
+      const response = await authAPI.register(name, email, password);
+      if (response.token) {
+        toast.success('Registration successful!');
+        navigate('/');
+      }
     } catch (error: any) {
       toast.error(error.message || 'Registration failed. Please try again.');
+      console.error('Registration error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -127,8 +131,6 @@ const SignUp = () => {
       </div>
     </div>
   );
-};
+}
 
 export default SignUp;
-
-export { SignUp }

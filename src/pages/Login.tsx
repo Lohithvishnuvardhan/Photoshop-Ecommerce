@@ -16,11 +16,13 @@ export function Login() {
     
     try {
       const response = await authAPI.login(email, password);
-      localStorage.setItem('token', response.token);
-      toast.success('Successfully logged in!');
-      navigate('/');
+      if (response.token) {
+        toast.success('Successfully logged in!');
+        navigate('/');
+      }
     } catch (error: any) {
-      toast.error(error.message || 'Invalid credentials');
+      toast.error(error.message || 'Login failed. Please try again.');
+      console.error('Login error:', error);
     } finally {
       setIsLoading(false);
     }
