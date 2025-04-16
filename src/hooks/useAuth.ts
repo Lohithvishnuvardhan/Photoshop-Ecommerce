@@ -1,11 +1,12 @@
-// src/hooks/useAuth.ts
+import { authAPI } from '../api';
+
 export function useAuth() {
   const signIn = async (email: string, password: string) => {
-    // Simulate a login process (replace with real API later)
-    if (email === 'test@example.com' && password === 'password123') {
-      return { user: { email } };
-    } else {
-      return { error: { message: 'Invalid credentials' } };
+    try {
+      const response = await authAPI.login(email, password);
+      return { user: response };
+    } catch (error: any) {
+      return { error };
     }
   };
 
