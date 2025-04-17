@@ -1,8 +1,10 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { cartAPI } from '../api';
 import toast from 'react-hot-toast';
 
 interface CartItem {
+  description: ReactNode;
+  stock: number;
   _id: string;
   name: string;
   price: number;

@@ -1,39 +1,48 @@
-
 import { useCart } from '../context/Cartcontext';
-import { Minus, Plus, X } from 'lucide-react';
+import { Minus, Plus, X, ShoppingBag } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const CartPage = () => {
-  const { cartItems, removeFromCart, updateQuantity } = useCart();
+  const { cart, removeFromCart, updateQuantity, isLoading } = useCart();
   const navigate = useNavigate();
 
-  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  const handleQuantityChange = (item: any, newQuantity: number) => {
+  const handleQuantityChange = async (itemId: string, newQuantity: number) => {
     if (newQuantity >= 1) {
-      updateQuantity(item.id, newQuantity);
+      await updateQuantity(itemId, newQuantity);
     }
   };
 
-  const handleCheckout = (items: any) => {
-    navigate('/payment', { state: { items } });
+  const handleCheckout = () => {
+    navigate('/payment', { state: { items: cart } });
   };
 
-  const handleRemove = (item: any) => {
-    removeFromCart(item.id);
-    toast.success(`${item.name} removed from cart!`);
+  const handleRemove = async (itemId: string) => {
+    await removeFromCart(itemId);
+    toast.success('Item removed from cart');
   };
 
-  if (cartItems.length === 0) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
+
+  if (cart.length === 0) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
+        <ShoppingBag className="h-16 w-16 text-gray-400 mb-4" />
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h2>
+        <p className="text-gray-600 mb-4">Add some amazing photography gear to your cart!</p>
         <button
-          onClick={() => navigate('/')}
-          className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700"
+          onClick={() => navigate('/cameras')}
+          className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
         >
-          Continue Shopping
+          Browse Cameras
         </button>
       </div>
     );
@@ -44,75 +53,102 @@ const CartPage = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Shopping Cart</h1>
         
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="p-6">
-            {cartItems.map((item) => (
-              <div key={item.id} className="flex items-center py-6 border-b border-gray-200 last:border-0">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-24 h-24 object-cover rounded-lg"
-                />
-                
-                <div className="flex-1 ml-6">
-                  <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
-                  <p className="text-gray-600">{item.description}</p>
-                  <div className="mt-2 flex items-center space-x-4">
-                    <div className="flex items-center border rounded-lg">
-                      <button
-                        onClick={() => handleQuantityChange(item, item.quantity - 1)}
-                        className="p-2 hover:bg-gray-100"
-                      >
-                        <Minus className="h-4 w-4" />
-                      </button>
-                      <span className="px-4 py-2">{item.quantity}</span>
-                      <button
-                        onClick={() => handleQuantityChange(item, item.quantity + 1)}
-                        className="p-2 hover:bg-gray-100"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </button>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Cart Items */}
+          <div className="lg:col-span-8">
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+              <div className="p-6 space-y-6">
+                {cart.map((item) => (
+                  <div key={item._id} className="flex items-center py-6 border-b border-gray-200 last:border-0">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-24 h-24 object-cover rounded-lg"
+                    />
+                    
+                    <div className="flex-1 ml-6">
+                      <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
+                      <p className="text-gray-600 mt-1">{item.description}</p>
+                      
+                      <div className="mt-4 flex items-center space-x-4">
+                        <div className="flex items-center border rounded-lg">
+                          <button
+                            onClick={() => handleQuantityChange(item._id, item.quantity - 1)}
+                            className="p-2 hover:bg-gray-100 transition-colors"
+                          >
+                            <Minus className="h-4 w-4" />
+                          </button>
+                          <span className="px-4 py-2 font-medium">{item.quantity}</span>
+                          <button
+                            onClick={() => handleQuantityChange(item._id, item.quantity + 1)}
+                            className="p-2 hover:bg-gray-100 transition-colors"
+                          >
+                            <Plus className="h-4 w-4" />
+                          </button>
+                        </div>
+                        <span className="text-lg font-semibold text-gray-900">
+                          ₹{(item.price * item.quantity).toLocaleString()}
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-lg font-semibold">
-                      ₹{(item.price * item.quantity).toLocaleString()}
-                    </span>
-                  </div>
-                </div>
 
-                <div className="ml-6 flex items-center space-x-4">
-                  <button
-                    onClick={() => handleCheckout([item])}
-                    className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-2 rounded-lg hover:from-purple-700 hover:to-blue-600"
-                  >
-                    Buy Now
-                  </button>
-                  <button
-                    onClick={() => handleRemove(item)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <X className="h-6 w-6" />
-                  </button>
-                </div>
+                    <button
+                      onClick={() => handleRemove(item._id)}
+                      className="ml-6 text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <X className="h-6 w-6" />
+                    </button>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
 
-          <div className="bg-gray-50 p-6">
-            <div className="flex justify-between items-center">
-              <span className="text-lg font-semibold text-gray-900">Total</span>
-              <span className="text-2xl font-bold text-gray-900">₹{total.toLocaleString()}</span>
+          {/* Order Summary */}
+          <div className="lg:col-span-4">
+            <div className="bg-white rounded-lg shadow-lg p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Summary</h2>
+              
+              <div className="space-y-4">
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal</span>
+                  <span>₹{total.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Shipping</span>
+                  <span>{total > 50000 ? 'Free' : '₹999'}</span>
+                </div>
+                <div className="border-t pt-4">
+                  <div className="flex justify-between text-lg font-semibold text-gray-900">
+                    <span>Total</span>
+                    <span>₹{(total > 50000 ? total : total + 999).toLocaleString()}</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={handleCheckout}
+                className="mt-6 w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
+                Proceed to Checkout
+              </button>
+
+              <div className="mt-6 space-y-2">
+                <div className="flex items-center text-sm text-gray-600">
+                  <span className="flex-1">Estimated delivery time</span>
+                  <span>2-4 business days</span>
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                  <span className="flex-1">Free shipping</span>
+                  <span>On orders above ₹50,000</span>
+                </div>
+              </div>
             </div>
-            <button
-              onClick={() => handleCheckout(cartItems)}
-              className="mt-4 w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300"
-            >
-              Checkout All Items
-            </button>
           </div>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default CartPage;
