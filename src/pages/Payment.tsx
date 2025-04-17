@@ -4,12 +4,14 @@ import { CreditCard, User, MapPin, Plus, Minus } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface CartItem {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
+  product: {
+    _id: string;
+    name: string;
+    price: number;
+    imageUrl: string;
+    description: string;
+  };
   quantity: number;
-  description: string;
 }
 
 interface PaymentProps {
@@ -20,12 +22,12 @@ interface PaymentProps {
 export function Payment() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { items, product } = location.state as PaymentProps;
-  const [quantities, setQuantities] = useState<Record<number, number>>(
+  const { items, product } = location.state as PaymentProps || {};
+  const [quantities, setQuantities] = useState<Record<string, number>>(
     items 
-      ? items.reduce((acc, item) => ({ ...acc, [item.id]: item.quantity }), {})
+      ? items.reduce((acc, item) => ({ ...acc, [item.product._id]: item.quantity }), {})
       : product 
-        ? { [product.id]: 1 }
+        ? { [product.product._id]: 1 }
         : {}
   );
 
@@ -52,7 +54,7 @@ export function Payment() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleQuantityChange = (itemId: number, change: number) => {
+  const handleQuantityChange = (itemId: string, change: number) => {
     setQuantities(prev => {
       const newQuantity = (prev[itemId] || 1) + change;
       if (newQuantity >= 1) {
@@ -80,7 +82,7 @@ export function Payment() {
 
   const displayItems = items ?? (product ? [product] : []);
   const total = displayItems.reduce((sum, item) => 
-    sum + item.price * (quantities[item.id] || 1), 
+    sum + item.product.price * (quantities[item.product._id] || 1), 
     0
   );
 
@@ -93,32 +95,32 @@ export function Payment() {
             <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
             <div className="space-y-4">
               {displayItems.map((item) => (
-                <div key={item.id} className="flex items-center space-x-4 pb-4 border-b border-gray-200">
+                <div key={item.product._id} className="flex items-center space-x-4 pb-4 border-b border-gray-200">
                   <img
-                    src={item.image}
-                    alt={item.name}
+                    src={item.product.imageUrl}
+                    alt={item.product.name}
                     className="w-24 h-24 object-cover rounded-md"
                   />
                   <div className="flex-1">
-                    <h3 className="font-semibold">{item.name}</h3>
-                    <p className="text-gray-600">Price: ₹{item.price.toLocaleString()}</p>
+                    <h3 className="font-semibold">{item.product.name}</h3>
+                    <p className="text-gray-600">Price: ₹{item.product.price.toLocaleString()}</p>
                     <div className="flex items-center mt-4 space-x-4">
                       <button
-                        onClick={() => handleQuantityChange(item.id, -1)}
+                        onClick={() => handleQuantityChange(item.product._id, -1)}
                         className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
                       >
                         <Minus className="h-4 w-4" />
                       </button>
-                      <span className="text-lg font-semibold">{quantities[item.id] || 1}</span>
+                      <span className="text-lg font-semibold">{quantities[item.product._id] || 1}</span>
                       <button
-                        onClick={() => handleQuantityChange(item.id, 1)}
+                        onClick={() => handleQuantityChange(item.product._id, 1)}
                         className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
                       >
                         <Plus className="h-4 w-4" />
                       </button>
                     </div>
                     <p className="mt-2 text-purple-600 font-semibold">
-                      Subtotal: ₹{((quantities[item.id] || 1) * item.price).toLocaleString()}
+                      Subtotal: ₹{((quantities[item.product._id] || 1) * item.product.price).toLocaleString()}
                     </p>
                   </div>
                 </div>

@@ -3,6 +3,7 @@ import { cartAPI } from '../api';
 import toast from 'react-hot-toast';
 
 interface CartItem {
+  product: any;
   _id: string;
   name: string;
   price: number;

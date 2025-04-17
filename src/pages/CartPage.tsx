@@ -1,25 +1,23 @@
 import { useCart } from '../context/Cartcontext';
-import {
-  Minus, Plus, X, ShoppingBag, Heart,
-  Clock, Truck, Shield, ArrowRight, Package
-} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Minus, Plus, X, ShoppingBag, Heart, Clock, Truck, Shield, ArrowRight, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
+import { CartItem } from '../types';
 
 const CartPage = () => {
   const { cart, removeFromCart, updateQuantity, isLoading, addToCart } = useCart();
   const navigate = useNavigate();
-  const [savedItems, setSavedItems] = useState<any[]>([]);
+  const [savedItems, setSavedItems] = useState<CartItem[]>([]);
 
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const total = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
   const shipping = total > 50000 ? 0 : 999;
   const finalTotal = total + shipping;
 
-  const handleQuantityChange = async (itemId: string, newQuantity: number, stock: number) => {
+  const handleQuantityChange = async (productId: string, newQuantity: number, stock: number) => {
     if (newQuantity >= 1) {
       if (newQuantity <= stock) {
-        await updateQuantity(itemId, newQuantity);
+        await updateQuantity(productId, newQuantity);
       } else {
         toast.error(`Sorry, only ${stock} items available in stock`);
       }
@@ -34,8 +32,8 @@ const CartPage = () => {
     navigate('/payment', { state: { items: cart } });
   };
 
-  const handleRemove = async (itemId: string) => {
-    await removeFromCart(itemId);
+  const handleRemove = async (productId: string) => {
+    await removeFromCart(productId);
     toast.success('Item removed from cart');
   };
 
@@ -89,24 +87,24 @@ const CartPage = () => {
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="p-6 space-y-6">
                 {cart.map((item) => (
-                  <div key={item._id} className="flex items-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div key={item.product._id} className="flex items-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                     <img
-                      src={item.image}
-                      alt={item.name}
+                      src={item.product.imageUrl}
+                      alt={item.product.name}
                       className="w-32 h-32 object-cover rounded-lg shadow-md"
                     />
                     <div className="flex-1 ml-6">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="text-xl font-semibold text-gray-900">{item.name}</h3>
-                          <p className="text-gray-600 mt-1">{item.description}</p>
+                          <h3 className="text-xl font-semibold text-gray-900">{item.product.name}</h3>
+                          <p className="text-gray-600 mt-1">{item.product.description}</p>
                           <div className="flex items-center mt-2 text-sm text-gray-500">
                             <Package className="h-4 w-4 mr-1" />
-                            <span>{item.stock} units in stock</span>
+                            <span>{item.product.stock} units in stock</span>
                           </div>
                         </div>
                         <button
-                          onClick={() => handleRemove(item._id)}
+                          onClick={() => handleRemove(item.product._id)}
                           className="text-gray-400 hover:text-red-500 transition-colors p-1 hover:bg-gray-200 rounded-full"
                         >
                           <X className="h-6 w-6" />
@@ -117,27 +115,27 @@ const CartPage = () => {
                         <div className="flex items-center space-x-6">
                           <div className="flex items-center border rounded-lg bg-white shadow-sm">
                             <button
-                              onClick={() => handleQuantityChange(item._id, item.quantity - 1, item.stock)}
+                              onClick={() => handleQuantityChange(item.product._id, item.quantity - 1, item.product.stock)}
                               className="p-2 hover:bg-gray-100 transition-colors rounded-l-lg"
                             >
                               <Minus className="h-4 w-4" />
                             </button>
                             <span className="px-6 py-2 font-medium text-gray-900">{item.quantity}</span>
                             <button
-                              onClick={() => handleQuantityChange(item._id, item.quantity + 1, item.stock)}
+                              onClick={() => handleQuantityChange(item.product._id, item.quantity + 1, item.product.stock)}
                               className="p-2 hover:bg-gray-100 transition-colors rounded-r-lg"
                             >
                               <Plus className="h-4 w-4" />
                             </button>
                           </div>
                           <span className="text-2xl font-bold text-gray-900">
-                            ₹{(item.price * item.quantity).toLocaleString()}
+                            ₹{(item.product.price * item.quantity).toLocaleString()}
                           </span>
                         </div>
                         <button
                           onClick={() => {
                             setSavedItems([...savedItems, item]);
-                            handleRemove(item._id);
+                            handleRemove(item.product._id);
                           }}
                           className="text-purple-600 hover:text-purple-700 flex items-center"
                         >
@@ -158,22 +156,31 @@ const CartPage = () => {
                 <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                   <div className="p-6 space-y-6">
                     {savedItems.map((item) => (
-                      <div key={item._id} className="flex items-center p-4 bg-gray-50 rounded-lg">
+                      <div key={item.product._id} className="flex items-center p-4 bg-gray-50 rounded-lg">
                         <img
-                          src={item.image}
-                          alt={item.name}
+                          src={item.product.imageUrl}
+                          alt={item.product.name}
                           className="w-24 h-24 object-cover rounded-lg"
                         />
                         <div className="flex-1 ml-6">
-                          <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
-                          <p className="text-gray-600 mt-1">{item.description}</p>
+                          <h3 className="text-lg font-semibold text-gray-900">{item.product.name}</h3>
+                          <p className="text-gray-600 mt-1">{item.product.description}</p>
                           <div className="mt-4 flex items-center justify-between">
-                            <span className="text-xl font-semibold text-gray-900">₹{item.price.toLocaleString()}</span>
+                            <span className="text-xl font-semibold text-gray-900">₹{item.product.price.toLocaleString()}</span>
                             <button
                               onClick={() => {
-                                setSavedItems(savedItems.filter(i => i._id !== item._id));
-                                addToCart(item);
-                                toast.success(`${item.name} moved to cart`);
+                                setSavedItems(savedItems.filter(i => i.product._id !== item.product._id));
+                                addToCart({
+                                  _id: item.product._id,
+                                  productId: item.product._id,
+                                  name: item.product.name,
+                                  description: item.product.description,
+                                  imageUrl: item.product.imageUrl,
+                                  price: item.product.price,
+                                  quantity: 1,
+                                  stock: item.product.stock,
+                                });
+                                toast.success(`${item.product.name} moved to cart`);
                               }}
                               className="text-purple-600 hover:text-purple-700"
                             >
