@@ -238,33 +238,6 @@ export function Home() {
         </div>
       </div>
 
-      {/* Newsletter Section */}
-      <div className="bg-gradient-to-r from-purple-900 to-blue-900 py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">Stay Updated</h2>
-            <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
-              Subscribe to our newsletter for exclusive deals, photography tips, and early access to new products.
-            </p>
-            <form className="max-w-md mx-auto">
-              <div className="flex gap-4">
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  className="flex-1 px-4 py-3 bg-white bg-opacity-20 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-400"
-                />
-                <button
-                  type="submit"
-                  className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-8 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                >
-                  Subscribe
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
       {/* SEO Content */}
       <div className="bg-gray-900 py-16 border-t border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

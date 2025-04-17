@@ -1,5 +1,5 @@
 {
-  "name": "photo-equipment-ecommerce",
+  "name": "photo-pixel-ecommerce",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -50,14 +50,14 @@
   "main": "eslint.config.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Lohithvishnuvardhan/Photoshop-Ecommerce.git"
+    "url": "git+https://github.com/Lohithvishnuvardhan/Photo-Pixel-Ecommerce.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Lohithvishnuvardhan/Photoshop-Ecommerce/issues"
+    "url": "https://github.com/Lohithvishnuvardhan/Photo-Pixel-Ecommerce/issues"
   },
-  "homepage": "https://github.com/Lohithvishnuvardhan/Photoshop-Ecommerce#readme",
+  "homepage": "https://github.com/Lohithvishnuvardhan/Photo-Pixel-Ecommerce#readme",
   "description": ""
 }
