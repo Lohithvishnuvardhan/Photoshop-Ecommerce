@@ -1,5 +1,5 @@
 import { useCart } from '../context/Cartcontext';
-import { Minus, Plus, X, ShoppingBag, Clock, Truck, Shield, ArrowRight } from 'lucide-react';
+import { Minus, Plus, X, ShoppingBag, Heart, Clock, Truck, Shield, ArrowRight, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
@@ -7,7 +7,7 @@ import { useState } from 'react';
 const CartPage = () => {
   const { cart, removeFromCart, updateQuantity, isLoading } = useCart();
   const navigate = useNavigate();
-  const [] = useState<any[]>([]);
+  const [savedItems, setSavedItems] = useState<any[]>([]);
 
   const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = total > 50000 ? 0 : 999;
@@ -63,13 +63,26 @@ const CartPage = () => {
     );
   }
 
+  function addToCart(_item: any) {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8 flex items-center">
-          <ShoppingBag className="h-8 w-8 text-purple-600 mr-3" />
-          Shopping Cart ({cart.length} {cart.length === 1 ? 'item' : 'items'})
-        </h1>
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+            <ShoppingBag className="h-8 w-8 text-purple-600 mr-3" />
+            Shopping Cart ({cart.length} {cart.length === 1 ? 'item' : 'items'})
+          </h1>
+          <button
+            onClick={() => navigate('/cameras')}
+            className="text-purple-600 hover:text-purple-700 flex items-center"
+          >
+            Continue Shopping
+            <ArrowRight className="ml-1 h-5 w-5" />
+          </button>
+        </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Cart Items */}
@@ -77,11 +90,11 @@ const CartPage = () => {
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="p-6 space-y-6">
                 {cart.map((item) => (
-                  <div key={item._id} className="flex items-center p-4 bg-gray-50 rounded-lg">
+                  <div key={item._id} className="flex items-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                     <img
                       src={item.image}
                       alt={item.name}
-                      className="w-32 h-32 object-cover rounded-lg"
+                      className="w-32 h-32 object-cover rounded-lg shadow-md"
                     />
                     
                     <div className="flex-1 ml-6">
@@ -89,42 +102,92 @@ const CartPage = () => {
                         <div>
                           <h3 className="text-xl font-semibold text-gray-900">{item.name}</h3>
                           <p className="text-gray-600 mt-1">{item.description}</p>
+                          <div className="flex items-center mt-2 text-sm text-gray-500">
+                            <Package className="h-4 w-4 mr-1" />
+                            <span>{item.stock} units in stock</span>
+                          </div>
                         </div>
                         <button
                           onClick={() => handleRemove(item._id)}
-                          className="text-gray-400 hover:text-red-500 transition-colors"
+                          className="text-gray-400 hover:text-red-500 transition-colors p-1 hover:bg-gray-200 rounded-full"
                         >
                           <X className="h-6 w-6" />
                         </button>
                       </div>
                       
                       <div className="mt-4 flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center border rounded-lg bg-white">
+                        <div className="flex items-center space-x-6">
+                          <div className="flex items-center border rounded-lg bg-white shadow-sm">
                             <button
                               onClick={() => handleQuantityChange(item._id, item.quantity - 1, item.stock)}
-                              className="p-2 hover:bg-gray-100 transition-colors"
+                              className="p-2 hover:bg-gray-100 transition-colors rounded-l-lg"
                             >
                               <Minus className="h-4 w-4" />
                             </button>
-                            <span className="px-4 py-2 font-medium">{item.quantity}</span>
+                            <span className="px-6 py-2 font-medium text-gray-900">{item.quantity}</span>
                             <button
                               onClick={() => handleQuantityChange(item._id, item.quantity + 1, item.stock)}
-                              className="p-2 hover:bg-gray-100 transition-colors"
+                              className="p-2 hover:bg-gray-100 transition-colors rounded-r-lg"
                             >
                               <Plus className="h-4 w-4" />
                             </button>
                           </div>
-                          <span className="text-xl font-semibold text-gray-900">
+                          <span className="text-2xl font-bold text-gray-900">
                             ₹{(item.price * item.quantity).toLocaleString()}
                           </span>
                         </div>
+                        <button
+                          onClick={() => {
+                            setSavedItems([...savedItems, item]);
+                            handleRemove(item._id);
+                          }}
+                          className="text-purple-600 hover:text-purple-700 flex items-center"
+                        >
+                          <Heart className="h-5 w-5 mr-1" />
+                          Save for later
+                        </button>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
+
+            {/* Saved Items */}
+            {savedItems.length > 0 && (
+              <div className="mt-8">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Saved for Later ({savedItems.length} items)</h2>
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+                  <div className="p-6 space-y-6">
+                    {savedItems.map((item) => (
+                      <div key={item._id} className="flex items-center p-4 bg-gray-50 rounded-lg">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-24 h-24 object-cover rounded-lg"
+                        />
+                        <div className="flex-1 ml-6">
+                          <h3 className="text-lg font-semibold text-gray-900">{item.name}</h3>
+                          <p className="text-gray-600 mt-1">{item.description}</p>
+                          <div className="mt-4 flex items-center justify-between">
+                            <span className="text-xl font-semibold text-gray-900">₹{item.price.toLocaleString()}</span>
+                            <button
+                              onClick={() => {
+                                setSavedItems(savedItems.filter(i => i._id !== item._id));
+                                addToCart(item);
+                              }}
+                              className="text-purple-600 hover:text-purple-700"
+                            >
+                              Move to Cart
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Order Summary */}
@@ -134,7 +197,7 @@ const CartPage = () => {
               
               <div className="space-y-4">
                 <div className="flex justify-between text-gray-600">
-                  <span>Subtotal</span>
+                  <span>Subtotal ({cart.length} items)</span>
                   <span>₹{total.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
@@ -146,6 +209,9 @@ const CartPage = () => {
                     <span>Total</span>
                     <span>₹{finalTotal.toLocaleString()}</span>
                   </div>
+                  <p className="text-sm text-gray-500 mt-1">
+                    (Including all taxes)
+                  </p>
                 </div>
               </div>
 

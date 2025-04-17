@@ -3,13 +3,13 @@ import { cartAPI } from '../api';
 import toast from 'react-hot-toast';
 
 interface CartItem {
-  description: ReactNode;
-  stock: number;
   _id: string;
   name: string;
   price: number;
   image: string;
   quantity: number;
+  description: string;
+  stock: number;
 }
 
 interface CartContextType {
@@ -23,7 +23,7 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | null>(null);
 
-export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
