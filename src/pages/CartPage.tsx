@@ -1,11 +1,14 @@
 import { useCart } from '../context/Cartcontext';
-import { Minus, Plus, X, ShoppingBag, Heart, Clock, Truck, Shield, ArrowRight, Package } from 'lucide-react';
+import {
+  Minus, Plus, X, ShoppingBag, Heart,
+  Clock, Truck, Shield, ArrowRight, Package
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
 
 const CartPage = () => {
-  const { cart, removeFromCart, updateQuantity, isLoading } = useCart();
+  const { cart, removeFromCart, updateQuantity, isLoading, addToCart } = useCart();
   const navigate = useNavigate();
   const [savedItems, setSavedItems] = useState<any[]>([]);
 
@@ -63,10 +66,6 @@ const CartPage = () => {
     );
   }
 
-  function addToCart(_item: any) {
-    throw new Error('Function not implemented.');
-  }
-
   return (
     <div className="min-h-screen bg-gray-100 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -83,7 +82,7 @@ const CartPage = () => {
             <ArrowRight className="ml-1 h-5 w-5" />
           </button>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Cart Items */}
           <div className="lg:col-span-8">
@@ -96,7 +95,6 @@ const CartPage = () => {
                       alt={item.name}
                       className="w-32 h-32 object-cover rounded-lg shadow-md"
                     />
-                    
                     <div className="flex-1 ml-6">
                       <div className="flex justify-between items-start">
                         <div>
@@ -114,7 +112,7 @@ const CartPage = () => {
                           <X className="h-6 w-6" />
                         </button>
                       </div>
-                      
+
                       <div className="mt-4 flex items-center justify-between">
                         <div className="flex items-center space-x-6">
                           <div className="flex items-center border rounded-lg bg-white shadow-sm">
@@ -175,6 +173,7 @@ const CartPage = () => {
                               onClick={() => {
                                 setSavedItems(savedItems.filter(i => i._id !== item._id));
                                 addToCart(item);
+                                toast.success(`${item.name} moved to cart`);
                               }}
                               className="text-purple-600 hover:text-purple-700"
                             >
@@ -194,7 +193,7 @@ const CartPage = () => {
           <div className="lg:col-span-4">
             <div className="bg-white rounded-xl shadow-lg p-6 sticky top-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Order Summary</h2>
-              
+
               <div className="space-y-4">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal ({cart.length} items)</span>
