@@ -170,16 +170,7 @@ const CartPage = () => {
                             <button
                               onClick={() => {
                                 setSavedItems(savedItems.filter(i => i.product._id !== item.product._id));
-                                addToCart({
-                                  _id: item.product._id,
-                                  productId: item.product._id,
-                                  name: item.product.name,
-                                  description: item.product.description,
-                                  imageUrl: item.product.imageUrl,
-                                  price: item.product.price,
-                                  quantity: 1,
-                                  stock: item.product.stock,
-                                });
+                                addToCart(item.product);
                                 toast.success(`${item.product.name} moved to cart`);
                               }}
                               className="text-purple-600 hover:text-purple-700"
