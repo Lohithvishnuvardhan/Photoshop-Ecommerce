@@ -2,34 +2,37 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CreditCard, User, MapPin, Plus, Minus } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { CartItem } from '../types';
 
-interface CartItem {
-  product: {
+interface LocationState {
+  items?: CartItem[];
+  product?: {
     _id: string;
     name: string;
     price: number;
     imageUrl: string;
     description: string;
+    stock: number;
   };
-  quantity: number;
-}
-
-interface PaymentProps {
-  items?: CartItem[];
-  product?: CartItem;
 }
 
 export function Payment() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { items, product } = location.state as PaymentProps || {};
-  const [quantities, setQuantities] = useState<Record<string, number>>(
-    items 
-      ? items.reduce((acc, item) => ({ ...acc, [item.product._id]: item.quantity }), {})
-      : product 
-        ? { [product.product._id]: 1 }
-        : {}
-  );
+  const state = location.state as LocationState;
+  
+  const [quantities, setQuantities] = useState<Record<string, number>>(() => {
+    if (state?.items) {
+      return state.items.reduce((acc, item) => ({
+        ...acc,
+        [item.product._id]: item.quantity
+      }), {});
+    }
+    if (state?.product) {
+      return { [state.product._id]: 1 };
+    }
+    return {};
+  });
 
   const [formData, setFormData] = useState({
     cardNumber: '',
@@ -64,7 +67,7 @@ export function Payment() {
     });
   };
 
-  if (!items && !product) {
+  if (!state?.items && !state?.product) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -80,7 +83,7 @@ export function Payment() {
     );
   }
 
-  const displayItems = items ?? (product ? [product] : []);
+  const displayItems = state.items ?? (state.product ? [{ product: state.product, quantity: 1 }] : []);
   const total = displayItems.reduce((sum, item) => 
     sum + item.product.price * (quantities[item.product._id] || 1), 
     0
