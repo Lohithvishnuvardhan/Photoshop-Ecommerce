@@ -2,20 +2,22 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { cartAPI } from '../api';
 import toast from 'react-hot-toast';
 
-interface CartItem {
-  product: any;
-  _id: string;
-  name: string;
-  price: number;
-  image: string;
+export interface CartItem {
+  product: {
+    _id: string;
+    name: string;
+    price: number;
+    description: string;
+    imageUrl: string;
+    category: string;
+    stock: number;
+  };
   quantity: number;
-  description: string;
-  stock: number;
 }
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (product: CartItem) => Promise<void>;
+  addToCart: (item: CartItem) => Promise<void>;
   removeFromCart: (id: string) => Promise<void>;
   updateQuantity: (id: string, quantity: number) => Promise<void>;
   clearCart: () => void;
@@ -46,18 +48,20 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  const addToCart = async (product: CartItem) => {
+  const addToCart = async (item: CartItem) => {
     try {
       setIsLoading(true);
-      await cartAPI.addToCart(product._id, 1);
+      await cartAPI.addToCart(item.product._id, 1);
       setCart(prev => {
-        const exists = prev.find(item => item._id === product._id);
+        const exists = prev.find(cartItem => cartItem.product._id === item.product._id);
         if (exists) {
-          return prev.map(item =>
-            item._id === product._id ? { ...item, quantity: item.quantity + 1 } : item
+          return prev.map(cartItem =>
+            cartItem.product._id === item.product._id
+              ? { ...cartItem, quantity: cartItem.quantity + 1 }
+              : cartItem
           );
         }
-        return [...prev, { ...product, quantity: 1 }];
+        return [...prev, { ...item, quantity: 1 }];
       });
       toast.success('Item added to cart');
     } catch (error) {
@@ -72,7 +76,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       setIsLoading(true);
       await cartAPI.removeFromCart(id);
-      setCart(prev => prev.filter(item => item._id !== id));
+      setCart(prev => prev.filter(item => item.product._id !== id));
       toast.success('Item removed from cart');
     } catch (error) {
       toast.error('Failed to remove item from cart');
@@ -88,7 +92,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       await cartAPI.updateQuantity(id, quantity);
       setCart(prev =>
         prev.map(item =>
-          item._id === id ? { ...item, quantity } : item
+          item.product._id === id ? { ...item, quantity } : item
         )
       );
     } catch (error) {

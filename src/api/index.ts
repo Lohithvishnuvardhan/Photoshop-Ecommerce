@@ -14,6 +14,21 @@ interface HealthCheckResponse {
   mongodb: 'connected' | 'disconnected';
 }
 
+interface CartResponse {
+  products: Array<{
+    productId: {
+      _id: string;
+      name: string;
+      price: number;
+      description: string;
+      imageUrl: string;
+      stock: number;
+      category: string;
+    };
+    quantity: number;
+  }>;
+}
+
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
   headers: {
@@ -22,7 +37,6 @@ const api: AxiosInstance = axios.create({
   withCredentials: false
 });
 
-// Request interceptor for adding token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -36,7 +50,6 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor for handling errors
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -74,6 +87,46 @@ export const authAPI = {
   }
 };
 
+export const cartAPI = {
+  getCart: async () => {
+    const response = await api.get<CartResponse>('/cart');
+    return response.data.products.map(item => ({
+      product: item.productId,
+      quantity: item.quantity
+    }));
+  },
+
+  addToCart: async (productId: string, quantity: number) => {
+    const response = await api.post<CartResponse>('/cart/add', { productId, quantity });
+    return {
+      products: response.data.products.map(item => ({
+        product: item.productId,
+        quantity: item.quantity
+      }))
+    };
+  },
+
+  updateQuantity: async (productId: string, quantity: number) => {
+    const response = await api.put<CartResponse>(`/cart/${productId}`, { quantity });
+    return {
+      products: response.data.products.map(item => ({
+        product: item.productId,
+        quantity: item.quantity
+      }))
+    };
+  },
+
+  removeFromCart: async (productId: string) => {
+    const response = await api.delete<CartResponse>(`/cart/${productId}`);
+    return {
+      products: response.data.products.map(item => ({
+        product: item.productId,
+        quantity: item.quantity
+      }))
+    };
+  }
+};
+
 export const productsAPI = {
   getAll: async () => {
     const response = await api.get('/products');
@@ -82,28 +135,6 @@ export const productsAPI = {
 
   getById: async (id: string) => {
     const response = await api.get(`/products/${id}`);
-    return response.data;
-  }
-};
-
-export const cartAPI = {
-  getCart: async () => {
-    const response = await api.get('/cart');
-    return response.data;
-  },
-
-  addToCart: async (productId: string, quantity: number) => {
-    const response = await api.post('/cart/add', { productId, quantity });
-    return response.data;
-  },
-
-  updateQuantity: async (productId: string, quantity: number) => {
-    const response = await api.put(`/cart/${productId}`, { quantity });
-    return response.data;
-  },
-
-  removeFromCart: async (productId: string) => {
-    const response = await api.delete(`/cart/${productId}`);
     return response.data;
   }
 };
