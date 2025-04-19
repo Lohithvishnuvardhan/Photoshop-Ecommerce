@@ -1,19 +1,19 @@
 import { useCart } from '../context/Cartcontext';
 import { useNavigate } from 'react-router-dom';
 import { Star, Shield, Truck, Clock, Camera } from 'lucide-react';
-import toast from 'react-hot-toast';
 
 const cameras = [
   {
-    id: 1,
+    _id: '1',
     name: 'Canon EOS R5',
     price: 324900,
-    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80',
     description: '45MP Full-Frame Mirrorless Camera',
     specs: ['45MP Full-Frame CMOS Sensor', '8K RAW Video Recording', 'Dual Card Slots', 'In-Body Image Stabilization'],
     rating: 4.9,
     reviews: 128,
-    inStock: true,
+    stock: 10,
+    category: 'Cameras',
     features: [
       'Advanced Dual Pixel CMOS AF II',
       'Up to 20fps Electronic Shutter',
@@ -22,15 +22,16 @@ const cameras = [
     ]
   },
   {
-    id: 2,
+    _id: '2',
     name: 'Sony A7 IV',
     price: 209990,
-    image: 'https://images.unsplash.com/photo-1621520291095-aa6c7137f048?auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1621520291095-aa6c7137f048?auto=format&fit=crop&q=80',
     description: '33MP Full-Frame Mirrorless Camera',
     specs: ['33MP Full-Frame Sensor', '4K 60p Video', '10fps Continuous Shooting', 'Advanced AF System'],
     rating: 4.8,
     reviews: 95,
-    inStock: true,
+    stock: 15,
+    category: 'Cameras',
     features: [
       'Real-time Eye AF',
       'Creative Look Presets',
@@ -39,15 +40,16 @@ const cameras = [
     ]
   },
   {
-    id: 3,
+    _id: '3',
     name: 'Nikon Z6 II',
     price: 164990,
-    image: 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?auto=format&fit=crop&q=80',
     description: '24.5MP Full-Frame Mirrorless Camera',
     specs: ['24.5MP BSI Sensor', 'Dual EXPEED 6 Processors', '14fps Continuous Shooting', 'Dual Memory Card Slots'],
     rating: 4.7,
     reviews: 82,
-    inStock: true,
+    stock: 12,
+    category: 'Cameras',
     features: [
       '273-Point AF System',
       'ProRes RAW Output',
@@ -56,15 +58,16 @@ const cameras = [
     ]
   },
   {
-    id: 4,
+    _id: '4',
     name: 'Fujifilm X-T4',
     price: 149990,
-    image: 'https://images.unsplash.com/photo-1581591524425-c7e0978865fc?auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1581591524425-c7e0978865fc?auto=format&fit=crop&q=80',
     description: '26.1MP APS-C Mirrorless Camera',
     specs: ['26.1MP X-Trans Sensor', '6.5-Stop IBIS', '4K/60p Video', '15fps Mechanical Shutter'],
     rating: 4.8,
     reviews: 76,
-    inStock: true,
+    stock: 8,
+    category: 'Cameras',
     features: [
       'Film Simulation Modes',
       'Vari-angle LCD Screen',
@@ -86,12 +89,8 @@ const Cameras = () => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
-  const handleAddToCart = (camera: any) => {
-    addToCart(camera);
-    toast.success(`${camera.name} added to cart!`, {
-      position: 'bottom-right',
-      duration: 2000,
-    });
+  const handleAddToCart = async (camera: any) => {
+    await addToCart(camera);
   };
 
   const handleBuyNow = (camera: any) => {
@@ -120,25 +119,19 @@ const Cameras = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {cameras.map((camera) => (
-            <div key={camera.id} className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
+            <div key={camera._id} className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
               <div className="relative">
                 <img
-                  src={camera.image}
+                  src={camera.imageUrl}
                   alt={camera.name}
                   className="w-full h-[400px] object-cover"
                 />
                 <div className="absolute top-4 right-4 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                   Best Seller
                 </div>
-                {camera.inStock ? (
-                  <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    In Stock
-                  </div>
-                ) : (
-                  <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    Out of Stock
-                  </div>
-                )}
+                <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  In Stock
+                </div>
               </div>
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
