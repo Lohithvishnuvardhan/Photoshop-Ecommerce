@@ -1,6 +1,7 @@
 import { useCart } from '../context/Cartcontext';
 import { useNavigate } from 'react-router-dom';
 import { Star, Shield, Truck, Clock, Camera } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const cameras = [
   {
@@ -89,8 +90,12 @@ const Cameras = () => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
-  const handleAddToCart = async (camera: any) => {
-    await addToCart(camera);
+  const handleAddToCart = (camera: any) => {
+    addToCart(camera);
+    toast.success(`${camera.name} added to cart!`, {
+      position: 'bottom-right',
+      duration: 2000,
+    });
   };
 
   const handleBuyNow = (camera: any) => {
