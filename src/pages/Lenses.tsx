@@ -8,7 +8,7 @@ const lenses = [
     _id: '5',
     name: 'Canon RF 24-70mm f/2.8L IS USM',
     price: 219990,
-    imageUrl: 'https://images.unsplash.com/photo-1495707902641-75cac588d2e9?auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1617005082133-548c4dd27f35?auto=format&fit=crop&q=80',
     description: 'Professional Standard Zoom Lens',
     specs: [
       'Constant f/2.8 Aperture',
@@ -31,7 +31,7 @@ const lenses = [
     _id: '6',
     name: 'Sony FE 70-200mm f/2.8 GM II',
     price: 259990,
-    imageUrl: 'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1617813144729-0676da0a72bc?auto=format&fit=crop&q=80',
     description: 'Professional Telephoto Zoom Lens',
     specs: [
       'Constant f/2.8 Aperture',
@@ -77,7 +77,7 @@ const lenses = [
     _id: '8',
     name: 'Sigma 14-24mm f/2.8 DG DN Art',
     price: 129990,
-    imageUrl: 'https://images.unsplash.com/photo-1598335624134-5bceb5de202b?auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1617005082133-548c4dd27f35?auto=format&fit=crop&q=80',
     description: 'Ultra-Wide Zoom Lens',
     specs: [
       'Constant f/2.8 Aperture',
@@ -110,9 +110,12 @@ const Lenses = () => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
-  const handleAddToCart = async (lens: any) => {
-    await addToCart(lens);
-    toast.success(`${lens.name} added to cart!`);
+  const handleAddToCart = (lens: any) => {
+    addToCart(lens);
+    toast.success(`${lens.name} added to cart!`, {
+      position: 'bottom-right',
+      duration: 2000,
+    });
   };
 
   const handleBuyNow = (lens: any) => {
