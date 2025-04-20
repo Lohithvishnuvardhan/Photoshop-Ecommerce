@@ -61,21 +61,27 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         price: product.price,
         description: product.description,
         imageUrl: product.imageUrl || product.image,
-        category: product.category,
-        stock: product.stock
+        category: product.category || '',
+        stock: product.stock || 10
+      };
+
+      // Create the cart item structure
+      const cartItem: CartItem = {
+        product: cartProduct,
+        quantity: 1
       };
 
       await cartAPI.addToCart(cartProduct._id, 1);
       setCart(prev => {
-        const exists = prev.find(cartItem => cartItem.product._id === cartProduct._id);
+        const exists = prev.find(item => item.product._id === cartProduct._id);
         if (exists) {
-          return prev.map(cartItem =>
-            cartItem.product._id === cartProduct._id
-              ? { ...cartItem, quantity: cartItem.quantity + 1 }
-              : cartItem
+          return prev.map(item =>
+            item.product._id === cartProduct._id
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
           );
         }
-        return [...prev, { product: cartProduct, quantity: 1 }];
+        return [...prev, cartItem];
       });
       toast.success('Item added to cart');
     } catch (error) {

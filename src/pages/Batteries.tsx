@@ -98,7 +98,17 @@ const Batteries = () => {
   const navigate = useNavigate();
 
   const handleAddToCart = (battery: any) => {
-    addToCart(battery);
+    const product = {
+      _id: battery._id || battery.id,
+      name: battery.name,
+      price: battery.price,
+      description: battery.description,
+      imageUrl: battery.imageUrl || battery.image,
+      category: 'Batteries',
+      stock: battery.stock || 10
+    };
+    
+    addToCart(product);
     toast.success(`${battery.name} added to cart!`, {
       position: 'bottom-right',
       duration: 2000,

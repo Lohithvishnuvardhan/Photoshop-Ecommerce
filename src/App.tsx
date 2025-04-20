@@ -20,19 +20,6 @@ import { CartProvider } from './context/Cartcontext';
 import { Toaster } from 'react-hot-toast';
 
 function App() {
-  const handleAddToCart = (product: any) => {
-    const cartProduct = {
-      _id: product._id || product.id,
-      name: product.name,
-      price: product.price,
-      description: product.description,
-      imageUrl: product.imageUrl || product.image,
-      category: product.category || 'Unknown',
-      stock: product.stock || 10
-    };
-    
-    addToCart(cartProduct);
-  };
 
   return (
     <CartProvider>
@@ -101,3 +88,5 @@ function App() {
 }
 
 export default App;
+
+

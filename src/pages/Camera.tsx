@@ -91,7 +91,17 @@ const Cameras = () => {
   const navigate = useNavigate();
 
   const handleAddToCart = (camera: any) => {
-    addToCart(camera);
+    const product = {
+      _id: camera._id || camera.id,
+      name: camera.name,
+      price: camera.price,
+      description: camera.description,
+      imageUrl: camera.imageUrl || camera.image,
+      category: 'Cameras',
+      stock: camera.stock || 10
+    };
+    
+    addToCart(product);
     toast.success(`${camera.name} added to cart!`, {
       position: 'bottom-right',
       duration: 2000,

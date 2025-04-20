@@ -98,7 +98,17 @@ const Accessories = () => {
   const navigate = useNavigate();
 
   const handleAddToCart = (accessory: any) => {
-    addToCart(accessory);
+    const product = {
+      _id: accessory._id || accessory.id,
+      name: accessory.name,
+      price: accessory.price,
+      description: accessory.description,
+      imageUrl: accessory.imageUrl || accessory.image,
+      category: 'Accessories',
+      stock: accessory.stock || 10
+    };
+    
+    addToCart(product);
     toast.success(`${accessory.name} added to cart!`, {
       position: 'bottom-right',
       duration: 2000,

@@ -111,7 +111,17 @@ const Lenses = () => {
   const navigate = useNavigate();
 
   const handleAddToCart = (lens: any) => {
-    addToCart(lens);
+    const product = {
+      _id: lens._id || lens.id,
+      name: lens.name,
+      price: lens.price,
+      description: lens.description,
+      imageUrl: lens.imageUrl || lens.image,
+      category: 'Lenses',
+      stock: lens.stock || 10
+    };
+    
+    addToCart(product);
     toast.success(`${lens.name} added to cart!`, {
       position: 'bottom-right',
       duration: 2000,
