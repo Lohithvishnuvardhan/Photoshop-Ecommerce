@@ -8,7 +8,7 @@ const lenses = [
     _id: '5',
     name: 'Canon RF 24-70mm f/2.8L IS USM',
     price: 219990,
-    imageUrl: 'https://images.unsplash.com/photo-1617005082133-548c4dd27f35?auto=format&fit=crop&q=80',
+    imageUrl: "src/public/images/canon.jpg",
     description: 'Professional Standard Zoom Lens',
     specs: [
       'Constant f/2.8 Aperture',
@@ -31,7 +31,7 @@ const lenses = [
     _id: '6',
     name: 'Sony FE 70-200mm f/2.8 GM II',
     price: 259990,
-    imageUrl: 'https://images.unsplash.com/photo-1617813144729-0676da0a72bc?auto=format&fit=crop&q=80',
+    imageUrl: "src/public/images/sony.jpg",
     description: 'Professional Telephoto Zoom Lens',
     specs: [
       'Constant f/2.8 Aperture',
@@ -54,7 +54,7 @@ const lenses = [
     _id: '7',
     name: 'Nikon Z 50mm f/1.2 S',
     price: 199990,
-    imageUrl: 'https://images.unsplash.com/photo-1617813144729-0676da0a72bc?auto=format&fit=crop&q=80',
+    imageUrl: "src/public/images/Nikon.jpg",
     description: 'Professional Prime Lens',
     specs: [
       'Ultra-Fast f/1.2 Aperture',
