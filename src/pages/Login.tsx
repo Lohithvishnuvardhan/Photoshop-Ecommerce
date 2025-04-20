@@ -3,37 +3,26 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Camera, Lock, Mail } from 'lucide-react';
 import { authAPI } from '../api';
 import toast from 'react-hot-toast';
+import { useCart } from '../context/Cartcontext';
 
 export function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { syncLocalCartToBackend } = useCart();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      const response = await authAPI.login(email, password);
-      if (response.token) {
-        // Show a custom success message with styling
-        toast.success('Welcome back! Successfully logged in', {
-          duration: 3000,
-          position: 'top-center',
-          style: {
-            background: '#4C1D95',
-            color: '#ffffff',
-            padding: '16px',
-            borderRadius: '8px',
-          },
-          icon: '👋',
-        });
-        navigate('/');
-      }
+      await authAPI.login(email, password);
+      await syncLocalCartToBackend();
+      toast.success('Login successful!');
+      navigate('/');
     } catch (error: any) {
-      toast.error(error.message || 'Login failed. Please try again.');
-      console.error('Login error:', error);
+      toast.error(error.message || 'Login failed');
     } finally {
       setIsLoading(false);
     }

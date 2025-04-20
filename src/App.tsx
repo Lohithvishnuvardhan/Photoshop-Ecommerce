@@ -18,6 +18,7 @@ import Profile from './pages/Profile';
 import PrivateRoute from './components/PrivateRoute';
 import { CartProvider } from './context/Cartcontext';
 import { Toaster } from 'react-hot-toast';
+import OrderSuccess from './pages/OrderSuccess';
 
 function App() {
 
@@ -78,6 +79,7 @@ function App() {
               <Route path="shipping" element={<ShippingInfo />} />
               <Route path="returns" element={<Returns />} />
               <Route path="faq" element={<FAQ />} />
+              <Route path="order-success" element={<OrderSuccess />} />
             </Route>
           </Routes>
           <Toaster />

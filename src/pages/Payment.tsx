@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { CreditCard, User, MapPin, Plus, Minus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { CartItem } from '../types';
+import { orderAPI } from '../api';
+import { useCart } from '../context/Cartcontext';
 
 interface LocationState {
   items?: CartItem[];
@@ -20,6 +22,8 @@ export function Payment() {
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state as LocationState;
+  const { clearCart } = useCart();
+  const [isProcessing, setIsProcessing] = useState(false);
   
   const [quantities, setQuantities] = useState<Record<string, number>>(() => {
     if (state?.items) {
@@ -44,17 +48,95 @@ export function Payment() {
     postalCode: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Payment processed successfully!');
-    setTimeout(() => {
-      navigate('/');
-    }, 2000);
+    
+    if (!state.items && !state.product) {
+      toast.error('No items to process');
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+
+      // Create order data
+      const orderData = {
+        items: state.items || [{ product: state.product, quantity: 1 }],
+        paymentDetails: {
+          cardNumber: formData.cardNumber.replace(/\s/g, ''),
+          cardName: formData.cardName,
+          expiry: formData.expiry,
+          cvv: formData.cvv
+        },
+        shippingAddress: {
+          address: formData.address,
+          city: formData.city,
+          postalCode: formData.postalCode
+        },
+        total: total,
+        status: 'pending'
+      };
+
+      // Create order in backend
+      await orderAPI.createOrder(orderData);
+      
+      // Clear the cart after successful order
+      clearCart();
+      
+      toast.success('Order placed successfully!');
+      
+      // Redirect to success page or home
+      setTimeout(() => {
+        navigate('/order-success');
+      }, 2000);
+    } catch (error: any) {
+      console.error('Payment error:', error);
+      toast.error(error.message || 'Failed to process payment');
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Add card number formatting
+  const formatCardNumber = (value: string) => {
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    const matches = v.match(/\d{4,16}/g);
+    const match = (matches && matches[0]) || '';
+    const parts = [];
+
+    for (let i = 0, len = match.length; i < len; i += 4) {
+      parts.push(match.substring(i, i + 4));
+    }
+
+    if (parts.length) {
+      return parts.join(' ');
+    } else {
+      return value;
+    }
+  };
+
+  // Add expiry date formatting
+  const formatExpiryDate = (value: string) => {
+    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
+    if (v.length >= 2) {
+      return `${v.slice(0, 2)}/${v.slice(2, 4)}`;
+    }
+    return v;
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    let formattedValue = value;
+    if (name === 'cardNumber') {
+      formattedValue = formatCardNumber(value);
+    } else if (name === 'expiry') {
+      formattedValue = formatExpiryDate(value);
+    } else if (name === 'cvv') {
+      formattedValue = value.slice(0, 3);
+    }
+    
+    setFormData(prev => ({ ...prev, [name]: formattedValue }));
   };
 
   const handleQuantityChange = (itemId: string, change: number) => {
@@ -259,9 +341,19 @@ export function Payment() {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                disabled={isProcessing}
+                className={`w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${
+                  isProcessing ? 'opacity-50 cursor-not-allowed' : 'hover:from-purple-700 hover:to-blue-600'
+                }`}
               >
-                Pay ₹{total.toLocaleString()}
+                {isProcessing ? (
+                  <div className="flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                    Processing...
+                  </div>
+                ) : (
+                  `Pay ₹${total.toLocaleString()}`
+                )}
               </button>
             </form>
           </div>
