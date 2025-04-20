@@ -5,25 +5,58 @@ import { useCartStore } from '../store/cart';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
 
-// Define available products for search
-const availableProducts = [
-  { id: 1, name: 'Canon EOS R5', category: 'cameras', path: '/cameras' },
-  { id: 2, name: 'Canon EOS R6', category: 'cameras', path: '/cameras' },
-  { id: 3, name: 'Sony A7 IV', category: 'cameras', path: '/cameras' },
-  { id: 4, name: 'Nikon Z6 II', category: 'cameras', path: '/cameras' },
-  { id: 5, name: 'Canon RF 24-70mm', category: 'lenses', path: '/lenses' },
-  { id: 6, name: 'Sony 50mm f/1.4', category: 'lenses', path: '/lenses' },
-  { id: 7, name: 'Camera Bag Deluxe', category: 'accessories', path: '/accessories' },
-  { id: 8, name: 'Tripod Pro', category: 'accessories', path: '/accessories' },
-  { id: 9, name: 'Canon Battery Pack', category: 'batteries', path: '/batteries' },
-  { id: 10, name: 'Sony Battery Pack', category: 'batteries', path: '/batteries' },
-  // Add more products as needed
+// Define categories and their search terms
+const categories = [
+  {
+    id: 'cameras',
+    name: 'Cameras',
+    path: '/cameras',
+    searchTerms: ['camera', 'cameras', 'dslr', 'mirrorless', 'canon', 'sony', 'nikon'],
+    products: [
+      { id: 1, name: 'Canon EOS R5', price: 3899 },
+      { id: 2, name: 'Sony A7 IV', price: 2499 },
+      { id: 3, name: 'Nikon Z6 II', price: 1999 },
+    ]
+  },
+  {
+    id: 'lenses',
+    name: 'Lenses',
+    path: '/lenses',
+    searchTerms: ['lens', 'lenses', 'zoom', 'prime', 'wide', 'telephoto'],
+    products: [
+      { id: 4, name: 'Canon RF 24-70mm f/2.8', price: 2299 },
+      { id: 5, name: 'Sony 50mm f/1.4', price: 999 },
+      { id: 6, name: 'Nikon Z 70-200mm f/2.8', price: 2599 },
+    ]
+  },
+  {
+    id: 'accessories',
+    name: 'Accessories',
+    path: '/accessories',
+    searchTerms: ['accessory', 'accessories', 'tripod', 'bag', 'filter', 'memory card'],
+    products: [
+      { id: 7, name: 'Camera Bag Deluxe', price: 129 },
+      { id: 8, name: 'Professional Tripod', price: 299 },
+      { id: 9, name: 'UV Filter Set', price: 79 },
+    ]
+  },
+  {
+    id: 'batteries',
+    name: 'Batteries',
+    path: '/batteries',
+    searchTerms: ['battery', 'batteries', 'charger', 'power', 'pack'],
+    products: [
+      { id: 10, name: 'Canon LP-E6NH Battery', price: 99 },
+      { id: 11, name: 'Sony NP-FZ100 Battery', price: 89 },
+      { id: 12, name: 'Dual Battery Charger', price: 79 },
+    ]
+  }
 ];
 
 export function Layout() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showResults, setShowResults] = useState(false);
-  const [searchResults, setSearchResults] = useState<typeof availableProducts>([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const cartItems = useCartStore(state => state.items);
@@ -51,20 +84,49 @@ export function Layout() {
       return;
     }
 
-    const results = availableProducts.filter(product =>
-      product.name.toLowerCase().includes(query.toLowerCase())
+    const normalizedQuery = query.toLowerCase().trim();
+
+    // First, check if the search matches any category
+    const matchingCategories = categories.filter(category => 
+      category.searchTerms.some(term => term.includes(normalizedQuery))
     );
+
+    // Then, check for specific products
+    const matchingProducts = categories.flatMap(category =>
+      category.products
+        .filter(product => product.name.toLowerCase().includes(normalizedQuery))
+        .map(product => ({
+          ...product,
+          category: category.name,
+          path: category.path
+        }))
+    );
+
+    const results = [
+      ...matchingCategories.map(category => ({
+        id: category.id,
+        name: category.name,
+        isCategory: true,
+        path: category.path
+      })),
+      ...matchingProducts
+    ];
 
     setSearchResults(results);
     setShowResults(true);
   };
 
   // Handle search result click
-  const handleResultClick = (product: typeof availableProducts[0]) => {
+  const handleResultClick = (result: any) => {
     setSearchQuery('');
     setShowResults(false);
-    navigate(product.path);
-    toast.success(`Navigating to ${product.name}`);
+    navigate(result.path);
+    
+    if (result.isCategory) {
+      toast.success(`Browsing ${result.name}`);
+    } else {
+      toast.success(`Viewing ${result.name}`);
+    }
   };
 
   // Handle search submit
@@ -73,7 +135,7 @@ export function Layout() {
     if (searchResults.length > 0) {
       handleResultClick(searchResults[0]);
     } else if (searchQuery.trim() !== '') {
-      toast.error('No matching products found');
+      toast.error('No matching products or categories found');
     }
   };
 
@@ -125,14 +187,29 @@ export function Layout() {
               {showResults && searchResults.length > 0 && (
                 <div className="absolute z-50 w-full mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
                   <ul className="py-2">
-                    {searchResults.map((product) => (
-                      <li key={product.id}>
+                    {searchResults.map((result) => (
+                      <li key={result.id}>
                         <button
-                          onClick={() => handleResultClick(product)}
-                          className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 hover:text-white flex items-center"
+                          onClick={() => handleResultClick(result)}
+                          className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 hover:text-white flex items-center justify-between"
                         >
-                          <span className="flex-1">{product.name}</span>
-                          <span className="text-sm text-gray-500 capitalize">{product.category}</span>
+                          <span className="flex items-center">
+                            {result.isCategory ? (
+                              <span className="font-medium">{result.name} Category</span>
+                            ) : (
+                              <>
+                                <span>{result.name}</span>
+                                <span className="ml-2 text-sm text-gray-500">
+                                  in {result.category}
+                                </span>
+                              </>
+                            )}
+                          </span>
+                          {!result.isCategory && (
+                            <span className="text-purple-400">
+                              ${result.price}
+                            </span>
+                          )}
                         </button>
                       </li>
                     ))}
