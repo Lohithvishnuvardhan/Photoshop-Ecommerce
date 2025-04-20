@@ -12,6 +12,8 @@ export function Layout() {
 
   const handleLogout = () => {
     logout();
+    localStorage.removeItem('token'); // Clear the token
+    localStorage.removeItem('cart'); // Clear the cart data
     toast.success('Successfully logged out');
     navigate('/login');
   };
@@ -38,36 +40,47 @@ export function Layout() {
             </div>
 
             <div className="flex items-center space-x-6">
-              <div className="relative group">
-                {isAuthenticated ? (
-                  <div className="flex flex-col">
-                    <Link to="/profile" className="text-gray-300 hover:text-white flex items-center space-x-1 mb-2">
-                      <User className="h-6 w-6" />
-                      <span>Profile</span>
-                    </Link>
-                    <button
-                      onClick={handleLogout}
-                      className="text-gray-300 hover:text-white flex items-center space-x-1 w-full"
-                    >
-                      <LogOut className="h-6 w-6" />
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
-                ) : (
-                  <Link to="/login" className="text-gray-300 hover:text-white flex items-center space-x-1">
+              {isAuthenticated ? (
+                <div className="flex items-center space-x-6">
+                  <Link to="/profile" className="text-gray-300 hover:text-white flex items-center space-x-1">
                     <User className="h-6 w-6" />
+                    <span>Profile</span>
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    <span>Sign Out</span>
+                  </button>
+                  <Link to="/cart" className="text-gray-300 hover:text-white relative">
+                    <ShoppingCart className="h-6 w-6" />
+                    {itemCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {itemCount}
+                      </span>
+                    )}
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  <Link 
+                    to="/login" 
+                    className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition-colors duration-200"
+                  >
+                    <User className="h-5 w-5" />
                     <span>Sign In</span>
                   </Link>
-                )}
-              </div>
-              <Link to="/cart" className="text-gray-300 hover:text-white relative">
-                <ShoppingCart className="h-6 w-6" />
-                {itemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                    {itemCount}
-                  </span>
-                )}
-              </Link>
+                  <Link to="/cart" className="text-gray-300 hover:text-white relative">
+                    <ShoppingCart className="h-6 w-6" />
+                    {itemCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                        {itemCount}
+                      </span>
+                    )}
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 
