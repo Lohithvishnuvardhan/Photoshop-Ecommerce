@@ -1,16 +1,12 @@
 import { useCart } from '../context/Cartcontext';
 import { useNavigate } from 'react-router-dom';
-import { Minus, Plus, X, ShoppingBag, Heart, Clock, Truck, Shield, ArrowRight, Package } from 'lucide-react';
+import { Minus, Plus, X, ShoppingBag, Clock, Truck, Shield, ArrowRight, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useState } from 'react';
-import { CartItem } from '../types';
 
 const CartPage = () => {
-  const { cart, removeFromCart, updateQuantity, isLoading, addToCart } = useCart();
+  const { cart, removeFromCart, updateQuantity, isLoading, total } = useCart();
   const navigate = useNavigate();
-  const [savedItems, setSavedItems] = useState<CartItem[]>([]);
 
-  const total = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
   const shipping = total > 50000 ? 0 : 999;
   const finalTotal = total + shipping;
 
@@ -34,7 +30,6 @@ const CartPage = () => {
 
   const handleRemove = async (productId: string) => {
     await removeFromCart(productId);
-    toast.success('Item removed from cart');
   };
 
   if (isLoading) {
@@ -132,59 +127,12 @@ const CartPage = () => {
                             ₹{(item.product.price * item.quantity).toLocaleString()}
                           </span>
                         </div>
-                        <button
-                          onClick={() => {
-                            setSavedItems([...savedItems, item]);
-                            handleRemove(item.product._id);
-                          }}
-                          className="text-purple-600 hover:text-purple-700 flex items-center"
-                        >
-                          <Heart className="h-5 w-5 mr-1" />
-                          Save for later
-                        </button>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* Saved Items */}
-            {savedItems.length > 0 && (
-              <div className="mt-8">
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">Saved for Later ({savedItems.length} items)</h2>
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                  <div className="p-6 space-y-6">
-                    {savedItems.map((item) => (
-                      <div key={item.product._id} className="flex items-center p-4 bg-gray-50 rounded-lg">
-                        <img
-                          src={item.product.imageUrl}
-                          alt={item.product.name}
-                          className="w-24 h-24 object-cover rounded-lg"
-                        />
-                        <div className="flex-1 ml-6">
-                          <h3 className="text-lg font-semibold text-gray-900">{item.product.name}</h3>
-                          <p className="text-gray-600 mt-1">{item.product.description}</p>
-                          <div className="mt-4 flex items-center justify-between">
-                            <span className="text-xl font-semibold text-gray-900">₹{item.product.price.toLocaleString()}</span>
-                            <button
-                              onClick={() => {
-                                setSavedItems(savedItems.filter(i => i.product._id !== item.product._id));
-                                addToCart(item);
-                                toast.success(`${item.product.name} moved to cart`);
-                              }}
-                              className="text-purple-600 hover:text-purple-700"
-                            >
-                              Move to Cart
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Order Summary */}

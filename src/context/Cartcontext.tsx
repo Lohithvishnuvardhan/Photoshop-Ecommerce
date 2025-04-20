@@ -17,11 +17,12 @@ export interface CartItem {
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (item: CartItem) => Promise<void>;
-  removeFromCart: (id: string) => Promise<void>;
-  updateQuantity: (id: string, quantity: number) => Promise<void>;
+  addToCart: (product: CartItem['product']) => Promise<void>;
+  removeFromCart: (productId: string) => Promise<void>;
+  updateQuantity: (productId: string, quantity: number) => Promise<void>;
   clearCart: () => void;
   isLoading: boolean;
+  total: number;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -29,6 +30,8 @@ const CartContext = createContext<CartContextType | null>(null);
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const total = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -48,20 +51,20 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  const addToCart = async (item: CartItem) => {
+  const addToCart = async (product: CartItem['product']) => {
     try {
       setIsLoading(true);
-      await cartAPI.addToCart(item.product._id, 1);
+      await cartAPI.addToCart(product._id, 1);
       setCart(prev => {
-        const exists = prev.find(cartItem => cartItem.product._id === item.product._id);
+        const exists = prev.find(cartItem => cartItem.product._id === product._id);
         if (exists) {
           return prev.map(cartItem =>
-            cartItem.product._id === item.product._id
+            cartItem.product._id === product._id
               ? { ...cartItem, quantity: cartItem.quantity + 1 }
               : cartItem
           );
         }
-        return [...prev, { ...item, quantity: 1 }];
+        return [...prev, { product, quantity: 1 }];
       });
       toast.success('Item added to cart');
     } catch (error) {
@@ -72,11 +75,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const removeFromCart = async (id: string) => {
+  const removeFromCart = async (productId: string) => {
     try {
       setIsLoading(true);
-      await cartAPI.removeFromCart(id);
-      setCart(prev => prev.filter(item => item.product._id !== id));
+      await cartAPI.removeFromCart(productId);
+      setCart(prev => prev.filter(item => item.product._id !== productId));
       toast.success('Item removed from cart');
     } catch (error) {
       toast.error('Failed to remove item from cart');
@@ -86,15 +89,18 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const updateQuantity = async (id: string, quantity: number) => {
+  const updateQuantity = async (productId: string, quantity: number) => {
+    if (quantity < 1) return;
+    
     try {
       setIsLoading(true);
-      await cartAPI.updateQuantity(id, quantity);
+      await cartAPI.updateQuantity(productId, quantity);
       setCart(prev =>
         prev.map(item =>
-          item.product._id === id ? { ...item, quantity } : item
+          item.product._id === productId ? { ...item, quantity } : item
         )
       );
+      toast.success('Cart updated');
     } catch (error) {
       toast.error('Failed to update quantity');
       console.error('Error updating quantity:', error);
@@ -108,7 +114,15 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, isLoading }}>
+    <CartContext.Provider value={{ 
+      cart, 
+      addToCart, 
+      removeFromCart, 
+      updateQuantity, 
+      clearCart, 
+      isLoading,
+      total 
+    }}>
       {children}
     </CartContext.Provider>
   );
