@@ -2,41 +2,13 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CreditCard, User, MapPin, Plus, Minus } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { CartItem } from '../types';
-import { orderAPI } from '../api';
 import { useCart } from '../context/Cartcontext';
-
-interface LocationState {
-  items?: CartItem[];
-  product?: {
-    _id: string;
-    name: string;
-    price: number;
-    imageUrl: string;
-    description: string;
-    stock: number;
-  };
-}
 
 export function Payment() {
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as LocationState;
-  const { clearCart } = useCart();
+  const { cart, clearCart } = useCart();
   const [isProcessing, setIsProcessing] = useState(false);
-  
-  const [quantities, setQuantities] = useState<Record<string, number>>(() => {
-    if (state?.items) {
-      return state.items.reduce((acc, item) => ({
-        ...acc,
-        [item.product._id]: item.quantity
-      }), {});
-    }
-    if (state?.product) {
-      return { [state.product._id]: 1 };
-    }
-    return {};
-  });
 
   const [formData, setFormData] = useState({
     cardNumber: '',
@@ -48,37 +20,23 @@ export function Payment() {
     postalCode: '',
   });
 
+  const total = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+  const shipping = total > 50000 ? 0 : 999;
+  const finalTotal = total + shipping;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!state.items && !state.product) {
-      toast.error('No items to process');
+    if (cart.length === 0) {
+      toast.error('Your cart is empty');
       return;
     }
 
     try {
       setIsProcessing(true);
 
-      // Create order data
-      const orderData = {
-        items: state.items || [{ product: state.product, quantity: 1 }],
-        paymentDetails: {
-          cardNumber: formData.cardNumber.replace(/\s/g, ''),
-          cardName: formData.cardName,
-          expiry: formData.expiry,
-          cvv: formData.cvv
-        },
-        shippingAddress: {
-          address: formData.address,
-          city: formData.city,
-          postalCode: formData.postalCode
-        },
-        total: total,
-        status: 'pending'
-      };
-
-      // Create order in backend
-      await orderAPI.createOrder(orderData);
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
       
       // Clear the cart after successful order
       clearCart();
@@ -86,18 +44,15 @@ export function Payment() {
       toast.success('Order placed successfully!');
       
       // Redirect to success page or home
-      setTimeout(() => {
-        navigate('/order-success');
-      }, 2000);
+      navigate('/');
     } catch (error: any) {
       console.error('Payment error:', error);
-      toast.error(error.message || 'Failed to process payment');
+      toast.error('Failed to process payment');
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // Add card number formatting
   const formatCardNumber = (value: string) => {
     const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
     const matches = v.match(/\d{4,16}/g);
@@ -115,7 +70,6 @@ export function Payment() {
     }
   };
 
-  // Add expiry date formatting
   const formatExpiryDate = (value: string) => {
     const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
     if (v.length >= 2) {
@@ -139,37 +93,21 @@ export function Payment() {
     setFormData(prev => ({ ...prev, [name]: formattedValue }));
   };
 
-  const handleQuantityChange = (itemId: string, change: number) => {
-    setQuantities(prev => {
-      const newQuantity = (prev[itemId] || 1) + change;
-      if (newQuantity >= 1) {
-        return { ...prev, [itemId]: newQuantity };
-      }
-      return prev;
-    });
-  };
-
-  if (!state?.items && !state?.product) {
+  if (cart.length === 0) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900">No items selected</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Your cart is empty</h2>
           <button
             onClick={() => navigate('/')}
             className="mt-4 bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700"
           >
-            Return to Home
+            Continue Shopping
           </button>
         </div>
       </div>
     );
   }
-
-  const displayItems = state.items ?? (state.product ? [{ product: state.product, quantity: 1 }] : []);
-  const total = displayItems.reduce((sum, item) => 
-    sum + item.product.price * (quantities[item.product._id] || 1), 
-    0
-  );
 
   return (
     <div className="min-h-screen bg-gray-100 py-12">
@@ -179,41 +117,35 @@ export function Payment() {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
             <div className="space-y-4">
-              {displayItems.map((item) => (
+              {cart.map((item) => (
                 <div key={item.product._id} className="flex items-center space-x-4 pb-4 border-b border-gray-200">
                   <img
                     src={item.product.imageUrl}
                     alt={item.product.name}
                     className="w-24 h-24 object-cover rounded-md"
                   />
-                  <div className="flex-1">
+                  <div>
                     <h3 className="font-semibold">{item.product.name}</h3>
                     <p className="text-gray-600">Price: ₹{item.product.price.toLocaleString()}</p>
-                    <div className="flex items-center mt-4 space-x-4">
-                      <button
-                        onClick={() => handleQuantityChange(item.product._id, -1)}
-                        className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
-                      >
-                        <Minus className="h-4 w-4" />
-                      </button>
-                      <span className="text-lg font-semibold">{quantities[item.product._id] || 1}</span>
-                      <button
-                        onClick={() => handleQuantityChange(item.product._id, 1)}
-                        className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </button>
-                    </div>
+                    <p className="text-gray-600">Quantity: {item.quantity}</p>
                     <p className="mt-2 text-purple-600 font-semibold">
-                      Subtotal: ₹{((quantities[item.product._id] || 1) * item.product.price).toLocaleString()}
+                      Subtotal: ₹{(item.product.price * item.quantity).toLocaleString()}
                     </p>
                   </div>
                 </div>
               ))}
               <div className="pt-4 border-t border-gray-200">
                 <div className="flex justify-between items-center">
-                  <span className="text-xl font-bold">Total:</span>
-                  <span className="text-2xl font-bold text-purple-600">₹{total.toLocaleString()}</span>
+                  <span>Subtotal</span>
+                  <span>₹{total.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span>Shipping</span>
+                  <span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span>
+                </div>
+                <div className="flex justify-between items-center mt-4 text-lg font-bold">
+                  <span>Total</span>
+                  <span>₹{finalTotal.toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -352,7 +284,7 @@ export function Payment() {
                     Processing...
                   </div>
                 ) : (
-                  `Pay ₹${total.toLocaleString()}`
+                  `Pay ₹${finalTotal.toLocaleString()}`
                 )}
               </button>
             </form>

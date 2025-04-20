@@ -101,9 +101,7 @@ const Cameras = () => {
       stock: camera.stock || 10
     };
     
-    addToCart(product).catch(error => {
-      console.error('Error adding to cart:', error);
-    });
+    addToCart(product);
   };
 
   const handleBuyNow = (camera: any) => {

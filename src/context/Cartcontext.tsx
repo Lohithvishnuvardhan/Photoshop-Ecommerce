@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { cartAPI } from '../api';
+
 import toast from 'react-hot-toast';
 
 export interface CartItem {
@@ -17,13 +17,12 @@ export interface CartItem {
 
 interface CartContextType {
   cart: CartItem[];
-  addToCart: (product: CartItem['product']) => Promise<void>;
+  addToCart: (product: any) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   updateQuantity: (productId: string, quantity: number) => Promise<void>;
   clearCart: () => void;
   isLoading: boolean;
   total: number;
-  syncLocalCartToBackend: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -34,34 +33,15 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const total = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
 
-  const isLoggedIn = () => {
-    return !!localStorage.getItem('token');
-  };
-
+  // Load cart from localStorage on initial render
   useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        setIsLoading(true);
-        if (!isLoggedIn()) {
-          const savedCart = localStorage.getItem('cart');
-          if (savedCart) {
-            setCart(JSON.parse(savedCart));
-          }
-          return;
-        }
-        const data = await cartAPI.getCart();
-        setCart(data);
-      } catch (error) {
-        console.error('Error fetching cart:', error);
-        toast.error('Failed to fetch cart');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchCart();
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      setCart(JSON.parse(savedCart));
+    }
   }, []);
 
+  // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
@@ -70,6 +50,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       setIsLoading(true);
       
+      // Transform the product to match CartItem structure
       const cartProduct = {
         _id: product._id || product.id,
         name: product.name,
@@ -80,24 +61,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         stock: product.stock || 10
       };
 
-      if (!isLoggedIn()) {
-        setCart(prev => {
-          const exists = prev.find(item => item.product._id === cartProduct._id);
-          if (exists) {
-            return prev.map(item =>
-              item.product._id === cartProduct._id
-                ? { ...item, quantity: item.quantity + 1 }
-                : item
-            );
-          }
-          return [...prev, { product: cartProduct, quantity: 1 }];
-        });
-        toast.success('Item added to cart');
-        return;
-      }
-
-      await cartAPI.addToCart(cartProduct._id, 1);
-      
+      // Update local cart state
       setCart(prev => {
         const exists = prev.find(item => item.product._id === cartProduct._id);
         if (exists) {
@@ -109,15 +73,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
         return [...prev, { product: cartProduct, quantity: 1 }];
       });
-      
+
       toast.success('Item added to cart');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error adding to cart:', error);
-      if (error.message === 'Unauthorized') {
-        toast.error('Please login to add items to cart');
-      } else {
-        toast.error(error.message || 'Failed to add item to cart');
-      }
+      toast.error('Failed to add item to cart');
     } finally {
       setIsLoading(false);
     }
@@ -126,9 +86,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const removeFromCart = async (productId: string) => {
     try {
       setIsLoading(true);
-      if (isLoggedIn()) {
-        await cartAPI.removeFromCart(productId);
-      }
       setCart(prev => prev.filter(item => item.product._id !== productId));
       toast.success('Item removed from cart');
     } catch (error) {
@@ -144,9 +101,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     
     try {
       setIsLoading(true);
-      if (isLoggedIn()) {
-        await cartAPI.updateQuantity(productId, quantity);
-      }
       setCart(prev =>
         prev.map(item =>
           item.product._id === productId ? { ...item, quantity } : item
@@ -166,40 +120,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem('cart');
   };
 
-  // Add sync function
-  const syncCartWithBackend = async () => {
-    if (!localStorage.getItem('token')) return;
-    
-    try {
-      const data = await cartAPI.getCart();
-      setCart(data);
-    } catch (error) {
-      console.error('Error syncing cart:', error);
-    }
-  };
-
-  // Sync cart when component mounts and when token changes
-  useEffect(() => {
-    syncCartWithBackend();
-  }, []);
-
-  // Add function to sync local cart with backend when user logs in
-  const syncLocalCartToBackend = async () => {
-    const localCart = localStorage.getItem('cart');
-    if (localCart) {
-      try {
-        const parsedCart = JSON.parse(localCart);
-        for (const item of parsedCart) {
-          await cartAPI.addToCart(item.product._id, item.quantity);
-        }
-        localStorage.removeItem('cart');
-        await syncCartWithBackend();
-      } catch (error) {
-        console.error('Error syncing local cart:', error);
-      }
-    }
-  };
-
   return (
     <CartContext.Provider value={{ 
       cart, 
@@ -208,8 +128,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       updateQuantity, 
       clearCart, 
       isLoading,
-      total,
-      syncLocalCartToBackend
+      total 
     }}>
       {children}
     </CartContext.Provider>
