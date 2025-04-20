@@ -1,5 +1,6 @@
 import { useCart } from '../context/Cartcontext';
 import { ShoppingCart, Shield, Truck, Clock, Camera } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 
 const accessories = [
@@ -103,6 +104,7 @@ const formatPrice = (price: number) => {
 
 const Accessories = () => {
   const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   const handleAddToCart = (accessory: any) => {
     const product = {
@@ -120,6 +122,10 @@ const Accessories = () => {
       position: 'bottom-right',
       duration: 2000,
     });
+  };
+
+  const handleBuyNow = (accessory: any) => {
+    navigate('/payment', { state: { product: accessory } });
   };
 
   return (
@@ -198,13 +204,20 @@ const Accessories = () => {
                       <span>Ships in 24 hours</span>
                     </div>
                   </div>
-                  <button
-                    onClick={() => handleAddToCart(accessory)}
-                    className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                  >
-                    <ShoppingCart className="w-5 h-5 mr-2 inline-block" />
-                    Add to Cart
-                  </button>
+                  <div className="space-x-4">
+                    <button 
+                      onClick={() => handleAddToCart(accessory)}
+                      className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    >
+                      Add to Cart
+                    </button>
+                    <button 
+                      onClick={() => handleBuyNow(accessory)}
+                      className="bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    >
+                      Buy Now
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
