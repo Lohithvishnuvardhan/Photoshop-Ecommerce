@@ -1,5 +1,6 @@
 import { useCart } from '../context/Cartcontext';
 import { useNavigate } from 'react-router-dom';
+import { Shield, Truck, Clock, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const batteries = [
@@ -21,7 +22,9 @@ const batteries = [
       'Enhanced Heat Resistance',
       'Improved Performance in Cold',
       'Real-time Battery Info Display'
-    ]
+    ],
+    inStock: true,
+    isProGrade: true
   },
   {
     id: 14,
@@ -41,7 +44,9 @@ const batteries = [
       'Accurate Power Indication',
       'Over-charge Protection',
       'Memory Effect Free'
-    ]
+    ],
+    inStock: true,
+    isProGrade: true
   },
   {
     id: 15,
@@ -61,7 +66,9 @@ const batteries = [
       'Smart Battery Management',
       'Overcharge Protection',
       'Temperature Monitoring'
-    ]
+    ],
+    inStock: true,
+    isProGrade: true
   },
   {
     id: 16,
@@ -81,7 +88,9 @@ const batteries = [
       'Advanced Power Management',
       'Protection Circuit Built-in',
       'Extended Lifespan Design'
-    ]
+    ],
+    inStock: true,
+    isProGrade: true
   }
 ];
 
@@ -122,25 +131,62 @@ const Batteries = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Camera Batteries</h1>
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900">Professional Batteries</h1>
+            <p className="mt-2 text-gray-600">Premium power solutions for your camera equipment</p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center text-green-600">
+              <Truck className="h-5 w-5 mr-2" />
+              <span>Free Shipping</span>
+            </div>
+            <div className="flex items-center text-purple-600">
+              <Shield className="h-5 w-5 mr-2" />
+              <span>Warranty Included</span>
+            </div>
+          </div>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {batteries.map((battery) => (
             <div key={battery.id} className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
-              <div className="aspect-w-16 aspect-h-9">
+              <div className="relative">
                 <img
                   src={battery.image}
                   alt={battery.name}
-                  className="w-full h-[300px] object-cover"
+                  className="w-full h-[400px] object-cover"
                 />
+                <div className="absolute top-4 right-4 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  Professional Grade
+                </div>
+                <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  In Stock
+                </div>
               </div>
               <div className="p-6">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{battery.name}</h3>
-                <p className="text-gray-600 mb-4">{battery.description}</p>
-                
-                <div className="mb-4">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Specifications:</h4>
-                  <ul className="space-y-2">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{battery.name}</h3>
+                    <p className="text-gray-600">{battery.description}</p>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold mb-2">Key Features</h4>
+                  <ul className="grid grid-cols-2 gap-2">
+                    {battery.features.map((feature, index) => (
+                      <li key={index} className="flex items-center text-gray-600">
+                        <Camera className="h-4 w-4 text-purple-500 mr-2" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold mb-2">Specifications</h4>
+                  <ul className="grid grid-cols-2 gap-2">
                     {battery.specs.map((spec, index) => (
                       <li key={index} className="flex items-center text-gray-600">
                         <span className="mr-2">•</span>
@@ -150,20 +196,14 @@ const Batteries = () => {
                   </ul>
                 </div>
 
-                <div className="mb-6">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Key Features:</h4>
-                  <ul className="space-y-2">
-                    {battery.features.map((feature, index) => (
-                      <li key={index} className="flex items-center text-gray-600">
-                        <span className="mr-2">✓</span>
-                        {feature}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-gray-900">{formatPrice(battery.price)}</span>
+                  <div>
+                    <span className="text-3xl font-bold text-gray-900">{formatPrice(battery.price)}</span>
+                    <div className="flex items-center mt-2 text-sm text-gray-600">
+                      <Clock className="h-4 w-4 mr-1" />
+                      <span>Ships in 24 hours</span>
+                    </div>
+                  </div>
                   <div className="space-x-4">
                     <button 
                       onClick={() => handleAddToCart(battery)}
@@ -189,4 +229,3 @@ const Batteries = () => {
 };
 
 export default Batteries;
-
