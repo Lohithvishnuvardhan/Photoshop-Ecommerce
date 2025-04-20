@@ -87,16 +87,24 @@ export const authAPI = {
   },
 
   async forgotPassword(email: string) {
-    const response = await api.post('/auth/forgot-password', { email });
-    return response.data;
+    try {
+      const response = await api.post('/auth/forgot-password', { email });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to send reset email');
+    }
   },
 
   async resetPassword(token: string, newPassword: string) {
-    const response = await api.post('/auth/reset-password', {
-      token,
-      newPassword
-    });
-    return response.data;
+    try {
+      const response = await api.post('/auth/reset-password', {
+        token,
+        newPassword,
+      });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to reset password');
+    }
   }
 };
 
