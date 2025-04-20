@@ -17,9 +17,13 @@ export function ForgotPassword() {
       // Call your API to send reset password email
       await authAPI.forgotPassword(email);
       setEmailSent(true);
-      toast.success('Password reset link has been sent to your email');
+      toast.success('Password reset link has been sent to your email', {
+        duration: 2000, // 2 seconds
+      });
     } catch (error: any) {
-      toast.error(error.message || 'Failed to send reset email');
+      toast.error(error.message || 'Failed to send reset email', {
+        duration: 2000, // 2 seconds
+      });
     } finally {
       setIsLoading(false);
     }

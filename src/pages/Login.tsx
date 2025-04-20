@@ -26,10 +26,14 @@ export function Login() {
         localStorage.setItem('cart', JSON.stringify(cart));
       }
 
-      toast.success('Login successful!');
+      toast.success('Login successful!', {
+        duration: 2000, // 2 seconds
+      });
       navigate('/');
     } catch (error: any) {
-      toast.error(error.message || 'Login failed');
+      toast.error(error.message || 'Login failed', {
+        duration: 2000, // 2 seconds
+      });
     } finally {
       setIsLoading(false);
     }

@@ -123,9 +123,13 @@ export function Layout() {
     navigate(result.path);
     
     if (result.isCategory) {
-      toast.success(`Browsing ${result.name}`);
+      toast.success(`Browsing ${result.name}`, {
+        duration: 2000, // 2 seconds
+      });
     } else {
-      toast.success(`Viewing ${result.name}`);
+      toast.success(`Viewing ${result.name}`, {
+        duration: 2000, // 2 seconds
+      });
     }
   };
 
@@ -135,7 +139,9 @@ export function Layout() {
     if (searchResults.length > 0) {
       handleResultClick(searchResults[0]);
     } else if (searchQuery.trim() !== '') {
-      toast.error('No matching products or categories found');
+      toast.error('No matching products or categories found', {
+        duration: 2000, // 2 seconds
+      });
     }
   };
 

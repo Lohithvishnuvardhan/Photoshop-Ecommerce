@@ -19,24 +19,31 @@ export function ResetPassword() {
     e.preventDefault();
     
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error('Passwords do not match', {
+        duration: 2000, // 2 seconds
+      });
       return;
     }
 
     if (password.length < 8) {
-      toast.error('Password must be at least 8 characters long');
+      toast.error('Password must be at least 8 characters long', {
+        duration: 2000, // 2 seconds
+      });
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // Call your API to reset the password
       await authAPI.resetPassword(token!, password);
-      toast.success('Password has been reset successfully');
+      toast.success('Password has been reset successfully', {
+        duration: 2000, // 2 seconds
+      });
       navigate('/login');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to reset password');
+      toast.error(error.message || 'Failed to reset password', {
+        duration: 2000, // 2 seconds
+      });
     } finally {
       setIsLoading(false);
     }
