@@ -21,75 +21,78 @@ import { Toaster } from 'react-hot-toast';
 import OrderSuccess from './pages/OrderSuccess';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
+import { SearchProvider } from './context/SearchContext';
 
 function App() {
 
   return (
-    <CartProvider>
-      <Router>
-        <div className="min-h-screen bg-gray-50">
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="cameras" element={
-                <PrivateRoute>
-                  <Cameras />
-                </PrivateRoute>
-              } />
-              <Route path="lenses" element={
-                <PrivateRoute>
-                  <Lenses />
-                </PrivateRoute>
-              } />
-              <Route path="accessories" element={
-                <PrivateRoute>
-                  <Accessories />
-                </PrivateRoute>
-              } />
-              <Route path="batteries" element={
-                <PrivateRoute>
-                  <Batteries />
-                </PrivateRoute>
-              } />
-              <Route path="about" element={
-                <PrivateRoute>
-                  <About />
-                </PrivateRoute>
-              } />
-              <Route path="contact" element={
-                <PrivateRoute>
-                  <Contact />
-                </PrivateRoute>
-              } />
-              <Route path="profile" element={
-                <PrivateRoute>
-                  <Profile />
-                </PrivateRoute>
-              } />
-              <Route path="login" element={<Login />} />
-              <Route path="signup" element={<SignUp />} />
-              <Route path="payment" element={
-                <PrivateRoute>
-                  <Payment />
-                </PrivateRoute>
-              } />
-              <Route path="cart" element={
-                <PrivateRoute>
-                  <CartPage />
-                </PrivateRoute>
-              } />
-              <Route path="shipping" element={<ShippingInfo />} />
-              <Route path="returns" element={<Returns />} />
-              <Route path="faq" element={<FAQ />} />
-              <Route path="order-success" element={<OrderSuccess />} />
-              <Route path="forgot-password" element={<ForgotPassword />} />
-              <Route path="reset-password" element={<ResetPassword />} />
-            </Route>
-          </Routes>
-          <Toaster />
-        </div>
-      </Router>
-    </CartProvider>
+    <SearchProvider>
+      <CartProvider>
+        <Router>
+          <div className="min-h-screen bg-gray-50">
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="cameras" element={
+                  <PrivateRoute>
+                    <Cameras />
+                  </PrivateRoute>
+                } />
+                <Route path="lenses" element={
+                  <PrivateRoute>
+                    <Lenses />
+                  </PrivateRoute>
+                } />
+                <Route path="accessories" element={
+                  <PrivateRoute>
+                    <Accessories />
+                  </PrivateRoute>
+                } />
+                <Route path="batteries" element={
+                  <PrivateRoute>
+                    <Batteries />
+                  </PrivateRoute>
+                } />
+                <Route path="about" element={
+                  <PrivateRoute>
+                    <About />
+                  </PrivateRoute>
+                } />
+                <Route path="contact" element={
+                  <PrivateRoute>
+                    <Contact />
+                  </PrivateRoute>
+                } />
+                <Route path="profile" element={
+                  <PrivateRoute>
+                    <Profile />
+                  </PrivateRoute>
+                } />
+                <Route path="login" element={<Login />} />
+                <Route path="signup" element={<SignUp />} />
+                <Route path="payment" element={
+                  <PrivateRoute>
+                    <Payment />
+                  </PrivateRoute>
+                } />
+                <Route path="cart" element={
+                  <PrivateRoute>
+                    <CartPage />
+                  </PrivateRoute>
+                } />
+                <Route path="shipping" element={<ShippingInfo />} />
+                <Route path="returns" element={<Returns />} />
+                <Route path="faq" element={<FAQ />} />
+                <Route path="order-success" element={<OrderSuccess />} />
+                <Route path="forgot-password" element={<ForgotPassword />} />
+                <Route path="reset-password" element={<ResetPassword />} />
+              </Route>
+            </Routes>
+            <Toaster />
+          </div>
+        </Router>
+      </CartProvider>
+    </SearchProvider>
   );
 }
 
