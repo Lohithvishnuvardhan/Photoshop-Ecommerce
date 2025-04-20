@@ -1,5 +1,5 @@
 import { useCart } from '../context/Cartcontext';
-import { ShoppingCart, Shield, Truck, Clock, Camera } from 'lucide-react';
+import { Shield, Truck, Clock, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 

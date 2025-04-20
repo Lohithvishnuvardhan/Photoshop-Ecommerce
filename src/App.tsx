@@ -19,6 +19,8 @@ import PrivateRoute from './components/PrivateRoute';
 import { CartProvider } from './context/Cartcontext';
 import { Toaster } from 'react-hot-toast';
 import OrderSuccess from './pages/OrderSuccess';
+import { ForgotPassword } from './pages/ForgotPassword';
+import { ResetPassword } from './pages/ResetPassword';
 
 function App() {
 
@@ -80,6 +82,8 @@ function App() {
               <Route path="returns" element={<Returns />} />
               <Route path="faq" element={<FAQ />} />
               <Route path="order-success" element={<OrderSuccess />} />
+              <Route path="forgot-password" element={<ForgotPassword />} />
+              <Route path="reset-password" element={<ResetPassword />} />
             </Route>
           </Routes>
           <Toaster />

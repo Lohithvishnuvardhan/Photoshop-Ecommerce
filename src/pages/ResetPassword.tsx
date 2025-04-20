@@ -1,55 +1,67 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Lock, Eye, EyeOff } from 'lucide-react';
 import { authAPI } from '../api';
 import toast from 'react-hot-toast';
-import { useCart } from '../context/Cartcontext';
 
-export function Login() {
-  const [email, setEmail] = useState('');
+export function ResetPassword() {
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { cart } = useCart();
+
+  const token = searchParams.get('token');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
+    if (password.length < 8) {
+      toast.error('Password must be at least 8 characters long');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const response = await authAPI.login(email, password);
-      localStorage.setItem('token', response.token);
-      
-      // If there are items in the cart, keep them
-      if (cart.length > 0) {
-        localStorage.setItem('cart', JSON.stringify(cart));
-      }
-
-      toast.success('Login successful!');
-      navigate('/');
+      // Call your API to reset the password
+      await authAPI.resetPassword(token!, password);
+      toast.success('Password has been reset successfully');
+      navigate('/login');
     } catch (error: any) {
-      toast.error(error.message || 'Login failed');
+      toast.error(error.message || 'Failed to reset password');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  if (!token) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="bg-gray-800 py-8 px-4 shadow-xl rounded-lg sm:px-10">
+            <p className="text-center text-red-500">Invalid or expired reset link</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="text-center text-3xl font-extrabold text-white">
-          Sign in to your account
+          Create new password
         </h2>
         <p className="mt-2 text-center text-sm text-gray-400">
-          Or{' '}
-          <Link to="/signup" className="font-medium text-purple-500 hover:text-purple-400">
-            create a new account
-          </Link>
+          Make sure it's at least 8 characters long
         </p>
       </div>
 
@@ -57,30 +69,8 @@ export function Login() {
         <div className="bg-gray-800 py-8 px-4 shadow-xl rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-200">
-                Email address
-              </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full pl-10 px-3 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 bg-gray-700 text-white sm:text-sm"
-                  placeholder="Enter your email"
-                />
-              </div>
-            </div>
-
-            <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-200">
-                Password
+                New password
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -90,16 +80,15 @@ export function Login() {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 bg-gray-700 text-white sm:text-sm"
-                  placeholder="Enter your password"
+                  placeholder="Enter new password"
                 />
                 <button
                   type="button"
-                  onClick={togglePasswordVisibility}
+                  onClick={() => setShowPassword(!showPassword)}
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                 >
                   {showPassword ? (
@@ -111,23 +100,35 @@ export function Login() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-200">
+                Confirm new password
+              </label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
                 <input
-                  id="remember_me"
-                  name="remember_me"
-                  type="checkbox"
-                  className="h-4 w-4 text-purple-500 focus:ring-purple-500 border-gray-600 rounded bg-gray-700"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="appearance-none block w-full pl-10 pr-10 py-2 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 bg-gray-700 text-white sm:text-sm"
+                  placeholder="Confirm new password"
                 />
-                <label htmlFor="remember_me" className="ml-2 block text-sm text-gray-200">
-                  Remember me
-                </label>
-              </div>
-
-              <div className="text-sm">
-                <Link to="/forgot-password" className="font-medium text-purple-500 hover:text-purple-400">
-                  Forgot your password?
-                </Link>
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300" />
+                  )}
+                </button>
               </div>
             </div>
 
@@ -142,10 +143,10 @@ export function Login() {
                 {isLoading ? (
                   <div className="flex items-center">
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Signing in...
+                    Resetting password...
                   </div>
                 ) : (
-                  'Sign in'
+                  'Reset Password'
                 )}
               </button>
             </div>
@@ -154,4 +155,4 @@ export function Login() {
       </div>
     </div>
   );
-}
+} 
