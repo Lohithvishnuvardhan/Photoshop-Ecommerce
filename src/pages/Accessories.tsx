@@ -1,5 +1,5 @@
 import { useCart } from '../context/Cartcontext';
-import { ShoppingCart, Shield, Truck } from 'lucide-react';
+import { ShoppingCart, Shield, Truck, Clock, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const accessories = [
@@ -123,62 +123,93 @@ const Accessories = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h1 className="text-4xl font-bold text-gray-900">Professional Accessories</h1>
-          <p className="text-xl text-gray-600 mt-2">Essential gear for your photography needs</p>
-        </div>
-        <div className="flex gap-6">
-          <div className="flex items-center text-green-600">
-            <Truck className="w-6 h-6 mr-2" />
-            <span>Free Shipping</span>
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-4xl font-bold text-gray-900">Professional Accessories</h1>
+            <p className="mt-2 text-gray-600">Essential gear for your photography needs</p>
           </div>
-          <div className="flex items-center text-purple-600">
-            <Shield className="w-6 h-6 mr-2" />
-            <span>Warranty Included</span>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center text-green-600">
+              <Truck className="h-5 w-5 mr-2" />
+              <span>Free Shipping</span>
+            </div>
+            <div className="flex items-center text-purple-600">
+              <Shield className="h-5 w-5 mr-2" />
+              <span>Warranty Included</span>
+            </div>
           </div>
         </div>
-      </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {accessories.map((accessory) => (
+            <div key={accessory.id} className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
+              <div className="relative">
+                <img
+                  src={accessory.image}
+                  alt={accessory.name}
+                  className="w-full h-[400px] object-cover"
+                />
+                <div className="absolute top-4 right-4 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  Professional Grade
+                </div>
+                <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  In Stock
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{accessory.name}</h3>
+                    <p className="text-gray-600">{accessory.description}</p>
+                  </div>
+                </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {accessories.map((accessory) => (
-          <div key={accessory.id} className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="relative">
-              <img
-                src={accessory.image}
-                alt={accessory.name}
-                className="w-full h-64 object-cover"
-              />
-              <div className="absolute top-4 left-4 flex gap-2">
-                {accessory.inStock && (
-                  <span className="bg-green-500 text-white px-3 py-1 rounded-full text-sm">
-                    In Stock
-                  </span>
-                )}
-                {accessory.isProGrade && (
-                  <span className="bg-purple-500 text-white px-3 py-1 rounded-full text-sm">
-                    Professional Grade
-                  </span>
-                )}
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold mb-2">Key Features</h4>
+                  <ul className="grid grid-cols-2 gap-2">
+                    {accessory.features.map((feature, index) => (
+                      <li key={index} className="flex items-center text-gray-600">
+                        <Camera className="h-4 w-4 text-purple-500 mr-2" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold mb-2">Specifications</h4>
+                  <ul className="grid grid-cols-2 gap-2">
+                    {accessory.specs.map((spec, index) => (
+                      <li key={index} className="flex items-center text-gray-600">
+                        <span className="mr-2">•</span>
+                        {spec}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <span className="text-3xl font-bold text-gray-900">{formatPrice(accessory.price)}</span>
+                    <div className="flex items-center mt-2 text-sm text-gray-600">
+                      <Clock className="h-4 w-4 mr-1" />
+                      <span>Ships in 24 hours</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleAddToCart(accessory)}
+                    className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  >
+                    <ShoppingCart className="w-5 h-5 mr-2 inline-block" />
+                    Add to Cart
+                  </button>
+                </div>
               </div>
             </div>
-            <div className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900">{accessory.name}</h3>
-              <p className="text-gray-600 mt-2">{accessory.description}</p>
-              <div className="mt-4 flex justify-between items-center">
-                <span className="text-2xl font-bold text-gray-900">{formatPrice(accessory.price)}</span>
-                <button
-                  onClick={() => handleAddToCart(accessory)}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center"
-                >
-                  <ShoppingCart className="w-5 h-5 mr-2" />
-                  Add to Cart
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
