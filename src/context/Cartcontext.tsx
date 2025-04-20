@@ -51,20 +51,31 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, []);
 
-  const addToCart = async (product: CartItem['product']) => {
+  const addToCart = async (product: any) => {
     try {
       setIsLoading(true);
-      await cartAPI.addToCart(product._id, 1);
+      // Transform the product to match CartItem structure
+      const cartProduct = {
+        _id: product._id || product.id,
+        name: product.name,
+        price: product.price,
+        description: product.description,
+        imageUrl: product.imageUrl || product.image,
+        category: product.category,
+        stock: product.stock
+      };
+
+      await cartAPI.addToCart(cartProduct._id, 1);
       setCart(prev => {
-        const exists = prev.find(cartItem => cartItem.product._id === product._id);
+        const exists = prev.find(cartItem => cartItem.product._id === cartProduct._id);
         if (exists) {
           return prev.map(cartItem =>
-            cartItem.product._id === product._id
+            cartItem.product._id === cartProduct._id
               ? { ...cartItem, quantity: cartItem.quantity + 1 }
               : cartItem
           );
         }
-        return [...prev, { product, quantity: 1 }];
+        return [...prev, { product: cartProduct, quantity: 1 }];
       });
       toast.success('Item added to cart');
     } catch (error) {
