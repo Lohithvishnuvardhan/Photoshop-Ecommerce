@@ -62,6 +62,7 @@ export function Layout() {
   const cartItems = useCartStore(state => state.items);
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const { isAuthenticated, logout } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handle click outside search results
   useEffect(() => {
@@ -145,12 +146,19 @@ export function Layout() {
     }
   };
 
-  const handleLogout = () => {
-    logout();
-    localStorage.removeItem('token'); // Clear the token
-    localStorage.removeItem('cart'); // Clear the cart data
-    toast.success('Successfully logged out');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      setIsLoading(true);
+      logout();
+      localStorage.removeItem('token');
+      localStorage.removeItem('cart');
+      toast.success('Successfully logged out');
+      navigate('/login');
+    } catch (error) {
+      toast.error('Error logging out. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -225,46 +233,40 @@ export function Layout() {
             </div>
 
             <div className="flex items-center space-x-6">
+              <Link 
+                to="/cart" 
+                className="relative text-gray-300 hover:text-white"
+                aria-label="Shopping cart"
+              >
+                <ShoppingCart className="h-6 w-6" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                    {itemCount}
+                  </span>
+                )}
+              </Link>
+
               {isAuthenticated ? (
-                <div className="flex items-center space-x-6">
-                  <Link to="/profile" className="text-gray-300 hover:text-white flex items-center space-x-1">
+                <div className="relative flex items-center space-x-4">
+                  <Link to="/profile" className="text-gray-300 hover:text-white">
                     <User className="h-6 w-6" />
-                    <span>Profile</span>
                   </Link>
                   <button
                     onClick={handleLogout}
-                    className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors duration-200"
+                    disabled={isLoading}
+                    className="text-gray-300 hover:text-white disabled:opacity-50"
+                    aria-label="Logout"
                   >
-                    <LogOut className="h-5 w-5" />
-                    <span>Sign Out</span>
+                    <LogOut className="h-6 w-6" />
                   </button>
-                  <Link to="/cart" className="text-gray-300 hover:text-white relative">
-                    <ShoppingCart className="h-6 w-6" />
-                    {itemCount > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                        {itemCount}
-                      </span>
-                    )}
-                  </Link>
                 </div>
               ) : (
-                <>
-                  <Link 
-                    to="/login" 
-                    className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition-colors duration-200"
-                  >
-                    <User className="h-5 w-5" />
-                    <span>Sign In</span>
-                  </Link>
-                  <Link to="/cart" className="text-gray-300 hover:text-white relative">
-                    <ShoppingCart className="h-6 w-6" />
-                    {itemCount > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                        {itemCount}
-                      </span>
-                    )}
-                  </Link>
-                </>
+                <Link 
+                  to="/login"
+                  className="text-white bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg font-medium"
+                >
+                  Sign In
+                </Link>
               )}
             </div>
           </div>
@@ -294,50 +296,30 @@ export function Layout() {
         </nav>
       </header>
 
-      <main className="bg-gray-100">
+      <div className="bg-gray-800 shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex space-x-8 h-12">
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                to={category.path}
+                className="text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center"
+              >
+                {category.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Outlet />
       </main>
 
-      <footer className="bg-gray-800 border-t border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <h3 className="font-semibold text-white">About Us</h3>
-              <p className="mt-4 text-sm text-gray-400">
-                Leading provider of professional photography equipment since 1990.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white">Quick Links</h3>
-              <ul className="mt-4 space-y-2">
-                <li>
-                  <Link to="/shipping" className="text-sm text-gray-400 hover:text-white">
-                    Shipping Info
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/returns" className="text-sm text-gray-400 hover:text-white">
-                    Returns
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/faq" className="text-sm text-gray-400 hover:text-white">
-                    FAQ
-                  </Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold text-white">Contact</h3>
-              <ul className="mt-4 space-y-2">
-                <li className="text-sm text-gray-400">1234 Camera Street</li>
-                <li className="text-sm text-gray-400">Photo City, PC 12345</li>
-                <li className="text-sm text-gray-400">contact@photopixel.com</li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-700 text-center text-sm text-gray-400">
-            © 2025 Photo Pixel. All rights reserved.
+      <footer className="bg-gray-800 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center text-gray-400">
+            <p>&copy; 2024 Photo Pixel. All rights reserved.</p>
           </div>
         </div>
       </footer>

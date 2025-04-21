@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { Login } from './pages/Login';
@@ -15,13 +15,24 @@ import ShippingInfo from './pages/ShippingInfo';
 import Returns from './pages/Returns';
 import FAQ from './pages/FAQ';
 import Profile from './pages/Profile';
-import PrivateRoute from './components/PrivateRoute';
-import { CartProvider } from './context/Cartcontext';
+import { useAuth } from './hooks/useAuth';
 import { Toaster } from 'react-hot-toast';
 import OrderSuccess from './pages/OrderSuccess';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
 import { SearchProvider } from './context/SearchContext';
+import { CartProvider } from './context/Cartcontext';
+
+// Protected Route component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+};
 
 function App() {
 
@@ -34,51 +45,51 @@ function App() {
               <Route path="/" element={<Layout />}>
                 <Route index element={<Home />} />
                 <Route path="cameras" element={
-                  <PrivateRoute>
+                  <ProtectedRoute>
                     <Cameras />
-                  </PrivateRoute>
+                  </ProtectedRoute>
                 } />
                 <Route path="lenses" element={
-                  <PrivateRoute>
+                  <ProtectedRoute>
                     <Lenses />
-                  </PrivateRoute>
+                  </ProtectedRoute>
                 } />
                 <Route path="accessories" element={
-                  <PrivateRoute>
+                  <ProtectedRoute>
                     <Accessories />
-                  </PrivateRoute>
+                  </ProtectedRoute>
                 } />
                 <Route path="batteries" element={
-                  <PrivateRoute>
+                  <ProtectedRoute>
                     <Batteries />
-                  </PrivateRoute>
+                  </ProtectedRoute>
                 } />
                 <Route path="about" element={
-                  <PrivateRoute>
+                  <ProtectedRoute>
                     <About />
-                  </PrivateRoute>
+                  </ProtectedRoute>
                 } />
                 <Route path="contact" element={
-                  <PrivateRoute>
+                  <ProtectedRoute>
                     <Contact />
-                  </PrivateRoute>
+                  </ProtectedRoute>
                 } />
                 <Route path="profile" element={
-                  <PrivateRoute>
+                  <ProtectedRoute>
                     <Profile />
-                  </PrivateRoute>
+                  </ProtectedRoute>
                 } />
                 <Route path="login" element={<Login />} />
                 <Route path="signup" element={<SignUp />} />
                 <Route path="payment" element={
-                  <PrivateRoute>
+                  <ProtectedRoute>
                     <Payment />
-                  </PrivateRoute>
+                  </ProtectedRoute>
                 } />
                 <Route path="cart" element={
-                  <PrivateRoute>
+                  <ProtectedRoute>
                     <CartPage />
-                  </PrivateRoute>
+                  </ProtectedRoute>
                 } />
                 <Route path="shipping" element={<ShippingInfo />} />
                 <Route path="returns" element={<Returns />} />
