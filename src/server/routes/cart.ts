@@ -1,71 +1,83 @@
-import express, { Router, Response } from 'express';
-import { IAuthRequest } from '.../.../middlewares/isAuthenticated'; // Update path if needed
-import { Cart } from '../models/cart.model'; // Rename and import correctly
+import express, { Request, Response, NextFunction } from 'express';
+import { Cart } from '../models/cart.model';
 
-const router: Router = express.Router();
+interface AuthRequest extends Request {
+  user?: {
+    _id: string;
+  };
+}
 
-router.get('/', async (req: IAuthRequest, res: Response): Promise<void> => {
+const router = express.Router();
+
+const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
-    const userId = req.user?._id;
-    const cartItems = await Cart.find({ user: userId });
-    res.status(200).json(cartItems);
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      res.status(401).json({ message: 'No token provided' });
+      return;
+    }
+
+    // Simulate auth logic
+    req.user = { _id: 'dummy-user-id' };
+    next();
   } catch (error) {
-    res.status(500).json({ error: 'Failed to fetch cart items' });
+    res.status(401).json({ message: 'Authentication failed' });
+  }
+};
+
+// Get cart items
+router.get('/cart', auth, async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user?._id) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
+    let cart = await Cart.findOne({ userId: req.user._id }).populate('items.productId');
+
+    if (!cart) {
+      cart = await Cart.create({
+        userId: req.user._id,
+        items: [],
+      });
+    }
+
+    res.status(200).json(cart);
+  } catch (error) {
+    console.error('Error fetching cart:', error);
+    res.status(500).json({ message: 'Error fetching cart' });
   }
 });
 
-router.post('/', async (req: IAuthRequest, res: Response): Promise<void> => {
+// Add item to cart
+router.post('/add', auth, async (req: AuthRequest, res: Response) => {
   try {
-    const userId = req.user?._id;
+    if (!req.user?._id) {
+      res.status(401).json({ message: 'Unauthorized' });
+      return;
+    }
+
     const { productId, quantity } = req.body;
 
-    const existingItem = await Cart.findOne({ user: userId, product: productId });
+    let cart = await Cart.findOne({ userId: req.user._id });
+
+    if (!cart) {
+      cart = await Cart.create({ userId: req.user._id, items: [] });
+    }
+
+    const existingItem = cart.items.find(item => item.productId.toString() === productId);
 
     if (existingItem) {
       existingItem.quantity += quantity;
-      await existingItem.save();
-      res.status(200).json(existingItem);
     } else {
-      const newItem = new Cart({ user: userId, product: productId, quantity });
-      await newItem.save();
-      res.status(201).json(newItem);
-    }
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to add item to cart' });
-  }
-});
-
-router.put('/:id', async (req: IAuthRequest, res: Response): Promise<void> => {
-  try {
-    const itemId = req.params.id;
-    const { quantity } = req.body;
-
-    const updatedItem = await Cart.findByIdAndUpdate(itemId, { quantity }, { new: true });
-
-    if (!updatedItem) {
-      res.status(404).json({ error: 'Cart item not found' });
-      return;
+      cart.items.push({ productId, quantity });
     }
 
-    res.status(200).json(updatedItem);
+    await cart.save();
+    res.status(200).json(cart);
   } catch (error) {
-    res.status(500).json({ error: 'Failed to update cart item' });
-  }
-});
-
-router.delete('/:id', async (req: IAuthRequest, res: Response): Promise<void> => {
-  try {
-    const itemId = req.params.id;
-    const deletedItem = await Cart.findByIdAndDelete(itemId);
-
-    if (!deletedItem) {
-      res.status(404).json({ error: 'Cart item not found' });
-      return;
-    }
-
-    res.status(200).json({ message: 'Item deleted' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete cart item' });
+    console.error('Error adding to cart:', error);
+    res.status(500).json({ message: 'Error adding to cart' });
   }
 });
 
