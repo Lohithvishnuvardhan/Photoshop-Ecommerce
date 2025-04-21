@@ -1,106 +1,71 @@
-import express, { Request, Response } from 'express';
-import { Cart } from '../models/Cart';
+import express, { Router, Response } from 'express';
+import { IAuthRequest } from '../../middlewares/isAuthenticated'; // Update path if needed
+import { Cart } from '../models/cart.model'; // Rename and import correctly
 
-interface AuthRequest extends Request {
-  user?: {
-    _id: string;
-  };
-}
+const router: Router = express.Router();
 
-const router = express.Router();
-
-// Get user's cart
-router.get('/', async (req: AuthRequest, res: Response) => {
+router.get('/', async (req: IAuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?._id;
-    if (!userId) {
-      return res.status(401).json({ message: 'User not authenticated' });
-    }
-
-    const cart = await Cart.findOne({ userId }).populate('products.productId');
-    if (!cart) {
-      return res.json({ products: [] });
-    }
-    res.json(cart.products);
+    const cartItems = await Cart.find({ user: userId });
+    res.status(200).json(cartItems);
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching cart' });
+    res.status(500).json({ error: 'Failed to fetch cart items' });
   }
 });
 
-// Add item to cart
-router.post('/add', async (req: AuthRequest, res: Response) => {
+router.post('/', async (req: IAuthRequest, res: Response): Promise<void> => {
   try {
     const userId = req.user?._id;
-    if (!userId) {
-      return res.status(401).json({ message: 'User not authenticated' });
-    }
-
     const { productId, quantity } = req.body;
-    let cart = await Cart.findOne({ userId });
 
-    if (!cart) {
-      cart = new Cart({ userId, products: [] });
-    }
+    const existingItem = await Cart.findOne({ user: userId, product: productId });
 
-    const productIndex = cart.products.findIndex(p => p.productId.toString() === productId);
-
-    if (productIndex > -1) {
-      cart.products[productIndex].quantity += quantity;
+    if (existingItem) {
+      existingItem.quantity += quantity;
+      await existingItem.save();
+      res.status(200).json(existingItem);
     } else {
-      cart.products.push({ productId, quantity });
+      const newItem = new Cart({ user: userId, product: productId, quantity });
+      await newItem.save();
+      res.status(201).json(newItem);
     }
-
-    await cart.save();
-    res.json(cart);
   } catch (error) {
-    res.status(500).json({ message: 'Error adding to cart' });
+    res.status(500).json({ error: 'Failed to add item to cart' });
   }
 });
 
-// Update item quantity
-router.put('/:productId', async (req: AuthRequest, res: Response) => {
+router.put('/:id', async (req: IAuthRequest, res: Response): Promise<void> => {
   try {
-    const userId = req.user?._id;
-    if (!userId) {
-      return res.status(401).json({ message: 'User not authenticated' });
+    const itemId = req.params.id;
+    const { quantity } = req.body;
+
+    const updatedItem = await Cart.findByIdAndUpdate(itemId, { quantity }, { new: true });
+
+    if (!updatedItem) {
+      res.status(404).json({ error: 'Cart item not found' });
+      return;
     }
 
-    const cart = await Cart.findOne({ userId });
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
-    }
-
-    const productIndex = cart.products.findIndex(p => p.productId.toString() === req.params.productId);
-    if (productIndex === -1) {
-      return res.status(404).json({ message: 'Product not found in cart' });
-    }
-
-    cart.products[productIndex].quantity = req.body.quantity;
-    await cart.save();
-    res.json(cart);
+    res.status(200).json(updatedItem);
   } catch (error) {
-    res.status(500).json({ message: 'Error updating cart' });
+    res.status(500).json({ error: 'Failed to update cart item' });
   }
 });
 
-// Remove item from cart
-router.delete('/:productId', async (req: AuthRequest, res: Response) => {
+router.delete('/:id', async (req: IAuthRequest, res: Response): Promise<void> => {
   try {
-    const userId = req.user?._id;
-    if (!userId) {
-      return res.status(401).json({ message: 'User not authenticated' });
+    const itemId = req.params.id;
+    const deletedItem = await Cart.findByIdAndDelete(itemId);
+
+    if (!deletedItem) {
+      res.status(404).json({ error: 'Cart item not found' });
+      return;
     }
 
-    const cart = await Cart.findOne({ userId });
-    if (!cart) {
-      return res.status(404).json({ message: 'Cart not found' });
-    }
-
-    cart.products = cart.products.filter(p => p.productId.toString() !== req.params.productId);
-    await cart.save();
-    res.json(cart);
+    res.status(200).json({ message: 'Item deleted' });
   } catch (error) {
-    res.status(500).json({ message: 'Error removing from cart' });
+    res.status(500).json({ error: 'Failed to delete cart item' });
   }
 });
 
