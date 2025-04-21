@@ -17,7 +17,7 @@ import FAQ from './pages/FAQ';
 import Profile from './pages/Profile';
 import { useAuth } from './hooks/useAuth';
 import { Toaster } from 'react-hot-toast';
-import OrderSuccess from './pages/OrderSuccess';
+import { OrderSuccess } from './pages/OrderSuccess';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
 import { SearchProvider } from './context/SearchContext';
