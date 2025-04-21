@@ -145,6 +145,16 @@ export const cartAPI = {
         quantity: item.quantity
       }))
     };
+  },
+
+  clearCart: async () => {
+    const response = await api.delete('/cart/clear');
+    return response.data;
+  },
+
+  syncCart: async (items: any[]) => {
+    const response = await api.post('/cart/sync', { items });
+    return response.data;
   }
 };
 
