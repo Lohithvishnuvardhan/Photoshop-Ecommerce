@@ -1,5 +1,5 @@
 import express, { Router, Response } from 'express';
-import { IAuthRequest } from '../../middlewares/isAuthenticated'; // Update path if needed
+import { IAuthRequest } from '.../.../middlewares/isAuthenticated'; // Update path if needed
 import { Cart } from '../models/cart.model'; // Rename and import correctly
 
 const router: Router = express.Router();
