@@ -171,24 +171,6 @@ export function Layout() {
               <span className="font-bold text-3xl text-white tracking-tight">Photo Pixel</span>
             </Link>
 
-            <div className="hidden md:flex items-center space-x-8">
-              {categories.map((category) => (
-                <Link
-                  key={category.id}
-                  to={category.path}
-                  className="text-gray-300 hover:text-white text-sm font-medium"
-                >
-                  {category.name}
-                </Link>
-              ))}
-              <Link to="/about" className="text-gray-300 hover:text-white text-sm font-medium">
-                About
-              </Link>
-              <Link to="/contact" className="text-gray-300 hover:text-white text-sm font-medium">
-                Contact
-              </Link>
-            </div>
-
             <div className="flex-1 max-w-lg mx-8 relative" ref={searchRef}>
               <form onSubmit={handleSearchSubmit}>
                 <div className="relative">
@@ -288,8 +270,47 @@ export function Layout() {
               )}
             </div>
           </div>
+
+          <div className="py-4">
+            <div className="flex space-x-8">
+              <Link to="/cameras" className="text-gray-300 hover:text-white">
+                Cameras
+              </Link>
+              <Link to="/lenses" className="text-gray-300 hover:text-white">
+                Lenses
+              </Link>
+              <Link to="/accessories" className="text-gray-300 hover:text-white">
+                Accessories
+              </Link>
+              <Link to="/batteries" className="text-gray-300 hover:text-white">
+                Batteries
+              </Link>
+              <Link to="/about" className="text-gray-300 hover:text-white">
+                About
+              </Link>
+              <Link to="/contact" className="text-gray-300 hover:text-white">
+                Contact
+              </Link>
+            </div>
+          </div>
         </nav>
       </header>
+
+      <div className="bg-gray-800 shadow">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex space-x-8 h-12">
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                to={category.path}
+                className="text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center"
+              >
+                {category.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Outlet />
