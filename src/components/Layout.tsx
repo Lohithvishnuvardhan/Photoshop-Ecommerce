@@ -58,8 +58,8 @@ export function Layout() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const cartItems = useCartStore(state => state.items);
-  const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const items = useCartStore(state => state.items);
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const { isAuthenticated, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -142,11 +142,11 @@ export function Layout() {
   const handleLogout = async () => {
     try {
       setIsLoading(true);
-      logout();
+    logout();
       localStorage.removeItem('token');
       localStorage.removeItem('cart');
-      toast.success('Successfully logged out');
-      navigate('/login');
+    toast.success('Successfully logged out');
+    navigate('/login');
     } catch (error) {
       toast.error('Error logging out. Please try again.');
     } finally {
@@ -158,22 +158,46 @@ export function Layout() {
     <div className="min-h-screen bg-gray-900">
       <header className="border-b border-gray-800">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             <Link to="/" className="flex items-center space-x-3">
-              <Camera className="h-10 w-10 text-purple-500" />
-              <span className="font-bold text-3xl text-white tracking-tight">Photo Pixel</span>
+              <Camera className="h-12 w-12 text-purple-500" />
+              <span className="font-bold text-4xl text-white tracking-tight">Photo Pixel</span>
             </Link>
+
+            <div className="hidden md:flex items-center space-x-12">
+              {categories.map((category) => (
+                <Link
+                  key={category.id}
+                  to={category.path}
+                  className="text-gray-300 hover:text-white text-lg font-medium transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-gray-800"
+                >
+                  {category.name}
+                </Link>
+              ))}
+              <Link 
+                to="/about" 
+                className="text-gray-300 hover:text-white text-lg font-medium transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-gray-800"
+              >
+                About
+              </Link>
+              <Link 
+                to="/contact" 
+                className="text-gray-300 hover:text-white text-lg font-medium transition-colors duration-200 px-4 py-2 rounded-lg hover:bg-gray-800"
+              >
+                Contact
+              </Link>
+            </div>
 
             <div className="flex-1 max-w-lg mx-8 relative" ref={searchRef}>
               <form onSubmit={handleSearchSubmit}>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="text"
+              <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
+                <input
+                  type="text"
                     value={searchQuery}
                     onChange={(e) => handleSearch(e.target.value)}
-                    placeholder="Search for cameras, lenses, accessories..."
-                    className="w-full pl-10 pr-10 py-2 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-400"
+                  placeholder="Search for cameras, lenses, accessories..."
+                    className="w-full pl-12 pr-12 py-3 text-lg bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-400"
                   />
                   {searchQuery && (
                     <button
@@ -183,12 +207,12 @@ export function Layout() {
                         setSearchResults([]);
                         setShowResults(false);
                       }}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2"
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2"
                     >
-                      <X className="h-5 w-5 text-gray-400 hover:text-gray-300" />
+                      <X className="h-6 w-6 text-gray-400 hover:text-gray-300" />
                     </button>
                   )}
-                </div>
+              </div>
               </form>
 
               {showResults && searchResults.length > 0 && (
@@ -196,9 +220,9 @@ export function Layout() {
                   <ul className="py-2">
                     {searchResults.map((result) => (
                       <li key={result.id}>
-                        <button
+                  <button
                           onClick={() => handleResultClick(result)}
-                          className="w-full px-4 py-2 text-left text-gray-300 hover:bg-gray-700 hover:text-white flex items-center justify-between"
+                          className="w-full px-4 py-3 text-left text-gray-300 hover:bg-gray-700 hover:text-white flex items-center justify-between text-lg"
                         >
                           <span className="flex items-center">
                             {result.isCategory ? (
@@ -217,7 +241,7 @@ export function Layout() {
                               ${result.price}
                             </span>
                           )}
-                        </button>
+                  </button>
                       </li>
                     ))}
                   </ul>
@@ -225,62 +249,42 @@ export function Layout() {
               )}
             </div>
 
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-8">
               <Link 
                 to="/cart" 
                 className="relative text-gray-300 hover:text-white"
                 aria-label="Shopping cart"
               >
-                <ShoppingCart className="h-6 w-6" />
+                <ShoppingCart className="h-8 w-8" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-sm font-bold rounded-full h-6 w-6 flex items-center justify-center">
                     {itemCount}
                   </span>
                 )}
               </Link>
 
               {isAuthenticated ? (
-                <div className="relative flex items-center space-x-4">
+                <div className="relative flex items-center space-x-6">
                   <Link to="/profile" className="text-gray-300 hover:text-white">
-                    <User className="h-6 w-6" />
-                  </Link>
+                    <User className="h-8 w-8" />
+              </Link>
                   <button
                     onClick={handleLogout}
                     disabled={isLoading}
                     className="text-gray-300 hover:text-white disabled:opacity-50"
                     aria-label="Logout"
                   >
-                    <LogOut className="h-6 w-6" />
+                    <LogOut className="h-8 w-8" />
                   </button>
                 </div>
               ) : (
                 <Link 
                   to="/login"
-                  className="text-white bg-purple-600 hover:bg-purple-700 px-4 py-2 rounded-lg font-medium"
+                  className="text-white bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-medium text-lg transition-colors duration-200"
                 >
                   Sign In
-                </Link>
+              </Link>
               )}
-            </div>
-          </div>
-
-          <div className="py-4">
-            <div className="flex space-x-8">
-              {categories.map((category) => (
-                <Link
-                  key={category.id}
-                  to={category.path}
-                  className="text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center"
-                >
-                  {category.name}
-                </Link>
-              ))}
-              <Link to="/about" className="text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">
-                About
-              </Link>
-              <Link to="/contact" className="text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">
-                Contact
-              </Link>
             </div>
           </div>
         </nav>
@@ -292,7 +296,7 @@ export function Layout() {
 
       <footer className="bg-gray-800 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-400">
+          <div className="text-center text-gray-400 text-lg">
             <p>&copy; 2024 Photo Pixel. All rights reserved.</p>
           </div>
         </div>

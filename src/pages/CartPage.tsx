@@ -1,20 +1,20 @@
-import { useCart } from '../context/Cartcontext';
 import { useNavigate } from 'react-router-dom';
 import { Minus, Plus, X, ShoppingBag, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useCartStore } from '../store/cart';
 
 const CartPage = () => {
-  const { cart, removeFromCart, updateQuantity, isLoading } = useCart();
+  const { items, removeItem, updateQuantity } = useCartStore();
   const navigate = useNavigate();
 
-  const total = cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+  const total = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
   const shipping = total > 50000 ? 0 : 999;
   const finalTotal = total + shipping;
 
-  const handleQuantityChange = async (productId: string, newQuantity: number, stock: number) => {
+  const handleQuantityChange = (productId: string, newQuantity: number, stock: number) => {
     if (newQuantity >= 1) {
       if (newQuantity <= stock) {
-        await updateQuantity(productId, newQuantity);
+        updateQuantity(productId, newQuantity);
       } else {
         toast.error(`Sorry, only ${stock} items available in stock`);
       }
@@ -22,26 +22,19 @@ const CartPage = () => {
   };
 
   const handleCheckout = () => {
-    if (cart.length === 0) {
+    if (items.length === 0) {
       toast.error('Your cart is empty');
       return;
     }
-    navigate('/payment', { state: { items: cart } });
+    navigate('/payment', { state: { items } });
   };
 
-  const handleRemove = async (productId: string) => {
-    await removeFromCart(productId);
+  const handleRemove = (productId: string) => {
+    removeItem(productId);
+    toast.success('Item removed from cart');
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-      </div>
-    );
-  }
-
-  if (cart.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center space-y-4">
         <ShoppingBag className="h-16 w-16 text-gray-400" />
@@ -63,7 +56,7 @@ const CartPage = () => {
           <div className="lg:col-span-8">
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="p-6 space-y-6">
-                {cart.map((item) => (
+                {items.map((item) => (
                   <div key={item.product._id} className="flex items-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                     <img
                       src={item.product.imageUrl}
