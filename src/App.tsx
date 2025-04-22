@@ -26,8 +26,9 @@ import { CartProvider } from './context/Cartcontext';
 // Protected Route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
+  const token = localStorage.getItem('token');
   
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !token) {
     return <Navigate to="/login" replace />;
   }
 
@@ -35,7 +36,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 function App() {
-
   return (
     <SearchProvider>
       <CartProvider>
@@ -44,36 +44,12 @@ function App() {
             <Routes>
               <Route path="/" element={<Layout />}>
                 <Route index element={<Home />} />
-                <Route path="cameras" element={
-                  <ProtectedRoute>
-                    <Cameras />
-                  </ProtectedRoute>
-                } />
-                <Route path="lenses" element={
-                  <ProtectedRoute>
-                    <Lenses />
-                  </ProtectedRoute>
-                } />
-                <Route path="accessories" element={
-                  <ProtectedRoute>
-                    <Accessories />
-                  </ProtectedRoute>
-                } />
-                <Route path="batteries" element={
-                  <ProtectedRoute>
-                    <Batteries />
-                  </ProtectedRoute>
-                } />
-                <Route path="about" element={
-                  <ProtectedRoute>
-                    <About />
-                  </ProtectedRoute>
-                } />
-                <Route path="contact" element={
-                  <ProtectedRoute>
-                    <Contact />
-                  </ProtectedRoute>
-                } />
+                <Route path="cameras" element={<Cameras />} />
+                <Route path="lenses" element={<Lenses />} />
+                <Route path="accessories" element={<Accessories />} />
+                <Route path="batteries" element={<Batteries />} />
+                <Route path="about" element={<About />} />
+                <Route path="contact" element={<Contact />} />
                 <Route path="profile" element={
                   <ProtectedRoute>
                     <Profile />
@@ -108,5 +84,3 @@ function App() {
 }
 
 export default App;
-
-

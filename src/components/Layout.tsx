@@ -5,7 +5,6 @@ import { useCartStore } from '../store/cart';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
 
-// Define categories and their search terms
 const categories = [
   {
     id: 'cameras',
@@ -64,7 +63,6 @@ export function Layout() {
   const { isAuthenticated, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Handle click outside search results
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -76,7 +74,6 @@ export function Layout() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Handle search
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     if (query.trim() === '') {
@@ -87,12 +84,10 @@ export function Layout() {
 
     const normalizedQuery = query.toLowerCase().trim();
 
-    // First, check if the search matches any category
     const matchingCategories = categories.filter(category => 
       category.searchTerms.some(term => term.includes(normalizedQuery))
     );
 
-    // Then, check for specific products
     const matchingProducts = categories.flatMap(category =>
       category.products
         .filter(product => product.name.toLowerCase().includes(normalizedQuery))
@@ -117,7 +112,6 @@ export function Layout() {
     setShowResults(true);
   };
 
-  // Handle search result click
   const handleResultClick = (result: any) => {
     setSearchQuery('');
     setShowResults(false);
@@ -125,23 +119,22 @@ export function Layout() {
     
     if (result.isCategory) {
       toast.success(`Browsing ${result.name}`, {
-        duration: 2000, // 2 seconds
+        duration: 2000,
       });
     } else {
       toast.success(`Viewing ${result.name}`, {
-        duration: 2000, // 2 seconds
+        duration: 2000,
       });
     }
   };
 
-  // Handle search submit
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchResults.length > 0) {
       handleResultClick(searchResults[0]);
     } else if (searchQuery.trim() !== '') {
       toast.error('No matching products or categories found', {
-        duration: 2000, // 2 seconds
+        duration: 2000,
       });
     }
   };
@@ -273,44 +266,25 @@ export function Layout() {
 
           <div className="py-4">
             <div className="flex space-x-8">
-              <Link to="/cameras" className="text-gray-300 hover:text-white">
-                Cameras
-              </Link>
-              <Link to="/lenses" className="text-gray-300 hover:text-white">
-                Lenses
-              </Link>
-              <Link to="/accessories" className="text-gray-300 hover:text-white">
-                Accessories
-              </Link>
-              <Link to="/batteries" className="text-gray-300 hover:text-white">
-                Batteries
-              </Link>
-              <Link to="/about" className="text-gray-300 hover:text-white">
+              {categories.map((category) => (
+                <Link
+                  key={category.id}
+                  to={category.path}
+                  className="text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center"
+                >
+                  {category.name}
+                </Link>
+              ))}
+              <Link to="/about" className="text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">
                 About
               </Link>
-              <Link to="/contact" className="text-gray-300 hover:text-white">
+              <Link to="/contact" className="text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium">
                 Contact
               </Link>
             </div>
           </div>
         </nav>
       </header>
-
-      <div className="bg-gray-800 shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8 h-12">
-            {categories.map((category) => (
-              <Link
-                key={category.id}
-                to={category.path}
-                className="text-gray-300 hover:text-white hover:bg-gray-700 px-3 py-2 rounded-md text-sm font-medium inline-flex items-center"
-              >
-                {category.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Outlet />
