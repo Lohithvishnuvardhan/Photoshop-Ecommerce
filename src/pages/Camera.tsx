@@ -92,24 +92,33 @@ const Cameras = () => {
 
   const handleAddToCart = (camera: any) => {
     const product = {
-      _id: camera._id || camera.id,
+      _id: camera._id,
       name: camera.name,
       price: camera.price,
-      description: camera.description || '',
-      imageUrl: camera.imageUrl || camera.image,
+      description: camera.description,
+      imageUrl: camera.imageUrl,
       category: 'Cameras',
-      stock: camera.stock || 10
+      stock: camera.stock
     };
     
     addToCart(product);
-    toast.success(`${camera.name} added to cart!`, {
-      position: 'bottom-right',
-      duration: 2000,
-    });
+    toast.success(`${camera.name} added to cart!`);
   };
 
   const handleBuyNow = (camera: any) => {
-    navigate('/payment', { state: { product: camera } });
+    navigate('/payment', { 
+      state: { 
+        items: [{
+          _id: camera._id,
+          name: camera.name,
+          price: camera.price,
+          quantity: 1,
+          image: camera.imageUrl
+        }],
+        totalAmount: camera.price,
+        isBuyNow: true
+      } 
+    });
   };
 
   return (
