@@ -11,6 +11,7 @@ interface LocationState {
     price: number;
     quantity: number;
     image: string;
+    imageUrl?: string;
   }>;
   totalAmount: number;
   isBuyNow?: boolean;
@@ -33,7 +34,13 @@ export function Payment() {
   });
 
   const { items, totalAmount, isBuyNow } = location.state as LocationState || {
-    items: cart,
+    items: cart.map(item => ({
+      _id: item.product._id,
+      name: item.product.name,
+      price: item.product.price,
+      quantity: item.quantity,
+      image: item.product.imageUrl
+    })),
     totalAmount: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
     isBuyNow: false
   };
@@ -116,7 +123,7 @@ export function Payment() {
               {items.map((item) => (
                 <div key={item._id} className="flex items-center space-x-4 pb-4 border-b border-gray-200">
                   <img
-                    src={item.image}
+                    src={item.image || item.imageUrl}
                     alt={item.name}
                     className="w-24 h-24 object-cover rounded-md"
                   />

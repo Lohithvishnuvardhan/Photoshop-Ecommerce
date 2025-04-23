@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
 
 interface CartItem {
+  product: any;
   _id: string;
   name: string;
   price: number;
