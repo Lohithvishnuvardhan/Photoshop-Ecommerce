@@ -69,12 +69,17 @@ export function Layout() {
   const handleResultClick = (result: any) => {
     setSearchQuery('');
     setShowResults(false);
-    navigate(result.path);
-
-    toast.success(
-      result.isCategory ? `Browsing ${result.name}` : `Viewing ${result.name}`,
-      { duration: 2000 }
-    );
+    
+    // Navigate based on the search result type
+    if (result.isCategory) {
+      navigate(`/${result.id}`);
+    } else {
+      navigate(`/${result.category.toLowerCase()}/${result.id}`);
+    }
+    
+    toast.success(`Viewing ${result.name}`, {
+      duration: 2000,
+    });
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -82,9 +87,19 @@ export function Layout() {
     if (searchResults.length > 0) {
       handleResultClick(searchResults[0]);
     } else if (searchQuery.trim() !== '') {
-      toast.error('No matching products or categories found', {
-        duration: 2000,
-      });
+      // Basic category matching
+      const query = searchQuery.toLowerCase();
+      if (query.includes('camera')) {
+        navigate('/cameras');
+      } else if (query.includes('lens')) {
+        navigate('/lenses');
+      } else if (query.includes('accessory') || query.includes('accessories')) {
+        navigate('/accessories');
+      } else if (query.includes('battery') || query.includes('batteries')) {
+        navigate('/batteries');
+      } else {
+        toast.error('No matching products or categories found');
+      }
     }
   };
 
@@ -108,15 +123,15 @@ export function Layout() {
       <header className="border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Top Bar */}
-          <div className="flex items-center justify-between py-4">
+          <div className="flex items-center justify-between py-6">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2">
-              <Camera className="h-10 w-10 text-purple-500" />
-              <span className="font-bold text-2xl text-white tracking-tight">Photo Pixel</span>
+            <Link to="/" className="flex items-center space-x-4">
+              <Camera className="h-16 w-16 text-purple-500" />
+              <span className="font-bold text-4xl text-white tracking-tight">Photo Pixel</span>
             </Link>
 
             {/* Search Bar */}
-            <div className="flex-1 max-w-2xl mx-8 relative" ref={searchRef}>
+            <div className="flex-1 max-w-2xl mx-12 relative" ref={searchRef}>
               <form onSubmit={handleSearchSubmit}>
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
@@ -125,7 +140,7 @@ export function Layout() {
                     value={searchQuery}
                     onChange={(e) => handleSearch(e.target.value)}
                     placeholder="Search for cameras, lenses, accessories..."
-                    className="w-full pl-12 pr-12 py-3 text-lg bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-400"
+                    className="w-full pl-12 pr-12 py-4 text-lg bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-400"
                   />
                   {searchQuery && (
                     <button
@@ -167,7 +182,7 @@ export function Layout() {
                           </span>
                           {!result.isCategory && (
                             <span className="text-purple-400">
-                              ${result.price}
+                              ₹{result.price.toLocaleString()}
                             </span>
                           )}
                         </button>
@@ -179,24 +194,24 @@ export function Layout() {
             </div>
 
             {/* Cart and Auth */}
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-8">
               <Link 
                 to="/cart" 
                 className="relative text-gray-300 hover:text-white"
                 aria-label="Shopping cart"
               >
-                <ShoppingCart className="h-8 w-8" />
+                <ShoppingCart className="h-10 w-10" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-sm font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                  <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-sm font-bold rounded-full h-7 w-7 flex items-center justify-center">
                     {itemCount}
                   </span>
                 )}
               </Link>
 
               {isAuthenticated ? (
-                <div className="relative flex items-center space-x-4">
+                <div className="relative flex items-center space-x-6">
                   <Link to="/profile" className="text-gray-300 hover:text-white">
-                    <User className="h-8 w-8" />
+                    <User className="h-10 w-10" />
                   </Link>
                   <button
                     onClick={handleLogout}
@@ -204,13 +219,13 @@ export function Layout() {
                     className="text-gray-300 hover:text-white disabled:opacity-50"
                     aria-label="Logout"
                   >
-                    <LogOut className="h-8 w-8" />
+                    <LogOut className="h-10 w-10" />
                   </button>
                 </div>
               ) : (
                 <Link 
                   to="/login"
-                  className="text-white bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-medium text-lg transition-colors duration-200"
+                  className="text-white bg-purple-600 hover:bg-purple-700 px-8 py-4 rounded-lg font-medium text-xl transition-colors duration-200"
                 >
                   Sign In
                 </Link>
