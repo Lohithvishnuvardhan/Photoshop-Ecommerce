@@ -106,102 +106,112 @@ export function Layout() {
   return (
     <div className="min-h-screen bg-gray-900">
       <header className="border-b border-gray-800">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col">
-            <div className="flex justify-between items-center h-20">
-              <Link to="/" className="flex items-center space-x-3">
-                <Camera className="h-12 w-12 text-purple-500" />
-                <span className="font-bold text-4xl text-white tracking-tight">Photo Pixel</span>
-              </Link>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Logo Section */}
+          <div className="flex justify-center py-6">
+            <Link to="/" className="flex flex-col items-center space-y-2">
+              <Camera className="h-16 w-16 text-purple-500" />
+              <span className="font-bold text-4xl text-white tracking-tight">Photo Pixel</span>
+            </Link>
+          </div>
 
-              <div className="flex-1 max-w-lg mx-8 relative" ref={searchRef}>
-                <form onSubmit={handleSearchSubmit}>
-                  <div className="relative">
-                    <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => handleSearch(e.target.value)}
-                      placeholder="Search for cameras, lenses, accessories..."
-                      className="w-full pl-12 pr-12 py-3 text-lg bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-400"
-                    />
-                    {searchQuery && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSearchQuery('');
-                          setSearchResults([]);
-                          setShowResults(false);
-                        }}
-                        className="absolute right-4 top-1/2 transform -translate-y-1/2"
-                      >
-                        <X className="h-6 w-6 text-gray-400 hover:text-gray-300" />
-                      </button>
-                    )}
-                  </div>
-                </form>
-
-                {showResults && searchResults.length > 0 && (
-                  <div className="absolute z-50 w-full mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
-                    <ul className="py-2">
-                      {searchResults.map((result) => (
-                        <li key={result.id}>
-                          <button
-                            onClick={() => handleResultClick(result)}
-                            className="w-full px-4 py-3 text-left text-gray-300 hover:bg-gray-700 hover:text-white flex items-center justify-between text-lg"
-                          >
-                            <span className="flex items-center">
-                              {result.isCategory ? (
-                                <span className="font-medium">{result.name} Category</span>
-                              ) : (
-                                <>
-                                  <span>{result.name}</span>
-                                  <span className="ml-2 text-sm text-gray-500">
-                                    in {result.category}
-                                  </span>
-                                </>
-                              )}
-                            </span>
-                            {!result.isCategory && (
-                              <span className="text-purple-400">
-                                ${result.price}
-                              </span>
-                            )}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-
-              <div className="flex items-center space-x-6">
-                <Link to="/cart" className="relative">
-                  <ShoppingCart className="h-8 w-8 text-white" />
-                  {itemCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                      {itemCount}
-                    </span>
+          {/* Search and Cart Section */}
+          <div className="flex items-center justify-between py-4">
+            {/* Search Bar */}
+            <div className="flex-1 max-w-2xl mx-auto relative" ref={searchRef}>
+              <form onSubmit={handleSearchSubmit}>
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    placeholder="Search for cameras, lenses, accessories..."
+                    className="w-full pl-12 pr-12 py-3 text-lg bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-400"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setSearchResults([]);
+                        setShowResults(false);
+                      }}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2"
+                    >
+                      <X className="h-6 w-6 text-gray-400 hover:text-gray-300" />
+                    </button>
                   )}
-                </Link>
-                {isAuthenticated ? (
-                  <button onClick={handleLogout} disabled={isLoading}>
-                    <LogOut className="h-8 w-8 text-white hover:text-red-500" />
-                  </button>
-                ) : (
-                  <Link to="/login">
-                    <User className="h-8 w-8 text-white hover:text-purple-500" />
-                  </Link>
+                </div>
+              </form>
+
+              {showResults && searchResults.length > 0 && (
+                <div className="absolute z-50 w-full mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
+                  <ul className="py-2">
+                    {searchResults.map((result) => (
+                      <li key={result.id}>
+                        <button
+                          onClick={() => handleResultClick(result)}
+                          className="w-full px-4 py-3 text-left text-gray-300 hover:bg-gray-700 hover:text-white flex items-center justify-between text-lg"
+                        >
+                          <span className="flex items-center">
+                            {result.isCategory ? (
+                              <span className="font-medium">{result.name} Category</span>
+                            ) : (
+                              <>
+                                <span>{result.name}</span>
+                                <span className="ml-2 text-sm text-gray-500">
+                                  in {result.category}
+                                </span>
+                              </>
+                            )}
+                          </span>
+                          {!result.isCategory && (
+                            <span className="text-purple-400">
+                              ${result.price}
+                            </span>
+                          )}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* Cart and Auth Section */}
+            <div className="flex items-center space-x-8 ml-8">
+              <Link to="/cart" className="relative">
+                <ShoppingCart className="h-8 w-8 text-white" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                    {itemCount}
+                  </span>
                 )}
-              </div>
+              </Link>
+              {isAuthenticated ? (
+                <button onClick={handleLogout} disabled={isLoading}>
+                  <LogOut className="h-8 w-8 text-white hover:text-red-500" />
+                </button>
+              ) : (
+                <Link to="/login">
+                  <User className="h-8 w-8 text-white hover:text-purple-500" />
+                </Link>
+              )}
             </div>
           </div>
-        </nav>
+        </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Main Content */}
+      <main>
         <Outlet />
       </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-800 mt-auto">
+        {/* ... keep existing footer code ... */}
+      </footer>
     </div>
   );
 }
