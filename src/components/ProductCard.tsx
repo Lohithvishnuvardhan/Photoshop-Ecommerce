@@ -27,7 +27,7 @@ export function ProductCard({ _id, name, price, image, description }: ProductPro
   };
 
   const handleBuyNow = () => {
-    const product = {
+    const item = {
       _id,
       name,
       price,
@@ -37,7 +37,7 @@ export function ProductCard({ _id, name, price, image, description }: ProductPro
     
     navigate('/payment', { 
       state: { 
-        items: [product],
+        items: [item],
         totalAmount: price,
         isBuyNow: true
       } 
@@ -85,4 +85,4 @@ export function ProductCard({ _id, name, price, image, description }: ProductPro
       </div>
     </div>
   );
-} 
+}

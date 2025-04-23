@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CreditCard, User, MapPin, Minus, Truck, Shield } from 'lucide-react';
+import { CreditCard, User, MapPin, Truck, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/Cartcontext';
 
@@ -34,7 +34,7 @@ export function Payment() {
 
   const { items, totalAmount, isBuyNow } = location.state as LocationState || {
     items: cart,
-    totalAmount: cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0),
+    totalAmount: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
     isBuyNow: false
   };
 
@@ -42,7 +42,6 @@ export function Payment() {
     const { name, value } = e.target;
     let formattedValue = value;
 
-    // Format card number
     if (name === 'cardNumber') {
       formattedValue = value
         .replace(/\s/g, '')
@@ -51,7 +50,6 @@ export function Payment() {
         .slice(0, 19);
     }
 
-    // Format expiry date
     if (name === 'expiryDate') {
       formattedValue = value
         .replace(/\D/g, '')
@@ -70,7 +68,6 @@ export function Payment() {
     setIsLoading(true);
 
     try {
-      // Validate form data
       if (!validateForm()) {
         return;
       }
@@ -108,22 +105,6 @@ export function Payment() {
     return true;
   };
 
-  if (cart.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900">Your cart is empty</h2>
-          <button
-            onClick={() => navigate('/')}
-            className="mt-4 bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700"
-          >
-            Continue Shopping
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-100 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -151,7 +132,7 @@ export function Payment() {
               ))}
               <div className="pt-4 border-t border-gray-200">
                 <div className="flex justify-between items-center">
-                  <span>Subtotal</span>
+                  <span>Total</span>
                   <span>₹{totalAmount.toLocaleString()}</span>
                 </div>
               </div>
