@@ -109,8 +109,14 @@ export function Layout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Top Bar */}
           <div className="flex items-center justify-between py-4">
+            {/* Logo */}
+            <Link to="/" className="flex items-center space-x-2">
+              <Camera className="h-10 w-10 text-purple-500" />
+              <span className="font-bold text-2xl text-white tracking-tight">Photo Pixel</span>
+            </Link>
+
             {/* Search Bar */}
-            <div className="flex-1 max-w-3xl relative" ref={searchRef}>
+            <div className="flex-1 max-w-2xl mx-8 relative" ref={searchRef}>
               <form onSubmit={handleSearchSubmit}>
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
@@ -172,9 +178,8 @@ export function Layout() {
               )}
             </div>
 
-            {/* Logo and Auth Section */}
-            <div className="flex items-center space-x-8 ml-8">
-              {/* Cart Icon */}
+            {/* Cart and Auth */}
+            <div className="flex items-center space-x-6">
               <Link 
                 to="/cart" 
                 className="relative text-gray-300 hover:text-white"
@@ -188,9 +193,8 @@ export function Layout() {
                 )}
               </Link>
 
-              {/* Auth Section */}
               {isAuthenticated ? (
-                <div className="relative flex items-center space-x-6">
+                <div className="relative flex items-center space-x-4">
                   <Link to="/profile" className="text-gray-300 hover:text-white">
                     <User className="h-8 w-8" />
                   </Link>
@@ -211,12 +215,6 @@ export function Layout() {
                   Sign In
                 </Link>
               )}
-
-              {/* Logo */}
-              <Link to="/" className="flex items-center space-x-2">
-                <Camera className="h-10 w-10 text-purple-500" />
-                <span className="font-bold text-2xl text-white tracking-tight">Photo Pixel</span>
-              </Link>
             </div>
           </div>
 

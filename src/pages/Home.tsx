@@ -1,6 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Star, Shield, Truck, Clock, Camera, Award, Users, DollarSign, Heart } from 'lucide-react';
-import { NavigationMenu } from '../components/NavigationMenu';
 
 export function Home() {
   const navigate = useNavigate();
@@ -69,9 +68,6 @@ export function Home() {
 
   return (
     <div className="bg-gray-900">
-      {/* Navigation Menu */}
-      <NavigationMenu />
-
       {/* Hero Section with Video Background */}
       <div className="relative h-[80vh] overflow-hidden">
         <video
