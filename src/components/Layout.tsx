@@ -107,18 +107,10 @@ export function Layout() {
     <div className="min-h-screen bg-gray-900">
       <header className="border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Logo Section */}
-          <div className="flex justify-center py-6">
-            <Link to="/" className="flex flex-col items-center space-y-2">
-              <Camera className="h-16 w-16 text-purple-500" />
-              <span className="font-bold text-4xl text-white tracking-tight">Photo Pixel</span>
-            </Link>
-          </div>
-
-          {/* Search and Cart Section */}
+          {/* Top Bar */}
           <div className="flex items-center justify-between py-4">
             {/* Search Bar */}
-            <div className="flex-1 max-w-2xl mx-auto relative" ref={searchRef}>
+            <div className="flex-1 max-w-3xl relative" ref={searchRef}>
               <form onSubmit={handleSearchSubmit}>
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
@@ -145,6 +137,7 @@ export function Layout() {
                 </div>
               </form>
 
+              {/* Search Results Dropdown */}
               {showResults && searchResults.length > 0 && (
                 <div className="absolute z-50 w-full mt-2 bg-gray-800 rounded-lg shadow-lg border border-gray-700">
                   <ul className="py-2">
@@ -179,27 +172,95 @@ export function Layout() {
               )}
             </div>
 
-            {/* Cart and Auth Section */}
+            {/* Logo and Auth Section */}
             <div className="flex items-center space-x-8 ml-8">
-              <Link to="/cart" className="relative">
-                <ShoppingCart className="h-8 w-8 text-white" />
+              {/* Cart Icon */}
+              <Link 
+                to="/cart" 
+                className="relative text-gray-300 hover:text-white"
+                aria-label="Shopping cart"
+              >
+                <ShoppingCart className="h-8 w-8" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                  <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-sm font-bold rounded-full h-6 w-6 flex items-center justify-center">
                     {itemCount}
                   </span>
                 )}
               </Link>
+
+              {/* Auth Section */}
               {isAuthenticated ? (
-                <button onClick={handleLogout} disabled={isLoading}>
-                  <LogOut className="h-8 w-8 text-white hover:text-red-500" />
-                </button>
+                <div className="relative flex items-center space-x-6">
+                  <Link to="/profile" className="text-gray-300 hover:text-white">
+                    <User className="h-8 w-8" />
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    disabled={isLoading}
+                    className="text-gray-300 hover:text-white disabled:opacity-50"
+                    aria-label="Logout"
+                  >
+                    <LogOut className="h-8 w-8" />
+                  </button>
+                </div>
               ) : (
-                <Link to="/login">
-                  <User className="h-8 w-8 text-white hover:text-purple-500" />
+                <Link 
+                  to="/login"
+                  className="text-white bg-purple-600 hover:bg-purple-700 px-6 py-3 rounded-lg font-medium text-lg transition-colors duration-200"
+                >
+                  Sign In
                 </Link>
               )}
+
+              {/* Logo */}
+              <Link to="/" className="flex items-center space-x-2">
+                <Camera className="h-10 w-10 text-purple-500" />
+                <span className="font-bold text-2xl text-white tracking-tight">Photo Pixel</span>
+              </Link>
             </div>
           </div>
+
+          {/* Navigation Menu */}
+          <nav className="py-4">
+            <div className="flex justify-center space-x-12">
+              <Link
+                to="/cameras"
+                className="text-gray-300 hover:text-white text-lg font-medium px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+              >
+                Cameras
+              </Link>
+              <Link
+                to="/lenses"
+                className="text-gray-300 hover:text-white text-lg font-medium px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+              >
+                Lenses
+              </Link>
+              <Link
+                to="/accessories"
+                className="text-gray-300 hover:text-white text-lg font-medium px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+              >
+                Accessories
+              </Link>
+              <Link
+                to="/batteries"
+                className="text-gray-300 hover:text-white text-lg font-medium px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+              >
+                Batteries
+              </Link>
+              <Link
+                to="/about"
+                className="text-gray-300 hover:text-white text-lg font-medium px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+              >
+                About
+              </Link>
+              <Link
+                to="/contact"
+                className="text-gray-300 hover:text-white text-lg font-medium px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors duration-200"
+              >
+                Contact
+              </Link>
+            </div>
+          </nav>
         </div>
       </header>
 
@@ -210,7 +271,11 @@ export function Layout() {
 
       {/* Footer */}
       <footer className="bg-gray-800 mt-auto">
-        {/* ... keep existing footer code ... */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center text-gray-400 text-lg">
+            <p>&copy; 2024 Photo Pixel. All rights reserved.</p>
+          </div>
+        </div>
       </footer>
     </div>
   );
