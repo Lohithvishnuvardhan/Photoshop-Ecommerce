@@ -176,8 +176,12 @@ export const productsAPI = {
 
 export const orderAPI = {
   createOrder: async (orderData: any) => {
-    const response = await api.post('/orders', orderData);
-    return response.data;
+    try {
+      const response = await api.post('/orders', orderData);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to create order');
+    }
   },
 
   getOrders: async () => {
