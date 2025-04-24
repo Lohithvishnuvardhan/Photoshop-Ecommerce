@@ -4,7 +4,7 @@ import { CreditCard, User, MapPin, Truck, Shield, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/Cartcontext';
 import { useCartStore } from '../store/cart';
-
+import { orderAPI } from '../api';
 
 export function Payment() {
   const location = useLocation();
@@ -78,8 +78,29 @@ export function Payment() {
         return;
       }
 
-      // Simulate payment processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        toast.error('Please login to continue');
+        navigate('/login');
+        return;
+      }
+
+      // Create order data
+      const orderData = {
+        user: userId,
+        orderItems: orderItems.map((item: any) => ({
+          name: item.name,
+          quantity: item.quantity,
+          image: item.image || item.imageUrl,
+          price: item.price,
+          product: item._id
+        })),
+        totalPrice: finalTotal,
+        status: 'Processing'
+      };
+
+      // Create the order
+      await orderAPI.createOrder(orderData);
 
       // Clear appropriate cart based on purchase type
       if (location.state?.isBuyNow) {
