@@ -64,7 +64,7 @@ exports.loginUser = async (req, res) => {
 
     const token = generateToken(user._id);
 
-    // Send response without password
+    // Send response without password but including isAdmin
     res.json({
       _id: user._id,
       name: user.name,
