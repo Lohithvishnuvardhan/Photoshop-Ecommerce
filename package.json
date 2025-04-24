@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "server": "node server/index.js",
     "start": "node server/index.js",
-    "dev:server": "nodemon server/index.js"
+    "dev:server": "nodemon server/index.js",
+    "create-admin": "node scripts/createAdmin.js"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.18",
