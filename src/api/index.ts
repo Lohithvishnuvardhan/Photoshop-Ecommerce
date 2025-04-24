@@ -15,21 +15,6 @@ interface HealthCheckResponse {
   mongodb: 'connected' | 'disconnected';
 }
 
-interface CartResponse {
-  products: Array<{
-    productId: {
-      _id: string;
-      name: string;
-      price: number;
-      description: string;
-      imageUrl: string;
-      stock: number;
-      category: string;
-    };
-    quantity: number;
-  }>;
-}
-
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
   headers: {
@@ -68,9 +53,10 @@ export const authAPI = {
   login: async (email: string, password: string): Promise<LoginResponse> => {
     try {
       const response = await api.post<LoginResponse>('/auth/login', { email, password });
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('userId', response.data._id);
-      localStorage.setItem('isAdmin', response.data.isAdmin.toString());
+      const { token, isAdmin, _id } = response.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('userId', _id);
+      localStorage.setItem('isAdmin', isAdmin.toString());
       return response.data;
     } catch (error: any) {
       throw new Error(error.message || 'Login failed');
@@ -80,9 +66,10 @@ export const authAPI = {
   register: async (name: string, email: string, password: string): Promise<LoginResponse> => {
     try {
       const response = await api.post<LoginResponse>('/auth/register', { name, email, password });
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('userId', response.data._id);
-      localStorage.setItem('isAdmin', response.data.isAdmin.toString());
+      const { token, isAdmin, _id } = response.data;
+      localStorage.setItem('token', token);
+      localStorage.setItem('userId', _id);
+      localStorage.setItem('isAdmin', isAdmin.toString());
       return response.data;
     } catch (error: any) {
       throw new Error(error.message || 'Registration failed');
@@ -135,41 +122,23 @@ export const adminAPI = {
 
 export const cartAPI = {
   getCart: async () => {
-    const response = await api.get<CartResponse>('/cart');
-    return response.data.products.map(item => ({
-      product: item.productId,
-      quantity: item.quantity
-    }));
+    const response = await api.get('/cart');
+    return response.data;
   },
 
   addToCart: async (productId: string, quantity: number) => {
-    const response = await api.post<CartResponse>('/cart/add', { productId, quantity });
-    return {
-      products: response.data.products.map(item => ({
-        product: item.productId,
-        quantity: item.quantity
-      }))
-    };
+    const response = await api.post('/cart/add', { productId, quantity });
+    return response.data;
   },
 
   updateQuantity: async (productId: string, quantity: number) => {
-    const response = await api.put<CartResponse>(`/cart/${productId}`, { quantity });
-    return {
-      products: response.data.products.map(item => ({
-        product: item.productId,
-        quantity: item.quantity
-      }))
-    };
+    const response = await api.put(`/cart/${productId}`, { quantity });
+    return response.data;
   },
 
   removeFromCart: async (productId: string) => {
-    const response = await api.delete<CartResponse>(`/cart/${productId}`);
-    return {
-      products: response.data.products.map(item => ({
-        product: item.productId,
-        quantity: item.quantity
-      }))
-    };
+    const response = await api.delete(`/cart/${productId}`);
+    return response.data;
   }
 };
 
