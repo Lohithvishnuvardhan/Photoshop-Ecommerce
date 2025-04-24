@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { CreditCard, User, MapPin, Truck, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/Cartcontext';
+import { useCartStore } from '../store/cart';
 
 interface LocationState {
   items: Array<{
@@ -21,6 +22,7 @@ export function Payment() {
   const location = useLocation();
   const navigate = useNavigate();
   const { cart, clearCart } = useCart();
+  const { clearBuyNow } = useCartStore();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     cardNumber: '',
@@ -41,9 +43,12 @@ export function Payment() {
       quantity: item.quantity,
       image: item.product.imageUrl
     })),
-    totalAmount: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+    totalAmount: cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0),
     isBuyNow: false
   };
+
+  const shipping = totalAmount > 50000 ? 0 : 999;
+  const finalTotal = totalAmount + shipping;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -82,8 +87,10 @@ export function Payment() {
       // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // Clear cart if not a direct buy
-      if (!isBuyNow) {
+      // Clear appropriate cart based on purchase type
+      if (isBuyNow) {
+        clearBuyNow();
+      } else {
         clearCart();
       }
 
@@ -137,10 +144,18 @@ export function Payment() {
                   </div>
                 </div>
               ))}
-              <div className="pt-4 border-t border-gray-200">
+              <div className="pt-4 space-y-2">
                 <div className="flex justify-between items-center">
-                  <span>Total</span>
+                  <span>Subtotal</span>
                   <span>₹{totalAmount.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Shipping</span>
+                  <span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span>
+                </div>
+                <div className="flex justify-between items-center text-lg font-bold pt-2 border-t">
+                  <span>Total</span>
+                  <span>₹{finalTotal.toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -307,7 +322,7 @@ export function Payment() {
                   ) : (
                     <>
                       <CreditCard className="w-5 h-5 mr-2" />
-                      Pay ₹{totalAmount.toLocaleString()}
+                      Pay ₹{finalTotal.toLocaleString()}
                     </>
                   )}
                 </button>
