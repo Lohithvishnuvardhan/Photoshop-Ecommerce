@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { authAPI } from '../api';
+import api from '../utils/api';
 
 interface User {
   _id: string;
@@ -27,31 +27,29 @@ export const useAuth = create<AuthState>()(
       isAdmin: localStorage.getItem('isAdmin') === 'true',
       login: async (email: string, password: string) => {
         try {
-          const response = await authAPI.login(email, password);
-          set({ 
-            user: response, 
-            isAuthenticated: true,
-            isAdmin: response.isAdmin
-          });
-          return response;
-        } catch (error) {
+          const { data } = await api.post('/auth/login', { email, password });
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('isAdmin', data.isAdmin.toString());
+          set({ user: data, isAuthenticated: true, isAdmin: data.isAdmin });
+          return data;
+        } catch (error: any) {
           throw error;
         }
       },
       register: async (name: string, email: string, password: string) => {
         try {
-          const response = await authAPI.register(name, email, password);
+          const response = await api.post('/auth/register', { name, email, password });
           set({ 
-            user: response, 
+            user: response.data,
             isAuthenticated: true,
-            isAdmin: response.isAdmin
+            isAdmin: response.data.isAdmin
           });
         } catch (error) {
           throw error;
         }
       },
       logout: () => {
-        authAPI.logout();
+        localStorage.clear();
         set({ 
           user: null, 
           isAuthenticated: false,
@@ -61,6 +59,10 @@ export const useAuth = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
+      partialize: (state) => ({
+        isAuthenticated: state.isAuthenticated,
+        isAdmin: state.isAdmin,
+      }),
     }
   )
 );
