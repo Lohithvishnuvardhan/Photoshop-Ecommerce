@@ -21,23 +21,24 @@ export function Login() {
 
     try {
       const response = await login(email, password);
+      console.log('Login response:', response);
       
-      // If there are items in the cart, keep them
       if (cart.length > 0) {
         localStorage.setItem('cart', JSON.stringify(cart));
       }
 
       toast.success('Login successful!');
       
-      // Check if user is admin and redirect accordingly
+      console.log('Is admin?', response.isAdmin);
       if (response.isAdmin) {
+        console.log('Redirecting to admin dashboard');
         navigate('/admin/dashboard');
       } else {
-        // Redirect to the previous page or home
         const from = location.state?.from?.pathname || '/';
         navigate(from);
       }
     } catch (error: any) {
+      console.error('Login error:', error);
       toast.error(error.message || 'Login failed');
     } finally {
       setIsLoading(false);
