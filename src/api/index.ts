@@ -88,27 +88,43 @@ export const authAPI = {
   logout: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
+  }
+};
+
+export const adminAPI = {
+  getDashboardStats: async () => {
+    const response = await api.get('/admin/dashboard');
+    return response.data;
   },
 
-  async forgotPassword(email: string) {
-    try {
-      const response = await api.post('/auth/forgot-password', { email });
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to send reset email');
-    }
+  getProducts: async () => {
+    const response = await api.get('/admin/products');
+    return response.data;
   },
 
-  async resetPassword(token: string, newPassword: string) {
-    try {
-      const response = await api.post('/auth/reset-password', {
-        token,
-        newPassword,
-      });
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to reset password');
-    }
+  addProduct: async (productData: any) => {
+    const response = await api.post('/admin/products', productData);
+    return response.data;
+  },
+
+  updateProduct: async (productId: string, productData: any) => {
+    const response = await api.put(`/admin/products/${productId}`, productData);
+    return response.data;
+  },
+
+  deleteProduct: async (productId: string) => {
+    const response = await api.delete(`/admin/products/${productId}`);
+    return response.data;
+  },
+
+  getOrders: async () => {
+    const response = await api.get('/admin/orders');
+    return response.data;
+  },
+
+  updateOrderStatus: async (orderId: string, status: string) => {
+    const response = await api.put(`/admin/orders/${orderId}`, { status });
+    return response.data;
   }
 };
 
@@ -149,16 +165,6 @@ export const cartAPI = {
         quantity: item.quantity
       }))
     };
-  },
-
-  clearCart: async () => {
-    const response = await api.delete('/cart/clear');
-    return response.data;
-  },
-
-  syncCart: async (items: any[]) => {
-    const response = await api.post('/cart/sync', { items });
-    return response.data;
   }
 };
 

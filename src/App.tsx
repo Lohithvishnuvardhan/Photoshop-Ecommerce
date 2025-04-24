@@ -16,6 +16,8 @@ import ShippingInfo from './pages/ShippingInfo';
 import Returns from './pages/Returns';
 import FAQ from './pages/FAQ';
 import Profile from './pages/Profile';
+import { AdminDashboard } from './pages/admin/Dashboard';
+import { AdminProducts } from './pages/admin/Products';
 import { useAuth } from './hooks/useAuth';
 import { Toaster } from 'react-hot-toast';
 import { OrderSuccess } from './pages/OrderSuccess';
@@ -24,12 +26,16 @@ import { ResetPassword } from './pages/ResetPassword';
 import { SearchProvider } from './context/SearchContext';
 import { CartProvider } from './context/Cartcontext';
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
+const ProtectedRoute = ({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) => {
+  const { isAuthenticated, user } = useAuth();
   const token = localStorage.getItem('token');
   
   if (!isAuthenticated && !token) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (adminOnly && (!user || !user.isAdmin)) {
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
@@ -58,6 +64,16 @@ function App() {
                 <Route path="orders" element={
                   <ProtectedRoute>
                     <Orders />
+                  </ProtectedRoute>
+                } />
+                <Route path="admin/dashboard" element={
+                  <ProtectedRoute adminOnly>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="admin/products" element={
+                  <ProtectedRoute adminOnly>
+                    <AdminProducts />
                   </ProtectedRoute>
                 } />
                 <Route path="login" element={<Login />} />
