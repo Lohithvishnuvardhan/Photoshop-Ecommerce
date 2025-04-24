@@ -27,13 +27,23 @@ export const useAuth = create<AuthState>()(
       isAdmin: localStorage.getItem('isAdmin') === 'true',
       login: async (email: string, password: string) => {
         try {
-          const { data } = await api.post('/auth/login', { email, password });
+          const response = await api.post<User>('/auth/login', { email, password });
+          const { data } = response;
+          
+          // Store token and admin status
           localStorage.setItem('token', data.token);
-          localStorage.setItem('isAdmin', data.isAdmin.toString());
-          set({ user: data, isAuthenticated: true, isAdmin: data.isAdmin });
+          localStorage.setItem('isAdmin', String(data.isAdmin));
+          
+          // Update state
+          set({ 
+            user: data,
+            isAuthenticated: true,
+            isAdmin: data.isAdmin
+          });
+          
           return data;
         } catch (error: any) {
-          throw error;
+          throw new Error(error.response?.data?.message || 'Login failed');
         }
       },
       register: async (name: string, email: string, password: string) => {
@@ -49,7 +59,8 @@ export const useAuth = create<AuthState>()(
         }
       },
       logout: () => {
-        localStorage.clear();
+        localStorage.removeItem('token');
+        localStorage.removeItem('isAdmin');
         set({ 
           user: null, 
           isAuthenticated: false,

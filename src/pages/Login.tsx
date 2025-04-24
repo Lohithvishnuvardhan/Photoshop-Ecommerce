@@ -20,6 +20,7 @@ export function Login() {
     setIsLoading(true);
 
     try {
+      console.log('Attempting login with:', { email });
       const response = await login(email, password);
       console.log('Login response:', response);
       
@@ -30,6 +31,8 @@ export function Login() {
       toast.success('Login successful!');
       
       console.log('Is admin?', response.isAdmin);
+      console.log('Local storage isAdmin:', localStorage.getItem('isAdmin'));
+      
       if (response.isAdmin) {
         console.log('Redirecting to admin dashboard');
         navigate('/admin/dashboard');

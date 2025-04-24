@@ -6,7 +6,7 @@ const authenticateToken = (req, res, next) => {
 
   try {
     const verified = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = verified;
+    req.user = { id: verified.id }; // Make sure we're setting the id property
     next();
   } catch (err) {
     res.status(400).json({ message: "Invalid token" });
