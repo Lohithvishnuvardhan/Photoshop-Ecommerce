@@ -4,6 +4,7 @@ import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { SignUp } from './pages/SignUp';
 import { Payment } from './pages/Payment';
+import { Orders } from './pages/Orders';
 import CartPage from './pages/CartPage';
 import Cameras from './pages/Camera';
 import Lenses from './pages/Lenses';
@@ -23,7 +24,6 @@ import { ResetPassword } from './pages/ResetPassword';
 import { SearchProvider } from './context/SearchContext';
 import { CartProvider } from './context/Cartcontext';
 
-// Protected Route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
   const token = localStorage.getItem('token');
@@ -53,6 +53,11 @@ function App() {
                 <Route path="profile" element={
                   <ProtectedRoute>
                     <Profile />
+                  </ProtectedRoute>
+                } />
+                <Route path="orders" element={
+                  <ProtectedRoute>
+                    <Orders />
                   </ProtectedRoute>
                 } />
                 <Route path="login" element={<Login />} />
