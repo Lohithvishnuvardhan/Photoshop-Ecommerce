@@ -7,8 +7,8 @@ import toast from 'react-hot-toast';
 
 export function Layout() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [showResults, setShowResults] = useState(false);
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [, setShowResults] = useState(false);
+  const [, setSearchResults] = useState<any[]>([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -39,7 +39,18 @@ export function Layout() {
       setShowResults(false);
       return;
     }
-    // Your existing search logic here
+
+    // Search through categories and navigate accordingly
+    const searchTermLower = query.toLowerCase();
+    if (searchTermLower.includes('camera')) {
+      navigate('/cameras');
+    } else if (searchTermLower.includes('lens')) {
+      navigate('/lenses');
+    } else if (searchTermLower.includes('accessory') || searchTermLower.includes('accessories')) {
+      navigate('/accessories');
+    } else if (searchTermLower.includes('battery') || searchTermLower.includes('batteries')) {
+      navigate('/batteries');
+    }
   };
 
   const handleLogout = async () => {
@@ -64,62 +75,56 @@ export function Layout() {
           <div className="flex items-center justify-between py-4">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
-              <Camera className="h-10 w-10 text-purple-500" />
-              <span className="font-bold text-2xl text-white tracking-tight">Photo Pixel</span>
+              <Camera className="h-12 w-12 text-purple-500" />
+              <span className="font-bold text-3xl text-white tracking-tight">Photo Pixel</span>
             </Link>
 
             {/* Search Bar */}
-            <div className="flex-1 max-w-2xl mx-12 relative" ref={searchRef}>
+            <div className="flex-1 max-w-3xl mx-12 relative" ref={searchRef}>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
                   placeholder="Search for cameras, lenses, accessories..."
-                  className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg"
                 />
               </div>
-              {/* Search Results Dropdown */}
-              {showResults && searchResults.length > 0 && (
-                <div className="absolute mt-2 w-full bg-gray-800 rounded-lg shadow-xl border border-gray-700">
-                  {/* Your search results rendering logic */}
-                </div>
-              )}
             </div>
 
             {/* Navigation and Auth */}
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-8">
               <Link 
                 to="/cart" 
                 className="relative text-gray-300 hover:text-white transition-colors"
                 aria-label="Shopping cart"
               >
-                <ShoppingCart className="h-6 w-6" />
+                <ShoppingCart className="h-8 w-8" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  <span className="absolute -top-2 -right-2 bg-purple-500 text-white text-sm font-bold rounded-full h-6 w-6 flex items-center justify-center">
                     {itemCount}
                   </span>
                 )}
               </Link>
 
               {isAuthenticated ? (
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-6">
                   <Link to="/profile" className="text-gray-300 hover:text-white transition-colors">
-                    <User className="h-6 w-6" />
+                    <User className="h-8 w-8" />
                   </Link>
                   <button
                     onClick={handleLogout}
                     disabled={isLoading}
                     className="text-gray-300 hover:text-white transition-colors disabled:opacity-50"
                   >
-                    <LogOut className="h-6 w-6" />
+                    <LogOut className="h-8 w-8" />
                   </button>
                 </div>
               ) : (
                 <Link 
                   to="/login"
-                  className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                  className="bg-purple-600 text-white px-8 py-3 rounded-lg hover:bg-purple-700 transition-colors text-lg font-medium"
                 >
                   Sign In
                 </Link>
@@ -131,9 +136,9 @@ export function Layout() {
                 className="md:hidden text-gray-300 hover:text-white"
               >
                 {isMobileMenuOpen ? (
-                  <X className="h-6 w-6" />
+                  <X className="h-8 w-8" />
                 ) : (
-                  <Menu className="h-6 w-6" />
+                  <Menu className="h-8 w-8" />
                 )}
               </button>
             </div>
@@ -142,22 +147,22 @@ export function Layout() {
           {/* Navigation Menu */}
           <nav className="hidden md:block py-4">
             <div className="flex justify-center space-x-12">
-              <Link to="/cameras" className="text-gray-300 hover:text-white transition-colors">
+              <Link to="/cameras" className="text-gray-300 hover:text-white transition-colors text-lg">
                 Cameras
               </Link>
-              <Link to="/lenses" className="text-gray-300 hover:text-white transition-colors">
+              <Link to="/lenses" className="text-gray-300 hover:text-white transition-colors text-lg">
                 Lenses
               </Link>
-              <Link to="/accessories" className="text-gray-300 hover:text-white transition-colors">
+              <Link to="/accessories" className="text-gray-300 hover:text-white transition-colors text-lg">
                 Accessories
               </Link>
-              <Link to="/batteries" className="text-gray-300 hover:text-white transition-colors">
+              <Link to="/batteries" className="text-gray-300 hover:text-white transition-colors text-lg">
                 Batteries
               </Link>
-              <Link to="/about" className="text-gray-300 hover:text-white transition-colors">
+              <Link to="/about" className="text-gray-300 hover:text-white transition-colors text-lg">
                 About
               </Link>
-              <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">
+              <Link to="/contact" className="text-gray-300 hover:text-white transition-colors text-lg">
                 Contact
               </Link>
             </div>
