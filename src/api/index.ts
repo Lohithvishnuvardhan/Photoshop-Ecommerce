@@ -6,6 +6,7 @@ interface LoginResponse {
   _id: string;
   name: string;
   email: string;
+  isAdmin: boolean;
   token: string;
 }
 
@@ -56,6 +57,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('userId');
+      localStorage.removeItem('isAdmin');
       window.location.href = '/login';
     }
     return Promise.reject(error.response?.data || error);
@@ -68,6 +70,7 @@ export const authAPI = {
       const response = await api.post<LoginResponse>('/auth/login', { email, password });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('userId', response.data._id);
+      localStorage.setItem('isAdmin', response.data.isAdmin.toString());
       return response.data;
     } catch (error: any) {
       throw new Error(error.message || 'Login failed');
@@ -79,6 +82,7 @@ export const authAPI = {
       const response = await api.post<LoginResponse>('/auth/register', { name, email, password });
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('userId', response.data._id);
+      localStorage.setItem('isAdmin', response.data.isAdmin.toString());
       return response.data;
     } catch (error: any) {
       throw new Error(error.message || 'Registration failed');
@@ -88,6 +92,7 @@ export const authAPI = {
   logout: () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
+    localStorage.removeItem('isAdmin');
   }
 };
 

@@ -15,7 +15,7 @@ export function Layout() {
   const location = useLocation();
   const items = useCartStore(state => state.items);
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, isAdmin, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -165,6 +165,16 @@ export function Layout() {
               <Link to="/contact" className="text-gray-300 hover:text-white transition-colors text-lg">
                 Contact
               </Link>
+              {isAuthenticated && isAdmin && (
+                <>
+                  <Link to="/admin/dashboard" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
+                    Admin Dashboard
+                  </Link>
+                  <Link to="/admin/products" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
+                    Manage Products
+                  </Link>
+                </>
+              )}
             </div>
           </nav>
 
