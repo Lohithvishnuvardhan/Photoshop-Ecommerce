@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Package, Calendar, Clock, ChevronDown, ChevronUp } from 'lucide-react';
+import { Package, Calendar, Clock, ChevronDown, ChevronUp, ShoppingBag } from 'lucide-react';
 import { orderAPI } from '../api';
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface OrderItem {
   name: string;
@@ -22,6 +23,7 @@ export function Orders() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedOrder, setExpandedOrder] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchOrders();
@@ -31,7 +33,7 @@ export function Orders() {
     try {
       const userId = localStorage.getItem('userId');
       if (!userId) {
-        toast.error('Please login to view orders');
+        navigate('/login');
         return;
       }
       const response = await orderAPI.getOrders();
@@ -70,9 +72,15 @@ export function Orders() {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <ShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-gray-900 mb-2">No orders found</h2>
-          <p className="text-gray-600">You haven't placed any orders yet.</p>
+          <p className="text-gray-600 mb-6">You haven't placed any orders yet.</p>
+          <button
+            onClick={() => navigate('/')}
+            className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+          >
+            Start Shopping
+          </button>
         </div>
       </div>
     );

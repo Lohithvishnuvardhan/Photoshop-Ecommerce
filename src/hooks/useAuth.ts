@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { authAPI } from '../api';
 import { persist } from 'zustand/middleware';
+import { authAPI } from '../api';
 
 interface AuthState {
   user: any | null;
@@ -14,7 +14,7 @@ export const useAuth = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      isAuthenticated: false,
+      isAuthenticated: !!localStorage.getItem('token'),
       login: async (email: string, password: string) => {
         try {
           const response = await authAPI.login(email, password);

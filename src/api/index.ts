@@ -55,6 +55,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
+      localStorage.removeItem('userId');
       window.location.href = '/login';
     }
     return Promise.reject(error.response?.data || error);
@@ -66,6 +67,7 @@ export const authAPI = {
     try {
       const response = await api.post<LoginResponse>('/auth/login', { email, password });
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('userId', response.data._id);
       return response.data;
     } catch (error: any) {
       throw new Error(error.message || 'Login failed');
@@ -76,6 +78,7 @@ export const authAPI = {
     try {
       const response = await api.post<LoginResponse>('/auth/register', { name, email, password });
       localStorage.setItem('token', response.data.token);
+      localStorage.setItem('userId', response.data._id);
       return response.data;
     } catch (error: any) {
       throw new Error(error.message || 'Registration failed');
@@ -84,6 +87,7 @@ export const authAPI = {
 
   logout: () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('userId');
   },
 
   async forgotPassword(email: string) {
@@ -177,7 +181,8 @@ export const orderAPI = {
   },
 
   getOrders: async () => {
-    const response = await api.get('/orders');
+    const userId = localStorage.getItem('userId');
+    const response = await api.get(`/orders/myorders/${userId}`);
     return response.data;
   }
 };
