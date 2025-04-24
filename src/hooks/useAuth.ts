@@ -2,11 +2,19 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { authAPI } from '../api';
 
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  isAdmin: boolean;
+  token: string;
+}
+
 interface AuthState {
-  user: any | null;
+  user: User | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
 }
@@ -25,6 +33,7 @@ export const useAuth = create<AuthState>()(
             isAuthenticated: true,
             isAdmin: response.isAdmin
           });
+          return response;
         } catch (error) {
           throw error;
         }

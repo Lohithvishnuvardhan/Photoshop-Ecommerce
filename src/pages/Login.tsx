@@ -32,7 +32,7 @@ export function Login() {
     setIsLoading(true);
 
     try {
-      await login(email, password);
+      const response = await login(email, password);
       
       // If there are items in the cart, keep them
       if (cart.length > 0) {
@@ -42,8 +42,7 @@ export function Login() {
       toast.success('Login successful!');
       
       // Check if user is admin and redirect accordingly
-      const isAdmin = localStorage.getItem('isAdmin') === 'true';
-      if (isAdmin) {
+      if (response.isAdmin) {
         navigate('/admin/dashboard');
       } else {
         // Redirect to the previous page or home
