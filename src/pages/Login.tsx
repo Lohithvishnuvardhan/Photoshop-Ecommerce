@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
-import { authAPI } from '../api';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/Cartcontext';
+import { useAuth } from '../hooks/useAuth';
 
 export function Login() {
   const [email, setEmail] = useState('');
@@ -11,29 +11,47 @@ export function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const { cart } = useCart();
+  const { login, isAuthenticated } = useAuth();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      const isAdmin = localStorage.getItem('isAdmin') === 'true';
+      if (isAdmin) {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/');
+      }
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      const response = await authAPI.login(email, password);
-      localStorage.setItem('token', response.token);
+      await login(email, password);
       
       // If there are items in the cart, keep them
       if (cart.length > 0) {
         localStorage.setItem('cart', JSON.stringify(cart));
       }
 
-      toast.success('Login successful!', {
-        duration: 2000, // 2 seconds
-      });
-      navigate('/');
+      toast.success('Login successful!');
+      
+      // Check if user is admin and redirect accordingly
+      const isAdmin = localStorage.getItem('isAdmin') === 'true';
+      if (isAdmin) {
+        navigate('/admin/dashboard');
+      } else {
+        // Redirect to the previous page or home
+        const from = location.state?.from?.pathname || '/';
+        navigate(from);
+      }
     } catch (error: any) {
-      toast.error(error.message || 'Login failed', {
-        duration: 2000, // 2 seconds
-      });
+      toast.error(error.message || 'Login failed');
     } finally {
       setIsLoading(false);
     }
