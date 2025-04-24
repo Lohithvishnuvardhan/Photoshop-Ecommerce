@@ -1,7 +1,8 @@
 import { useCart } from '../context/Cartcontext';
 import { useNavigate } from 'react-router-dom';
-import { Shield, Truck, Clock, Camera } from 'lucide-react';
+import { Star, Shield, Truck, Clock, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useCartStore } from '../store/cart';
 
 const batteries = [
   {
@@ -104,6 +105,7 @@ const formatPrice = (price: number) => {
 
 const Batteries = () => {
   const { addToCart } = useCart();
+  const { addToBuyNow, buyNowItems, buyNowTotal } = useCartStore();
   const navigate = useNavigate();
 
   const handleAddToCart = (battery: any) => {
@@ -125,16 +127,28 @@ const Batteries = () => {
   };
 
   const handleBuyNow = (battery: any) => {
+    const product = {
+      _id: battery._id || battery.id,
+      name: battery.name,
+      price: battery.price,
+      description: battery.description,
+      imageUrl: battery.imageUrl || battery.image,
+      category: 'Batteries',
+      stock: battery.stock || 10
+    };
+
+    addToBuyNow(product);
+    
     navigate('/payment', { 
       state: { 
-        items: [{
+        items: [...buyNowItems, {
           _id: battery._id || battery.id,
           name: battery.name,
           price: battery.price,
           quantity: 1,
           image: battery.imageUrl || battery.image
         }],
-        totalAmount: battery.price,
+        totalAmount: buyNowTotal + battery.price,
         isBuyNow: true
       } 
     });

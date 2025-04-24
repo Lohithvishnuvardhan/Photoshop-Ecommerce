@@ -1,7 +1,8 @@
 import { useCart } from '../context/Cartcontext';
-import { Shield, Truck, Clock, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Star, Shield, Truck, Clock, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useCartStore } from '../store/cart';
 
 const accessories = [
   {
@@ -104,6 +105,7 @@ const formatPrice = (price: number) => {
 
 const Accessories = () => {
   const { addToCart } = useCart();
+  const { addToBuyNow, buyNowItems, buyNowTotal } = useCartStore();
   const navigate = useNavigate();
 
   const handleAddToCart = (accessory: any) => {
@@ -125,16 +127,28 @@ const Accessories = () => {
   };
 
   const handleBuyNow = (accessory: any) => {
+    const product = {
+      _id: accessory._id || accessory.id,
+      name: accessory.name,
+      price: accessory.price,
+      description: accessory.description,
+      imageUrl: accessory.imageUrl || accessory.image,
+      category: 'Accessories',
+      stock: accessory.stock || 10
+    };
+
+    addToBuyNow(product);
+    
     navigate('/payment', { 
       state: { 
-        items: [{
+        items: [...buyNowItems, {
           _id: accessory._id || accessory.id,
           name: accessory.name,
           price: accessory.price,
           quantity: 1,
           image: accessory.imageUrl || accessory.image
         }],
-        totalAmount: accessory.price,
+        totalAmount: buyNowTotal + accessory.price,
         isBuyNow: true
       } 
     });

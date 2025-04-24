@@ -2,6 +2,7 @@ import { useCart } from '../context/Cartcontext';
 import { useNavigate } from 'react-router-dom';
 import { Star, Shield, Truck, Clock, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useCartStore } from '../store/cart';
 
 const cameras = [
   {
@@ -88,6 +89,7 @@ const formatPrice = (price: number) => {
 
 const Cameras = () => {
   const { addToCart } = useCart();
+  const { addToBuyNow, buyNowItems, buyNowTotal } = useCartStore();
   const navigate = useNavigate();
 
   const handleAddToCart = (camera: any) => {
@@ -102,23 +104,35 @@ const Cameras = () => {
     };
     
     addToCart(product);
-    toast.success(`${camera.name} added to cart!`,{
+    toast.success(`${camera.name} added to cart!`, {
       position: 'bottom-right',
       duration: 2000,
     });
   };
 
   const handleBuyNow = (camera: any) => {
+    const product = {
+      _id: camera._id,
+      name: camera.name,
+      price: camera.price,
+      description: camera.description,
+      imageUrl: camera.imageUrl,
+      category: 'Cameras',
+      stock: camera.stock
+    };
+
+    addToBuyNow(product);
+    
     navigate('/payment', { 
       state: { 
-        items: [{
+        items: [...buyNowItems, {
           _id: camera._id,
           name: camera.name,
           price: camera.price,
           quantity: 1,
           image: camera.imageUrl
         }],
-        totalAmount: camera.price,
+        totalAmount: buyNowTotal + camera.price,
         isBuyNow: true
       } 
     });

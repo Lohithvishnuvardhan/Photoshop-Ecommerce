@@ -17,13 +17,25 @@ interface CartItem {
   quantity: number;
 }
 
+interface BuyNowItem {
+  _id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
+}
+
 interface CartStore {
   items: CartItem[];
+  buyNowItems: BuyNowItem[];
   addItem: (product: Product) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
+  addToBuyNow: (product: Product) => void;
+  clearBuyNow: () => void;
   total: number;
+  buyNowTotal: number;
   checkout: () => Promise<void>;
 }
 
@@ -31,6 +43,7 @@ export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
       items: [],
+      buyNowItems: [],
       addItem: (product) => {
         const items = get().items;
         const existingItem = items.find(item => item.product._id === product._id);
@@ -60,9 +73,27 @@ export const useCartStore = create<CartStore>()(
         });
       },
       clearCart: () => set({ items: [] }),
+      addToBuyNow: (product) => {
+        const buyNowItems = get().buyNowItems;
+        const newItem = {
+          _id: product._id,
+          name: product.name,
+          price: product.price,
+          quantity: 1,
+          image: product.imageUrl
+        };
+        set({ buyNowItems: [...buyNowItems, newItem] });
+      },
+      clearBuyNow: () => set({ buyNowItems: [] }),
       get total() {
         return get().items.reduce(
           (sum, item) => sum + item.product.price * item.quantity,
+          0
+        );
+      },
+      get buyNowTotal() {
+        return get().buyNowItems.reduce(
+          (sum, item) => sum + item.price * item.quantity,
           0
         );
       },
@@ -92,7 +123,7 @@ export const useCartStore = create<CartStore>()(
       }
     }),
     {
-      name: 'cart-storage', // unique name for localStorage
+      name: 'cart-storage',
     }
   )
 );
