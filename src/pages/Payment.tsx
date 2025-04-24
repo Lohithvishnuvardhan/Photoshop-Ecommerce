@@ -1,29 +1,18 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CreditCard, User, MapPin, Truck, Shield } from 'lucide-react';
+import { CreditCard, User, MapPin, Truck, Shield, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/Cartcontext';
 import { useCartStore } from '../store/cart';
 
-interface LocationState {
-  items: Array<{
-    _id: string;
-    name: string;
-    price: number;
-    quantity: number;
-    image: string;
-    imageUrl?: string;
-  }>;
-  totalAmount: number;
-  isBuyNow?: boolean;
-}
 
 export function Payment() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { cart, clearCart } = useCart();
+  const { clearCart } = useCart();
   const { clearBuyNow } = useCartStore();
   const [isLoading, setIsLoading] = useState(false);
+  const [orderItems, setOrderItems] = useState(location.state?.items || []);
   const [formData, setFormData] = useState({
     cardNumber: '',
     cardName: '',
@@ -35,20 +24,25 @@ export function Payment() {
     pincode: ''
   });
 
-  const { items, totalAmount, isBuyNow } = location.state as LocationState || {
-    items: cart.map(item => ({
-      _id: item.product._id,
-      name: item.product.name,
-      price: item.product.price,
-      quantity: item.quantity,
-      image: item.product.imageUrl
-    })),
-    totalAmount: cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0),
-    isBuyNow: false
+  const calculateTotal = () => {
+    const subtotal = orderItems.reduce((sum: number, item: { price: number; quantity: number; }) => sum + (item.price * item.quantity), 0);
+    const shipping = subtotal > 50000 ? 0 : 999;
+    return {
+      subtotal,
+      shipping,
+      final: subtotal + shipping
+    };
   };
 
-  const shipping = totalAmount > 50000 ? 0 : 999;
-  const finalTotal = totalAmount + shipping;
+  const { subtotal, shipping, final: finalTotal } = calculateTotal();
+
+  const handleRemoveItem = (itemId: string) => {
+    setOrderItems((prev: any[]) => prev.filter((item: { _id: string; }) => item._id !== itemId));
+    if (orderItems.length === 1) {
+      navigate('/');
+      toast.error('All items removed from order');
+    }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -88,7 +82,7 @@ export function Payment() {
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Clear appropriate cart based on purchase type
-      if (isBuyNow) {
+      if (location.state?.isBuyNow) {
         clearBuyNow();
       } else {
         clearCart();
@@ -127,27 +121,37 @@ export function Payment() {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
             <div className="space-y-4">
-              {items.map((item) => (
+              {orderItems.map((item: { _id: React.Key | null | undefined; image: any; imageUrl: any; name: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined; price: number; quantity: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined; }) => (
                 <div key={item._id} className="flex items-center space-x-4 pb-4 border-b border-gray-200">
                   <img
                     src={item.image || item.imageUrl}
-                    alt={item.name}
+                    alt={item.name?.toString()}
                     className="w-24 h-24 object-cover rounded-md"
                   />
-                  <div>
-                    <h3 className="font-semibold">{item.name}</h3>
-                    <p className="text-gray-600">Price: ₹{item.price.toLocaleString()}</p>
-                    <p className="text-gray-600">Quantity: {item.quantity}</p>
-                    <p className="mt-2 text-purple-600 font-semibold">
-                      Subtotal: ₹{(item.price * item.quantity).toLocaleString()}
-                    </p>
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold">{item.name}</h3>
+                        <p className="text-gray-600">Price: ₹{item.price.toLocaleString()}</p>
+                        <p className="text-gray-600">Quantity: {item.quantity?.toString()}</p>
+                        <p className="mt-2 text-purple-600 font-semibold">
+                          Subtotal: ₹{(item.price * Number(item.quantity || 0)).toLocaleString()}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => typeof item._id === 'string' && handleRemoveItem(item._id)}
+                        className="text-gray-400 hover:text-red-500 transition-colors"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
               <div className="pt-4 space-y-2">
                 <div className="flex justify-between items-center">
                   <span>Subtotal</span>
-                  <span>₹{totalAmount.toLocaleString()}</span>
+                  <span>₹{subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Shipping</span>
@@ -309,9 +313,9 @@ export function Payment() {
                 </div>
                 <button
                   type="submit"
-                  disabled={isLoading}
+                  disabled={isLoading || orderItems.length === 0}
                   className={`flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                    isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                    (isLoading || orderItems.length === 0) ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
                   {isLoading ? (
