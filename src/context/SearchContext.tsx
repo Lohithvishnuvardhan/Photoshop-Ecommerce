@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 
 interface SearchContextType {
   searchResults: any[];
@@ -7,9 +7,9 @@ interface SearchContextType {
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const SearchContext = createContext<SearchContextType | undefined>(undefined);
+const SearchContext = createContext<SearchContextType | null>(null);
 
-export function SearchProvider({ children }: { children: React.ReactNode }) {
+export const SearchProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -18,12 +18,12 @@ export function SearchProvider({ children }: { children: React.ReactNode }) {
       {children}
     </SearchContext.Provider>
   );
-}
+};
 
-export function useSearch() {
+export const useSearch = () => {
   const context = useContext(SearchContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useSearch must be used within a SearchProvider');
   }
   return context;
-} 
+}; 
