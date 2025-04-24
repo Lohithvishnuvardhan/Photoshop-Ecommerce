@@ -102,10 +102,10 @@ const Cameras = () => {
     };
     
     addToCart(product);
-    toast.success(`${camera.name} added to cart!`),{
+    toast.success(`${camera.name} added to cart!`,{
       position: 'bottom-right',
       duration: 2000,
-    };
+    });
   };
 
   const handleBuyNow = (camera: any) => {
