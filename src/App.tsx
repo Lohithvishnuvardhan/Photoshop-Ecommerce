@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ErrorBoundary } from 'react-error-boundary'; // ✅ Fix: Add this
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { Login } from './pages/Login';
@@ -29,7 +30,7 @@ import { CartProvider } from './context/Cartcontext';
 const ProtectedRoute = ({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) => {
   const { isAuthenticated, user } = useAuth();
   const token = localStorage.getItem('token');
-  
+
   if (!isAuthenticated && !token) {
     return <Navigate to="/login" replace />;
   }
@@ -41,66 +42,55 @@ const ProtectedRoute = ({ children, adminOnly = false }: { children: React.React
   return <>{children}</>;
 };
 
+function ErrorFallback({ error }: { error: Error }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-red-600">Something went wrong:</h1>
+        <pre className="mt-2 text-gray-700">{error.message}</pre>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   return (
-    <SearchProvider>
-      <CartProvider>
-        <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <div className="min-h-screen bg-gray-50">
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route index element={<Home />} />
-                <Route path="cameras" element={<Cameras />} />
-                <Route path="lenses" element={<Lenses />} />
-                <Route path="accessories" element={<Accessories />} />
-                <Route path="batteries" element={<Batteries />} />
-                <Route path="about" element={<About />} />
-                <Route path="contact" element={<Contact />} />
-                <Route path="profile" element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                } />
-                <Route path="orders" element={
-                  <ProtectedRoute>
-                    <Orders />
-                  </ProtectedRoute>
-                } />
-                <Route path="admin/dashboard" element={
-                  <ProtectedRoute adminOnly>
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="admin/products" element={
-                  <ProtectedRoute adminOnly>
-                    <AdminProducts />
-                  </ProtectedRoute>
-                } />
-                <Route path="login" element={<Login />} />
-                <Route path="signup" element={<SignUp />} />
-                <Route path="payment" element={
-                  <ProtectedRoute>
-                    <Payment />
-                  </ProtectedRoute>
-                } />
-                <Route path="cart" element={
-                  <ProtectedRoute>
-                    <CartPage />
-                  </ProtectedRoute>
-                } />
-                <Route path="shipping" element={<ShippingInfo />} />
-                <Route path="returns" element={<Returns />} />
-                <Route path="faq" element={<FAQ />} />
-                <Route path="order-success" element={<OrderSuccess />} />
-                <Route path="forgot-password" element={<ForgotPassword />} />
-                <Route path="reset-password" element={<ResetPassword />} />
-              </Route>
-            </Routes>
-            <Toaster />
-          </div>
-        </Router>
-      </CartProvider>
-    </SearchProvider>
+    <ErrorBoundary FallbackComponent={ErrorFallback}>
+      <SearchProvider>
+        <CartProvider>
+          <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <div className="min-h-screen bg-gray-50">
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Home />} />
+                  <Route path="cameras" element={<Cameras />} />
+                  <Route path="lenses" element={<Lenses />} />
+                  <Route path="accessories" element={<Accessories />} />
+                  <Route path="batteries" element={<Batteries />} />
+                  <Route path="about" element={<About />} />
+                  <Route path="contact" element={<Contact />} />
+                  <Route path="profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                  <Route path="orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
+                  <Route path="admin/dashboard" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+                  <Route path="admin/products" element={<ProtectedRoute adminOnly><AdminProducts /></ProtectedRoute>} />
+                  <Route path="login" element={<Login />} />
+                  <Route path="signup" element={<SignUp />} />
+                  <Route path="payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
+                  <Route path="cart" element={<ProtectedRoute><CartPage /></ProtectedRoute>} />
+                  <Route path="shipping" element={<ShippingInfo />} />
+                  <Route path="returns" element={<Returns />} />
+                  <Route path="faq" element={<FAQ />} />
+                  <Route path="order-success" element={<OrderSuccess />} />
+                  <Route path="forgot-password" element={<ForgotPassword />} />
+                  <Route path="reset-password" element={<ResetPassword />} />
+                </Route>
+              </Routes>
+              <Toaster />
+            </div>
+          </Router>
+        </CartProvider>
+      </SearchProvider>
+    </ErrorBoundary>
   );
 }
 

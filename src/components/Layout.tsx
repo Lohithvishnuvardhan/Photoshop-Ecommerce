@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Camera, ShoppingCart, User, Search, LogOut, X, Menu } from 'lucide-react';
+import { ShoppingCart, User, Search, LogOut, X, Menu } from 'lucide-react';
 import { useCartStore } from '../store/cart';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';

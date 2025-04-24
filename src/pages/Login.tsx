@@ -4,6 +4,7 @@ import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/Cartcontext';
 import { useAuth } from '../hooks/useAuth';
+import cart from '../server/routes/cart';
 
 export function Login() {
   const [email, setEmail] = useState('');
@@ -12,7 +13,7 @@ export function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { cart } = useCart();
+  useCart();
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
