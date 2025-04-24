@@ -125,7 +125,19 @@ const Accessories = () => {
   };
 
   const handleBuyNow = (accessory: any) => {
-    navigate('/payment', { state: { product: accessory } });
+    navigate('/payment', { 
+      state: { 
+        items: [{
+          _id: accessory._id || accessory.id,
+          name: accessory.name,
+          price: accessory.price,
+          quantity: 1,
+          image: accessory.imageUrl || accessory.image
+        }],
+        totalAmount: accessory.price,
+        isBuyNow: true
+      } 
+    });
   };
 
   return (

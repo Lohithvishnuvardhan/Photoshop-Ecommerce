@@ -112,13 +112,13 @@ const Lenses = () => {
 
   const handleAddToCart = (lens: any) => {
     const product = {
-      _id: lens._id || lens.id,
+      _id: lens._id,
       name: lens.name,
       price: lens.price,
       description: lens.description,
-      imageUrl: lens.imageUrl || lens.image,
+      imageUrl: lens.imageUrl,
       category: 'Lenses',
-      stock: lens.stock || 10
+      stock: lens.stock
     };
     
     addToCart(product);
@@ -129,7 +129,19 @@ const Lenses = () => {
   };
 
   const handleBuyNow = (lens: any) => {
-    navigate('/payment', { state: { product: lens } });
+    navigate('/payment', { 
+      state: { 
+        items: [{
+          _id: lens._id,
+          name: lens.name,
+          price: lens.price,
+          quantity: 1,
+          image: lens.imageUrl
+        }],
+        totalAmount: lens.price,
+        isBuyNow: true
+      } 
+    });
   };
 
   return (

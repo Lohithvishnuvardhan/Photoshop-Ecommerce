@@ -125,7 +125,19 @@ const Batteries = () => {
   };
 
   const handleBuyNow = (battery: any) => {
-    navigate('/payment', { state: { product: battery } });
+    navigate('/payment', { 
+      state: { 
+        items: [{
+          _id: battery._id || battery.id,
+          name: battery.name,
+          price: battery.price,
+          quantity: 1,
+          image: battery.imageUrl || battery.image
+        }],
+        totalAmount: battery.price,
+        isBuyNow: true
+      } 
+    });
   };
 
   return (
