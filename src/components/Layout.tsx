@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Camera, ShoppingCart, User, Search, LogOut, X, Menu, Heart, Package } from 'lucide-react';
+import { Camera, ShoppingCart, User, Search, LogOut, X, Menu } from 'lucide-react';
 import { useCartStore } from '../store/cart';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
@@ -17,7 +17,6 @@ export function Layout() {
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const { isAuthenticated, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const [showUserMenu, setShowUserMenu] = useState(false);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -31,7 +30,6 @@ export function Layout() {
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
-    setShowUserMenu(false);
   }, [location.pathname]);
 
   const handleSearch = (query: string) => {
@@ -41,7 +39,6 @@ export function Layout() {
       setShowResults(false);
       return;
     }
-
     // Your existing search logic here
   };
 
@@ -71,35 +68,28 @@ export function Layout() {
               <span className="font-bold text-2xl text-white tracking-tight">Photo Pixel</span>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-8">
-              <Link to="/cameras" className="text-gray-300 hover:text-white transition-colors">Cameras</Link>
-              <Link to="/lenses" className="text-gray-300 hover:text-white transition-colors">Lenses</Link>
-              <Link to="/accessories" className="text-gray-300 hover:text-white transition-colors">Accessories</Link>
-              <Link to="/batteries" className="text-gray-300 hover:text-white transition-colors">Batteries</Link>
-            </nav>
-
-            {/* Search, Cart, and Auth */}
-            <div className="flex items-center space-x-6">
-              <div className="relative" ref={searchRef}>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => handleSearch(e.target.value)}
-                    placeholder="Search products..."
-                    className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
-                {/* Search Results Dropdown */}
-                {showResults && searchResults.length > 0 && (
-                  <div className="absolute mt-2 w-full bg-gray-800 rounded-lg shadow-xl border border-gray-700">
-                    {/* Your search results rendering logic */}
-                  </div>
-                )}
+            {/* Search Bar */}
+            <div className="flex-1 max-w-2xl mx-12 relative" ref={searchRef}>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  placeholder="Search for cameras, lenses, accessories..."
+                  className="w-full pl-10 pr-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
               </div>
+              {/* Search Results Dropdown */}
+              {showResults && searchResults.length > 0 && (
+                <div className="absolute mt-2 w-full bg-gray-800 rounded-lg shadow-xl border border-gray-700">
+                  {/* Your search results rendering logic */}
+                </div>
+              )}
+            </div>
 
+            {/* Navigation and Auth */}
+            <div className="flex items-center space-x-6">
               <Link 
                 to="/cart" 
                 className="relative text-gray-300 hover:text-white transition-colors"
@@ -114,49 +104,17 @@ export function Layout() {
               </Link>
 
               {isAuthenticated ? (
-                <div className="relative">
-                  <button
-                    onClick={() => setShowUserMenu(!showUserMenu)}
-                    className="text-gray-300 hover:text-white transition-colors"
-                  >
+                <div className="flex items-center space-x-4">
+                  <Link to="/profile" className="text-gray-300 hover:text-white transition-colors">
                     <User className="h-6 w-6" />
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    disabled={isLoading}
+                    className="text-gray-300 hover:text-white transition-colors disabled:opacity-50"
+                  >
+                    <LogOut className="h-6 w-6" />
                   </button>
-                  
-                  {showUserMenu && (
-                    <div className="absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-xl border border-gray-700">
-                      <div className="py-1">
-                        <Link
-                          to="/profile"
-                          className="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white"
-                        >
-                          <User className="h-4 w-4 mr-2" />
-                          Profile
-                        </Link>
-                        <Link
-                          to="/orders"
-                          className="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white"
-                        >
-                          <Package className="h-4 w-4 mr-2" />
-                          Orders
-                        </Link>
-                        <Link
-                          to="/wishlist"
-                          className="flex items-center px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white"
-                        >
-                          <Heart className="h-4 w-4 mr-2" />
-                          Wishlist
-                        </Link>
-                        <button
-                          onClick={handleLogout}
-                          disabled={isLoading}
-                          className="flex items-center w-full px-4 py-2 text-gray-300 hover:bg-gray-700 hover:text-white"
-                        >
-                          <LogOut className="h-4 w-4 mr-2" />
-                          {isLoading ? 'Logging out...' : 'Logout'}
-                        </button>
-                      </div>
-                    </div>
-                  )}
                 </div>
               ) : (
                 <Link 
@@ -181,6 +139,30 @@ export function Layout() {
             </div>
           </div>
 
+          {/* Navigation Menu */}
+          <nav className="hidden md:block py-4">
+            <div className="flex justify-center space-x-12">
+              <Link to="/cameras" className="text-gray-300 hover:text-white transition-colors">
+                Cameras
+              </Link>
+              <Link to="/lenses" className="text-gray-300 hover:text-white transition-colors">
+                Lenses
+              </Link>
+              <Link to="/accessories" className="text-gray-300 hover:text-white transition-colors">
+                Accessories
+              </Link>
+              <Link to="/batteries" className="text-gray-300 hover:text-white transition-colors">
+                Batteries
+              </Link>
+              <Link to="/about" className="text-gray-300 hover:text-white transition-colors">
+                About
+              </Link>
+              <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">
+                Contact
+              </Link>
+            </div>
+          </nav>
+
           {/* Mobile Menu */}
           {isMobileMenuOpen && (
             <div className="md:hidden py-4 border-t border-gray-800">
@@ -189,6 +171,8 @@ export function Layout() {
                 <Link to="/lenses" className="text-gray-300 hover:text-white">Lenses</Link>
                 <Link to="/accessories" className="text-gray-300 hover:text-white">Accessories</Link>
                 <Link to="/batteries" className="text-gray-300 hover:text-white">Batteries</Link>
+                <Link to="/about" className="text-gray-300 hover:text-white">About</Link>
+                <Link to="/contact" className="text-gray-300 hover:text-white">Contact</Link>
               </nav>
             </div>
           )}
@@ -203,7 +187,7 @@ export function Layout() {
       {/* Footer */}
       <footer className="bg-gray-800 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <h3 className="text-white font-semibold mb-4">About Us</h3>
               <p className="text-gray-400">Professional photography equipment for every level of expertise.</p>
@@ -223,12 +207,6 @@ export function Layout() {
                 <li><Link to="/returns" className="text-gray-400 hover:text-white">Returns</Link></li>
                 <li><Link to="/orders" className="text-gray-400 hover:text-white">Track Order</Link></li>
               </ul>
-            </div>
-            <div>
-              <h3 className="text-white font-semibold mb-4">Connect With Us</h3>
-              <div className="flex space-x-4">
-                {/* Add your social media links here */}
-              </div>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
