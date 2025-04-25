@@ -8,12 +8,12 @@ router.post('/', authenticateToken, async (req, res) => {
   try {
     const { orderItems, totalPrice, shippingAddress } = req.body;
     
-    if (!orderItems || !totalPrice) {
+    if (!orderItems || !totalPrice || !shippingAddress) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
     const newOrder = new Order({
-      user: req.user.id,
+      user: req.user.id, // Using id from authenticated user
       orderItems,
       totalPrice,
       shippingAddress,
@@ -29,9 +29,9 @@ router.post('/', authenticateToken, async (req, res) => {
 });
 
 // Get orders by user ID
-router.get('/myorders/:userId', authenticateToken, async (req, res) => {
+router.get('/myorders', authenticateToken, async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.params.userId })
+    const orders = await Order.find({ user: req.user.id })
       .sort({ createdAt: -1 }); // Sort by newest first
     res.json(orders);
   } catch (err) {

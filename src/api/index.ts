@@ -94,16 +94,7 @@ export const authAPI = {
 export const orderAPI = {
   createOrder: async (orderData: any) => {
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Please login to continue');
-      }
-      
-      const response = await api.post('/orders', orderData, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
+      const response = await api.post('/orders', orderData);
       return response;
     } catch (error: any) {
       throw new Error(error.message || 'Failed to create order');
@@ -111,12 +102,12 @@ export const orderAPI = {
   },
 
   getOrders: async () => {
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-      throw new Error('User ID not found');
+    try {
+      const response = await api.get('/orders/myorders');
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.message || 'Failed to fetch orders');
     }
-    const response = await api.get(`/orders/myorders/${userId}`);
-    return response.data;
   }
 };
 
