@@ -90,32 +90,38 @@ export const authAPI = {
 };
 
 export const orderAPI = {
-  createOrder: (orderData: any) => {
-    const token = localStorage.getItem('token');
+  createOrder: async (orderData: any) => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication required');
+      }
 
-    return axios.post('/api/orders', orderData, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+      const response = await api.post('/orders', orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response;
+    } catch (error: any) {
+      console.error('Create order error:', error);
+      throw new Error(error.response?.data?.message || 'Failed to create order');
+    }
   },
 
-  // keep the rest of your API methods unchanged
-};
-
-
   getOrders: async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('Authentication required');
-    }
-
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication required');
+      }
+
       const response = await api.get('/orders/myorders');
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch orders');
     }
   }
+};
 
 export default api;
