@@ -106,12 +106,12 @@ export function Payment() {
       const orderData = {
         orderItems: orderItems.map((item: any) => ({
           name: item.name,
-          quantity: item.quantity,
+          quantity:Number(item.quantity),
           image: item.image || item.imageUrl,
-          price: item.price,
+          price: Number(item.price),
           product: item._id
         })),
-        totalPrice: finalTotal,
+        totalPrice: Number(finalTotal),
         shippingAddress: {
           address: formData.address,
           city: formData.city,
@@ -140,8 +140,8 @@ export function Payment() {
       }, 2000);
 
     } catch (error: any) {
-      console.error('Order creation error:', error);
-      toast.error(error.message || 'Failed to place order. Please try again.');
+      console.error('Order creation error:', error .response?.data || error);
+      toast.error(error.response?.data?.message || error.message || 'Failed to place order');
       setIsLoading(false);
     }
   };
