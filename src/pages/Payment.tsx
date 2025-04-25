@@ -109,7 +109,7 @@ export function Payment() {
           quantity: item.quantity,
           image: item.image || item.imageUrl,
           price: item.price,
-          _id: item._id
+          product: item._id
         })),
         totalPrice: finalTotal,
         shippingAddress: {
