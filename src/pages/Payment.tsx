@@ -27,18 +27,27 @@ export function Payment() {
 
   // Check authentication on component mount
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      // Save current location before redirecting
-      navigate('/login', { 
-        state: { 
-          from: location.pathname,
-          paymentData: {
-            items: orderItems,
-            isBuyNow: location.state?.isBuyNow
-          }
-        } 
-      });
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        // Save current location and cart data before redirecting
+        navigate('/login', { 
+          state: { 
+            from: location.pathname,
+            paymentData: {
+              items: orderItems,
+              isBuyNow: location.state?.isBuyNow
+            }
+          },
+          replace: true // Use replace to avoid back button issues
+        });
+        return false;
+      }
+      return true;
+    };
+
+    if (!checkAuth()) {
+      return;
     }
   }, [navigate, location, orderItems]);
 
@@ -90,9 +99,7 @@ export function Payment() {
       }
 
       const token = localStorage.getItem('token');
-      const userId = localStorage.getItem('userId');
-      
-      if (!token || !userId) {
+      if (!token) {
         toast.error('Please login to continue');
         navigate('/login');
         return;
@@ -135,7 +142,20 @@ export function Payment() {
       }, 2000);
 
     } catch (error: any) {
-      toast.error(error.message || 'Failed to place order. Please try again.');
+      if (error.response?.status === 401) {
+        toast.error('Please login to continue');
+        navigate('/login', { 
+          state: { 
+            from: location.pathname,
+            paymentData: {
+              items: orderItems,
+              isBuyNow: location.state?.isBuyNow
+            }
+          }
+        });
+      } else {
+        toast.error(error.message || 'Failed to place order. Please try again.');
+      }
       setIsLoading(false);
     }
   };
