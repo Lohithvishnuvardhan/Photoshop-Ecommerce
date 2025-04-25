@@ -26,37 +26,30 @@ export function Payment() {
   });
 
   useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login', { 
-          state: { 
-            from: location.pathname,
-            paymentData: {
-              items: orderItems,
-              isBuyNow: location.state?.isBuyNow
-            }
-          },
-          replace: true
-        });
-        return false;
-      }
-      return true;
-    };
-
-    if (!checkAuth()) {
+    if (!location.state?.items?.length) {
+      navigate('/cart');
       return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login', { 
+        state: { 
+          from: location.pathname,
+          paymentData: {
+            items: orderItems,
+            isBuyNow: location.state?.isBuyNow
+          }
+        }
+      });
     }
   }, [navigate, location, orderItems]);
 
   const calculateTotal = () => {
-    const subtotal = orderItems.reduce((sum: number, item: { price: number; quantity: number; }) => sum + (item.price * item.quantity), 0);
+    const subtotal = orderItems.reduce((sum: number, item: { price: number; quantity: number; }) => 
+      sum + (item.price * item.quantity), 0);
     const shipping = subtotal > 50000 ? 0 : 999;
-    return {
-      subtotal,
-      shipping,
-      final: subtotal + shipping
-    };
+    return { subtotal, shipping, final: subtotal + shipping };
   };
 
   const { subtotal, shipping, final: finalTotal } = calculateTotal();
@@ -86,6 +79,22 @@ export function Payment() {
     }));
   };
 
+  const validateForm = () => {
+    if (formData.cardNumber.replace(/\s/g, '').length !== 16) {
+      toast.error('Please enter a valid card number');
+      return false;
+    }
+    if (formData.cvv.length !== 3) {
+      toast.error('Please enter a valid CVV');
+      return false;
+    }
+    if (!formData.address || !formData.city || !formData.state || !formData.pincode) {
+      toast.error('Please fill in all address fields');
+      return false;
+    }
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -96,17 +105,10 @@ export function Payment() {
         return;
       }
 
-      const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('Please login to continue');
-        navigate('/login');
-        return;
-      }
-
       const orderData = {
         orderItems: orderItems.map((item: any) => ({
           name: item.name,
-          quantity:Number(item.quantity),
+          quantity: Number(item.quantity),
           image: item.image || item.imageUrl,
           price: Number(item.price),
           product: item._id
@@ -120,7 +122,7 @@ export function Payment() {
         }
       };
 
-      const response = await orderAPI.createOrder(orderData, token);
+      const response = await orderAPI.createOrder(orderData, localStorage.getItem('token') || '');
 
       if (location.state?.isBuyNow) {
         clearBuyNow();
@@ -140,26 +142,10 @@ export function Payment() {
       }, 2000);
 
     } catch (error: any) {
-      console.error('Order creation error:', error .response?.data || error);
-      
+      console.error('Order creation error:', error);
+      toast.error(error.response?.data?.message || 'Failed to create order');
       setIsLoading(false);
     }
-  };
-
-  const validateForm = () => {
-    if (formData.cardNumber.replace(/\s/g, '').length !== 16) {
-      toast.error('Please enter a valid card number');
-      return false;
-    }
-    if (formData.cvv.length !== 3) {
-      toast.error('Please enter a valid CVV');
-      return false;
-    }
-    if (!formData.address || !formData.city || !formData.state || !formData.pincode) {
-      toast.error('Please fill in all address fields');
-      return false;
-    }
-    return true;
   };
 
   return (
