@@ -4,7 +4,6 @@ import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/Cartcontext';
 import { useAuth } from '../hooks/useAuth';
-import cart from '../server/routes/cart';
 
 export function Login() {
   const [email, setEmail] = useState('');
@@ -13,7 +12,7 @@ export function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  useCart();
+  const { items: cartItems } = useCart();
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,8 +24,8 @@ export function Login() {
       const response = await login(email, password);
       console.log('Login response:', response);
       
-      if (cart.length > 0) {
-        localStorage.setItem('cart', JSON.stringify(cart));
+      if (cartItems && cartItems.length > 0) {
+        localStorage.setItem('cart', JSON.stringify(cartItems));
       }
 
       toast.success('Login successful!');
@@ -38,7 +37,6 @@ export function Login() {
         console.log('Redirecting to admin dashboard');
         navigate('/admin/dashboard');
       } else {
-        // Safely access location.state using optional chaining
         const redirectPath = location.state?.from?.pathname;
         navigate(redirectPath || '/');
       }

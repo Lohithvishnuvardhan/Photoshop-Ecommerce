@@ -3,8 +3,7 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../hooks/useAuth';
 import { create } from 'zustand';
 
-interface CartItem {
-  product: any;
+export interface CartItem {
   _id: string;
   name: string;
   price: number;
@@ -30,7 +29,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     addToCart: (product: any) => {
       set((state) => ({
         items: [...state.items, {
-          product,
           _id: product._id,
           name: product.name,
           price: product.price,
@@ -69,6 +67,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   store.subscribe((state) => {
     localStorage.setItem('cart', JSON.stringify(state.items));
   });
+
   return (
     <CartContext.Provider value={store.getState()}>
       {children}
