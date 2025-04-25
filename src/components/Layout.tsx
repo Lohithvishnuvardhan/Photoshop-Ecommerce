@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, User, Search, LogOut, X, Menu } from 'lucide-react';
+import { ShoppingCart, User, Search, LogOut, X, Menu, Camera } from 'lucide-react';
 import { useCartStore } from '../store/cart';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
@@ -74,14 +74,9 @@ export function Layout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4">
             {/* Logo */}
-            <Link to="/">
-              <img 
-                src="/logo2.png" 
-                alt="Photo Pixel Logo" 
-                width="150" 
-                height="50"
-                loading="eager"
-              />
+            <Link to="/" className="flex items-center space-x-3">
+              <Camera className="h-12 w-12 text-purple-500" />
+              <span className="text-3xl font-bold text-white">Photo Pixel</span>
             </Link>
 
             {/* Search Bar */}
