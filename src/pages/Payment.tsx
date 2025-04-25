@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CreditCard, User, MapPin, Truck, Shield, X } from 'lucide-react';
+import { CreditCard, User, MapPin, Truck, Shield, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/Cartcontext';
 import { useCartStore } from '../store/cart';
@@ -12,7 +12,7 @@ export function Payment() {
   const { clearCart } = useCart();
   const { clearBuyNow } = useCartStore();
   const [isLoading, setIsLoading] = useState(false);
-  const [orderItems, setOrderItems] = useState(location.state?.items || []);
+  const [orderItems] = useState(location.state?.items || []);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [formData, setFormData] = useState({
     cardNumber: '',
@@ -36,14 +36,6 @@ export function Payment() {
   };
 
   const { subtotal, shipping, final: finalTotal } = calculateTotal();
-
-  const handleRemoveItem = (itemId: string) => {
-    setOrderItems((prev: any[]) => prev.filter((item: { _id: string; }) => item._id !== itemId));
-    if (orderItems.length === 1) {
-      navigate('/');
-      toast.error('All items removed from order');
-    }
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -87,9 +79,7 @@ export function Payment() {
         return;
       }
 
-      // Create order data
       const orderData = {
-        user: userId,
         orderItems: orderItems.map((item: any) => ({
           name: item.name,
           quantity: item.quantity,
@@ -98,7 +88,6 @@ export function Payment() {
           product: item._id
         })),
         totalPrice: finalTotal,
-        status: 'Processing',
         shippingAddress: {
           address: formData.address,
           city: formData.city,
@@ -107,32 +96,27 @@ export function Payment() {
         }
       };
 
-      // Create the order
-      await orderAPI.createOrder(orderData);
+      const response = await orderAPI.createOrder(orderData);
 
-      // Clear appropriate cart based on purchase type
       if (location.state?.isBuyNow) {
         clearBuyNow();
       } else {
         clearCart();
       }
 
-      // Show success popup
       setShowSuccessPopup(true);
 
-      // Navigate after a short delay
       setTimeout(() => {
-        navigate('/order-success', { 
-          state: { 
-            orderDetails: orderData,
-            fromPayment: true 
+        navigate('/order-success', {
+          state: {
+            orderDetails: response.data,
+            fromPayment: true
           }
         });
       }, 2000);
 
     } catch (error: any) {
       toast.error(error.message || 'Failed to place order. Please try again.');
-    } finally {
       setIsLoading(false);
     }
   };
@@ -155,14 +139,11 @@ export function Payment() {
 
   return (
     <div className="min-h-screen bg-gray-100 py-12">
-      {/* Success Popup */}
       {showSuccessPopup && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-8 text-center max-w-md mx-4">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-              </svg>
+              <CheckCircle className="w-10 h-10 text-green-500" />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h2>
             <p className="text-gray-600 mb-4">Thank you for your purchase. Your order has been confirmed.</p>
@@ -177,11 +158,11 @@ export function Payment() {
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
             <div className="space-y-4">
-              {orderItems.map((item: { _id: React.Key | null | undefined; image: any; imageUrl: any; name: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined; price: number; quantity: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined; }) => (
+              {orderItems.map((item: any) => (
                 <div key={item._id} className="flex items-center space-x-4 pb-4 border-b border-gray-200">
                   <img
                     src={item.image || item.imageUrl}
-                    alt={item.name?.toString()}
+                    alt={item.name}
                     className="w-24 h-24 object-cover rounded-md"
                   />
                   <div className="flex-1">
@@ -189,17 +170,11 @@ export function Payment() {
                       <div>
                         <h3 className="font-semibold">{item.name}</h3>
                         <p className="text-gray-600">Price: ₹{item.price.toLocaleString()}</p>
-                        <p className="text-gray-600">Quantity: {item.quantity?.toString()}</p>
+                        <p className="text-gray-600">Quantity: {item.quantity}</p>
                         <p className="mt-2 text-purple-600 font-semibold">
-                          Subtotal: ₹{(item.price * Number(item.quantity || 0)).toLocaleString()}
+                          Subtotal: ₹{(item.price * item.quantity).toLocaleString()}
                         </p>
                       </div>
-                      <button
-                        onClick={() => typeof item._id === 'string' && handleRemoveItem(item._id)}
-                        className="text-gray-400 hover:text-red-500 transition-colors"
-                      >
-                        <X className="h-5 w-5" />
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -286,6 +261,7 @@ export function Payment() {
                     value={formData.cvv}
                     onChange={handleInputChange}
                     placeholder="123"
+                    maxLength={3}
                     className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
                     required
                   />

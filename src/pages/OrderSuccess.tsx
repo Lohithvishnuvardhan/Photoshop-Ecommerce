@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { CheckCircle, ShoppingBag, Home, Package } from 'lucide-react';
+import { CheckCircle, Package, Home } from 'lucide-react';
 
 export function OrderSuccess() {
   const navigate = useNavigate();
@@ -9,10 +9,10 @@ export function OrderSuccess() {
   const fromPayment = location.state?.fromPayment;
 
   useEffect(() => {
-    if (!fromPayment) {
+    if (!fromPayment || !orderDetails) {
       navigate('/');
     }
-  }, [fromPayment, navigate]);
+  }, [fromPayment, orderDetails, navigate]);
 
   if (!orderDetails) {
     return null;
