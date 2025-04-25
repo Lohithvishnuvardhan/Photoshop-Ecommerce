@@ -47,7 +47,7 @@ api.interceptors.response.use(
         window.location.href = '/login';
       }
     }
-    return Promise.reject(error.response?.data || error);
+    return Promise.reject(error);
   }
 );
 
@@ -57,14 +57,13 @@ export const authAPI = {
       const response = await api.post<LoginResponse>('/auth/login', { email, password });
       const { token, isAdmin, _id } = response.data;
       
-      // Store auth data
       localStorage.setItem('token', token);
       localStorage.setItem('userId', _id);
       localStorage.setItem('isAdmin', isAdmin.toString());
       
       return response.data;
     } catch (error: any) {
-      throw new Error(error.message || 'Login failed');
+      throw new Error(error.response?.data?.message || 'Login failed');
     }
   },
 
@@ -73,14 +72,13 @@ export const authAPI = {
       const response = await api.post<LoginResponse>('/auth/register', { name, email, password });
       const { token, isAdmin, _id } = response.data;
       
-      // Store auth data
       localStorage.setItem('token', token);
       localStorage.setItem('userId', _id);
       localStorage.setItem('isAdmin', isAdmin.toString());
       
       return response.data;
     } catch (error: any) {
-      throw new Error(error.message || 'Registration failed');
+      throw new Error(error.response?.data?.message || 'Registration failed');
     }
   },
 
@@ -93,20 +91,31 @@ export const authAPI = {
 
 export const orderAPI = {
   createOrder: async (orderData: any) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
     try {
       const response = await api.post('/orders', orderData);
       return response;
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to create order');
+      console.error('Order creation error:', error);
+      throw new Error(error.response?.data?.message || 'Failed to create order');
     }
   },
 
   getOrders: async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+
     try {
       const response = await api.get('/orders/myorders');
       return response.data;
     } catch (error: any) {
-      throw new Error(error.message || 'Failed to fetch orders');
+      throw new Error(error.response?.data?.message || 'Failed to fetch orders');
     }
   }
 };
