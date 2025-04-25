@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { User, Mail, Phone, MapPin,  } from 'lucide-react';
-
+import { useNavigate } from 'react-router-dom';
+import { User, Mail, Phone, MapPin, Edit2, Save, X } from 'lucide-react';
 import toast from 'react-hot-toast';
-import api from '../api';
+import api from '../utils/api';
 
 interface UserProfile {
   name: string;
   email: string;
   phoneNumber: string;
-  avatar: string;
   addresses: Array<{
     street: string;
     city: string;
@@ -23,6 +22,7 @@ export default function Profile() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -31,28 +31,36 @@ export default function Profile() {
     city: '',
     state: '',
     postalCode: '',
-    country: ''
+    country: 'India'
   });
 
   useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login', { state: { from: '/profile' } });
+      return;
+    }
     fetchProfile();
-  }, []);
+  }, [navigate]);
 
   const fetchProfile = async () => {
     try {
       const response = await api.get('/users/profile');
       setProfile(response.data);
       setFormData({
-        name: response.data.name,
+        name: response.data.name || '',
         phoneNumber: response.data.phoneNumber || '',
-        street: response.data.addresses[0]?.street || '',
-        city: response.data.addresses[0]?.city || '',
-        state: response.data.addresses[0]?.state || '',
-        postalCode: response.data.addresses[0]?.postalCode || '',
-        country: response.data.addresses[0]?.country || ''
+        street: response.data.addresses?.[0]?.street || '',
+        city: response.data.addresses?.[0]?.city || '',
+        state: response.data.addresses?.[0]?.state || '',
+        postalCode: response.data.addresses?.[0]?.postalCode || '',
+        country: response.data.addresses?.[0]?.country || 'India'
       });
-    } catch (error) {
-      toast.error('Failed to load profile');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to load profile');
+      if (error.response?.status === 401) {
+        navigate('/login');
+      }
     } finally {
       setLoading(false);
     }
@@ -69,12 +77,12 @@ export default function Profile() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.put('/users/profile', formData);
-      toast.success('Profile updated successfully');
+      const response = await api.put('/users/profile', formData);
+      setProfile(response.data);
       setIsEditing(false);
-      fetchProfile();
-    } catch (error) {
-      toast.error('Failed to update profile');
+      toast.success('Profile updated successfully');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to update profile');
     }
   };
 
@@ -95,9 +103,23 @@ export default function Profile() {
               <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                style={{
+                  backgroundColor: isEditing ? '#EF4444' : '#7C3AED',
+                  color: 'white'
+                }}
               >
-                {isEditing ? 'Cancel' : 'Edit Profile'}
+                {isEditing ? (
+                  <>
+                    <X className="h-5 w-5 mr-2" />
+                    Cancel
+                  </>
+                ) : (
+                  <>
+                    <Edit2 className="h-5 w-5 mr-2" />
+                    Edit Profile
+                  </>
+                )}
               </button>
             </div>
 
@@ -166,23 +188,14 @@ export default function Profile() {
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
                     />
                   </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Country</label>
-                    <input
-                      type="text"
-                      name="country"
-                      value={formData.country}
-                      onChange={handleInputChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                    />
-                  </div>
                 </div>
 
                 <div className="flex justify-end">
                   <button
                     type="submit"
-                    className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                    className="inline-flex items-center px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
                   >
+                    <Save className="h-5 w-5 mr-2" />
                     Save Changes
                   </button>
                 </div>
@@ -221,8 +234,10 @@ export default function Profile() {
                     <div>
                       <p className="text-sm text-gray-500">Address {index + 1}</p>
                       <p className="text-lg font-medium text-gray-900">
-                        {address.street}, {address.city}<br />
-                        {address.state}, {address.postalCode}<br />
+                        {address.street && `${address.street},`} {address.city && `${address.city},`}
+                        <br />
+                        {address.state && `${address.state},`} {address.postalCode}
+                        <br />
                         {address.country}
                       </p>
                     </div>
