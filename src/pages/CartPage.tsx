@@ -4,10 +4,10 @@ import toast from 'react-hot-toast';
 import { useCart } from '../context/Cartcontext';
 
 const CartPage = () => {
-  const { cart, removeFromCart, updateQuantity } = useCart();
+  const { items = [], removeFromCart, updateQuantity } = useCart();
   const navigate = useNavigate();
 
-  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const total = items?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || 0;
   const shipping = total > 50000 ? 0 : 999;
   const finalTotal = total + shipping;
 
@@ -18,19 +18,19 @@ const CartPage = () => {
   };
 
   const handleCheckout = () => {
-    if (cart.length === 0) {
+    if (!items?.length) {
       toast.error('Your cart is empty');
       return;
     }
     navigate('/payment', { 
       state: { 
-        items: cart,
+        items: items,
         totalAmount: finalTotal
       } 
     });
   };
 
-  if (cart.length === 0) {
+  if (!items?.length) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -54,7 +54,7 @@ const CartPage = () => {
           <div className="lg:col-span-8">
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="p-6 space-y-6">
-                {cart.map((item) => (
+                {items.map((item) => (
                   <div key={item._id} className="flex items-center p-6 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
                     <img
                       src={item.image}
