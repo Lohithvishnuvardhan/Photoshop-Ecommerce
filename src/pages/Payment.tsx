@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { CreditCard, User, MapPin, Truck, Shield, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -24,6 +24,23 @@ export function Payment() {
     state: '',
     pincode: ''
   });
+
+  // Check authentication on component mount
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Save current location before redirecting
+      navigate('/login', { 
+        state: { 
+          from: location.pathname,
+          paymentData: {
+            items: orderItems,
+            isBuyNow: location.state?.isBuyNow
+          }
+        } 
+      });
+    }
+  }, [navigate, location, orderItems]);
 
   const calculateTotal = () => {
     const subtotal = orderItems.reduce((sum: number, item: { price: number; quantity: number; }) => sum + (item.price * item.quantity), 0);
@@ -72,8 +89,10 @@ export function Payment() {
         return;
       }
 
+      const token = localStorage.getItem('token');
       const userId = localStorage.getItem('userId');
-      if (!userId) {
+      
+      if (!token || !userId) {
         toast.error('Please login to continue');
         navigate('/login');
         return;

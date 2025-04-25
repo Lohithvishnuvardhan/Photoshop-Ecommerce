@@ -18,6 +18,7 @@ const api: AxiosInstance = axios.create({
   withCredentials: false
 });
 
+// Request interceptor
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -31,15 +32,18 @@ api.interceptors.request.use(
   }
 );
 
+// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Clear auth data
+      localStorage.removeItem('token');
+      localStorage.removeItem('userId');
+      localStorage.removeItem('isAdmin');
+      
       // Only redirect to login if not already on login page
       if (!window.location.pathname.includes('/login')) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('isAdmin');
         window.location.href = '/login';
       }
     }
@@ -52,9 +56,12 @@ export const authAPI = {
     try {
       const response = await api.post<LoginResponse>('/auth/login', { email, password });
       const { token, isAdmin, _id } = response.data;
+      
+      // Store auth data
       localStorage.setItem('token', token);
       localStorage.setItem('userId', _id);
       localStorage.setItem('isAdmin', isAdmin.toString());
+      
       return response.data;
     } catch (error: any) {
       throw new Error(error.message || 'Login failed');
@@ -65,9 +72,12 @@ export const authAPI = {
     try {
       const response = await api.post<LoginResponse>('/auth/register', { name, email, password });
       const { token, isAdmin, _id } = response.data;
+      
+      // Store auth data
       localStorage.setItem('token', token);
       localStorage.setItem('userId', _id);
       localStorage.setItem('isAdmin', isAdmin.toString());
+      
       return response.data;
     } catch (error: any) {
       throw new Error(error.message || 'Registration failed');
@@ -88,8 +98,13 @@ export const orderAPI = {
       if (!token) {
         throw new Error('Please login to continue');
       }
-      const response = await api.post('/orders', orderData);
-      return response.data;
+      
+      const response = await api.post('/orders', orderData, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      return response;
     } catch (error: any) {
       throw new Error(error.message || 'Failed to create order');
     }

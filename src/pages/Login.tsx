@@ -28,8 +28,20 @@ export function Login() {
 
       toast.success('Login successful!');
       
+      // Check if we were redirected from payment page
+      const from = location.state?.from;
+      const paymentData = location.state?.paymentData;
+      
       if (response.user?.isAdmin) {
         navigate('/admin/dashboard');
+      } else if (from === '/payment' && paymentData) {
+        // Redirect back to payment with the saved items
+        navigate('/payment', { 
+          state: { 
+            items: paymentData.items,
+            isBuyNow: paymentData.isBuyNow
+          }
+        });
       } else {
         const redirectPath = location.state?.from?.pathname || '/';
         navigate(redirectPath);
