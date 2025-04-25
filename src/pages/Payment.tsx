@@ -13,6 +13,7 @@ export function Payment() {
   const { clearBuyNow } = useCartStore();
   const [isLoading, setIsLoading] = useState(false);
   const [orderItems, setOrderItems] = useState(location.state?.items || []);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [formData, setFormData] = useState({
     cardNumber: '',
     cardName: '',
@@ -116,8 +117,19 @@ export function Payment() {
         clearCart();
       }
 
-      toast.success('Order placed successfully!');
-      navigate('/order-success');
+      // Show success popup
+      setShowSuccessPopup(true);
+
+      // Navigate after a short delay
+      setTimeout(() => {
+        navigate('/order-success', { 
+          state: { 
+            orderDetails: orderData,
+            fromPayment: true 
+          }
+        });
+      }, 2000);
+
     } catch (error: any) {
       toast.error(error.message || 'Failed to place order. Please try again.');
     } finally {
@@ -143,6 +155,22 @@ export function Payment() {
 
   return (
     <div className="min-h-screen bg-gray-100 py-12">
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 text-center max-w-md mx-4">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h2>
+            <p className="text-gray-600 mb-4">Thank you for your purchase. Your order has been confirmed.</p>
+            <div className="animate-pulse text-sm text-gray-500">Redirecting to order summary...</div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Order Summary */}
