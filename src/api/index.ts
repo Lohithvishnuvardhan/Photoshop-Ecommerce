@@ -90,20 +90,19 @@ export const authAPI = {
 };
 
 export const orderAPI = {
-  createOrder: async (orderData: any) => {
+  createOrder: (orderData: any) => {
     const token = localStorage.getItem('token');
-    if (!token) {
-      throw new Error('Authentication required');
-    }
 
-    try {
-      const response = await api.post('/orders', orderData);
-      return response;
-    } catch (error: any) {
-      console.error('Order creation error:', error);
-      throw new Error(error.response?.data?.message || 'Failed to create order');
-    }
+    return axios.post('/api/orders', orderData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
   },
+
+  // keep the rest of your API methods unchanged
+};
+
 
   getOrders: async () => {
     const token = localStorage.getItem('token');
@@ -118,6 +117,5 @@ export const orderAPI = {
       throw new Error(error.response?.data?.message || 'Failed to fetch orders');
     }
   }
-};
 
 export default api;

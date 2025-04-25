@@ -142,6 +142,9 @@ export function Payment() {
       }, 2000);
 
     } catch (error: any) {
+      console.log('API Error:', error); // ADD THIS
+      console.log('API Error response:', error?.response); // ADD THIS
+      
       if (error.response?.status === 401) {
         toast.error('Please login to continue');
         navigate('/login', { 
