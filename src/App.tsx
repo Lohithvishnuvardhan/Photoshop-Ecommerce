@@ -21,6 +21,8 @@ import { AdminDashboard } from './pages/admin/Dashboard';
 import { AdminProducts } from './pages/admin/Products';
 import { SearchProvider } from './context/SearchContext';
 import { CartProvider } from './context/Cartcontext';
+import AdminRoute from './components/AdminRoute';
+import PrivateRoute from './components/PrivateRoute';
 
 function ErrorFallback({ error }: { error: Error }) {
   return (
@@ -48,13 +50,13 @@ function App() {
                 <Route path="batteries" element={<Batteries />} />
                 <Route path="about" element={<About />} />
                 <Route path="contact" element={<Contact />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="orders" element={<Orders />} />
-                <Route path="admin/dashboard" element={<AdminDashboard />} />
-                <Route path="admin/products" element={<AdminProducts />} />
+                <Route path="profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+                <Route path="orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
+                <Route path="admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+                <Route path="admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
                 <Route path="login" element={<Login />} />
                 <Route path="signup" element={<SignUp />} />
-                <Route path="payment" element={<Payment />} />
+                <Route path="payment" element={<PrivateRoute><Payment /></PrivateRoute>} />
                 <Route path="cart" element={<CartPage />} />
                 <Route path="shipping" element={<ShippingInfo />} />
                 <Route path="returns" element={<Returns />} />

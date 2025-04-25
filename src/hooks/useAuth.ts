@@ -30,11 +30,9 @@ export const useAuth = create<AuthState>()(
           const response = await api.post<User>('/auth/login', { email, password });
           const { data } = response;
           
-          // Store token and admin status
           localStorage.setItem('token', data.token);
           localStorage.setItem('isAdmin', String(data.isAdmin));
           
-          // Update state
           set({ 
             user: data,
             isAuthenticated: true,
