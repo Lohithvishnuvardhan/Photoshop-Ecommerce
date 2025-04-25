@@ -4,11 +4,11 @@ exports.createOrder = async (req, res) => {
   try {
     const { orderItems, totalPrice, shippingAddress } = req.body;
     
-    if (!orderItems || !totalPrice || !shippingAddress) {
+    if (!orderItems?.length || !totalPrice || !shippingAddress) {
       return res.status(400).json({ 
         message: 'Missing required fields',
         details: {
-          orderItems: !orderItems,
+          orderItems: !orderItems?.length,
           totalPrice: !totalPrice,
           shippingAddress: !shippingAddress
         }
@@ -25,8 +25,7 @@ exports.createOrder = async (req, res) => {
         name: item.name,
         quantity: item.quantity,
         image: item.image || item.imageUrl,
-        price: item.price,
-        product: item._id
+        price: item.price
       })),
       shippingAddress,
       totalPrice,
@@ -51,11 +50,16 @@ exports.createOrder = async (req, res) => {
 
 exports.getOrders = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ message: 'User not authenticated' });
+    }
+
     const orders = await Order.find({ user: req.user.id })
       .sort({ createdAt: -1 })
       .populate('user', 'name email');
     res.json(orders);
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching orders' });
+    console.error('Order fetch error:', err);
+    res.status(500).json({ message: 'Failed to fetch orders' });
   }
 };

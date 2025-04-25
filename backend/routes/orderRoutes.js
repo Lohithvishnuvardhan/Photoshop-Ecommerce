@@ -24,8 +24,7 @@ router.post('/', authenticateToken, async (req, res) => {
         name: item.name,
         quantity: item.quantity,
         image: item.image || item.imageUrl,
-        price: item.price,
-        product: item._id
+        price: item.price
       })),
       shippingAddress,
       totalPrice,
