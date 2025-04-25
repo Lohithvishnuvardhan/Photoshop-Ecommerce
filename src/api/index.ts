@@ -37,12 +37,10 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Clear auth data
       localStorage.removeItem('token');
       localStorage.removeItem('userId');
       localStorage.removeItem('isAdmin');
       
-      // Only redirect to login if not already on login page
       if (!window.location.pathname.includes('/login')) {
         window.location.href = '/login';
       }
@@ -97,14 +95,15 @@ export const orderAPI = {
         throw new Error('Authentication required');
       }
 
-      const response = await api.post('/orders', orderData, {
+      const response = await axios.post(`${API_URL}/orders`, orderData, {
         headers: {
-          Authorization: `Bearer ${token}`,
-        },
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
       return response;
     } catch (error: any) {
-      console.error('Create order error:', error);
+      console.error('Create order error:', error.response || error);
       throw new Error(error.response?.data?.message || 'Failed to create order');
     }
   },
