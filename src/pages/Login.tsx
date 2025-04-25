@@ -38,8 +38,9 @@ export function Login() {
         console.log('Redirecting to admin dashboard');
         navigate('/admin/dashboard');
       } else {
-        const from = location.state?.from?.pathname || '/';
-        navigate(from);
+        // Safely access location.state using optional chaining
+        const redirectPath = location.state?.from?.pathname;
+        navigate(redirectPath || '/');
       }
     } catch (error: any) {
       console.error('Login error:', error);

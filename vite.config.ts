@@ -4,7 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   server: {
-    port: 3000,
+    port: 5173, // Changed to default Vite port
     strictPort: false,
     host: true,
     proxy: {

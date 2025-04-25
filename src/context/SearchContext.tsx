@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface SearchContextType {
   searchResults: any[];
@@ -26,4 +26,4 @@ export const useSearch = () => {
     throw new Error('useSearch must be used within a SearchProvider');
   }
   return context;
-}; 
+};
