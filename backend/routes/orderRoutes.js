@@ -6,17 +6,18 @@ const authenticateToken = require('../middleware/authMiddleware');
 // Create a new order
 router.post('/', authenticateToken, async (req, res) => {
   try {
-    const { user, orderItems, totalPrice, status } = req.body;
+    const { orderItems, totalPrice, shippingAddress } = req.body;
     
-    if (!user || !orderItems || !totalPrice) {
+    if (!orderItems || !totalPrice) {
       return res.status(400).json({ message: 'Missing required fields' });
     }
 
     const newOrder = new Order({
-      user,
+      user: req.user.id,
       orderItems,
       totalPrice,
-      status: status || 'Processing',
+      shippingAddress,
+      status: 'Processing',
     });
 
     const savedOrder = await newOrder.save();

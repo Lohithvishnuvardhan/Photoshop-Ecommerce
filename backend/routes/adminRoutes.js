@@ -40,7 +40,7 @@ router.get('/dashboard', authenticateToken, isAdmin, async (req, res) => {
       totalRevenue: totalRevenue[0]?.total || 0,
       recentOrders: recentOrders.map(order => ({
         _id: order._id,
-        customer: order.user.name,
+        customer: order.user.email,
         products: order.orderItems.length,
         total: order.totalPrice,
         status: order.status,
