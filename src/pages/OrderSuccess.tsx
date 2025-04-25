@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { CheckCircle, Package, Home } from 'lucide-react';
+import { CheckCircle, Package, Home, ShoppingBag } from 'lucide-react';
 
 export function OrderSuccess() {
   const navigate = useNavigate();
@@ -15,7 +15,22 @@ export function OrderSuccess() {
   }, [fromPayment, orderDetails, navigate]);
 
   if (!orderDetails) {
-    return null;
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
+          <ShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">No Order Found</h2>
+          <p className="text-gray-600 mb-6">Please place an order to view order details.</p>
+          <button
+            onClick={() => navigate('/')}
+            className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors inline-flex items-center"
+          >
+            <Home className="w-5 h-5 mr-2" />
+            Return to Home
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -30,18 +45,18 @@ export function OrderSuccess() {
             Thank you for your purchase. Your order has been confirmed.
           </p>
 
-          <div className="bg-gray-50 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-gray-900 mb-2">Order Summary</h3>
-            <div className="space-y-2 text-sm text-gray-600">
-              <div className="flex justify-between">
+          <div className="bg-gray-50 rounded-lg p-6 mb-6">
+            <h3 className="font-semibold text-gray-900 mb-4">Order Summary</h3>
+            <div className="space-y-3 text-sm text-gray-600">
+              <div className="flex justify-between border-b pb-2">
                 <span>Order Total:</span>
                 <span className="font-medium">₹{orderDetails.totalPrice.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between border-b pb-2">
                 <span>Items:</span>
                 <span className="font-medium">{orderDetails.orderItems.length} items</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between pt-2">
                 <span>Shipping Address:</span>
                 <span className="font-medium text-right">
                   {orderDetails.shippingAddress.address},<br />
@@ -52,7 +67,7 @@ export function OrderSuccess() {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4">
+          <div className="grid grid-cols-2 gap-4">
             <button
               onClick={() => navigate('/orders')}
               className="flex items-center justify-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
