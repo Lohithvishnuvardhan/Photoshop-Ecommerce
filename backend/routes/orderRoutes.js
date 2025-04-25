@@ -3,24 +3,19 @@ const router = express.Router();
 const Order = require('../models/Order');
 const authenticateToken = require('../middleware/authMiddleware');
 
-// Create a new order
 router.post('/', authenticateToken, async (req, res) => {
   try {
     const { orderItems, totalPrice, shippingAddress } = req.body;
     
-    if (!orderItems || !totalPrice || !shippingAddress) {
+    if (!orderItems?.length || !totalPrice || !shippingAddress) {
       return res.status(400).json({ 
         message: 'Missing required fields',
         details: {
-          orderItems: !orderItems,
+          orderItems: !orderItems?.length,
           totalPrice: !totalPrice,
           shippingAddress: !shippingAddress
         }
       });
-    }
-
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ message: 'User not authenticated' });
     }
 
     const newOrder = new Order({
@@ -38,11 +33,6 @@ router.post('/', authenticateToken, async (req, res) => {
     });
 
     const savedOrder = await newOrder.save();
-    
-    if (!savedOrder) {
-      throw new Error('Failed to save order');
-    }
-
     res.status(201).json(savedOrder);
   } catch (err) {
     console.error('Order creation error:', err);
@@ -53,13 +43,8 @@ router.post('/', authenticateToken, async (req, res) => {
   }
 });
 
-// Get orders by user ID
 router.get('/myorders', authenticateToken, async (req, res) => {
   try {
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ message: 'User not authenticated' });
-    }
-
     const orders = await Order.find({ user: req.user.id })
       .sort({ createdAt: -1 })
       .populate('user', 'name email');

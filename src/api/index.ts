@@ -18,7 +18,6 @@ const api: AxiosInstance = axios.create({
   withCredentials: false
 });
 
-// Request interceptor
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -32,7 +31,6 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -95,12 +93,7 @@ export const orderAPI = {
         throw new Error('Authentication required');
       }
 
-      const response = await axios.post(`${API_URL}/orders`, orderData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.post('/orders', orderData);
       return response;
     } catch (error: any) {
       console.error('Create order error:', error.response || error);

@@ -25,12 +25,10 @@ export function Payment() {
     pincode: ''
   });
 
-  // Check authentication on component mount
   useEffect(() => {
     const checkAuth = () => {
       const token = localStorage.getItem('token');
       if (!token) {
-        // Save current location and cart data before redirecting
         navigate('/login', { 
           state: { 
             from: location.pathname,
@@ -39,7 +37,7 @@ export function Payment() {
               isBuyNow: location.state?.isBuyNow
             }
           },
-          replace: true // Use replace to avoid back button issues
+          replace: true
         });
         return false;
       }
@@ -111,7 +109,7 @@ export function Payment() {
           quantity: item.quantity,
           image: item.image || item.imageUrl,
           price: item.price,
-          product: item._id
+          _id: item._id
         })),
         totalPrice: finalTotal,
         shippingAddress: {
@@ -142,23 +140,8 @@ export function Payment() {
       }, 2000);
 
     } catch (error: any) {
-      console.log('API Error:', error); // ADD THIS
-      console.log('API Error response:', error?.response); // ADD THIS
-      
-      if (error.response?.status === 401) {
-        toast.error('Please login to continue');
-        navigate('/login', { 
-          state: { 
-            from: location.pathname,
-            paymentData: {
-              items: orderItems,
-              isBuyNow: location.state?.isBuyNow
-            }
-          }
-        });
-      } else {
-        toast.error(error.message || 'Failed to place order. Please try again.');
-      }
+      console.error('Order creation error:', error);
+      toast.error(error.message || 'Failed to place order. Please try again.');
       setIsLoading(false);
     }
   };
