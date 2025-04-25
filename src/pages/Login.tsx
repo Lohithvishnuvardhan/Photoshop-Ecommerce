@@ -35,7 +35,6 @@ export function Login() {
         navigate(redirectPath);
       }
     } catch (error: any) {
-      console.error('Login error:', error);
       toast.error(error.message || 'Login failed');
     } finally {
       setIsLoading(false);
