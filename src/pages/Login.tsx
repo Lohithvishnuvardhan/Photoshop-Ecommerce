@@ -28,7 +28,7 @@ export function Login() {
 
       toast.success('Login successful!');
       
-      if (response.isAdmin) {
+      if (response.user?.isAdmin) {
         navigate('/admin/dashboard');
       } else {
         const redirectPath = location.state?.from?.pathname || '/';

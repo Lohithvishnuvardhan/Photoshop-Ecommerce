@@ -2,10 +2,13 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, {
-    expiresIn: '30d',
-  });
+// ✅ Updated to include isAdmin in the token payload
+const generateToken = (user) => {
+  return jwt.sign(
+    { id: user._id, isAdmin: user.isAdmin },
+    process.env.JWT_SECRET,
+    { expiresIn: '30d' }
+  );
 };
 
 exports.registerUser = async (req, res) => {
@@ -26,10 +29,10 @@ exports.registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      isAdmin: true,
+      isAdmin: true, // 👈 Ensure you want all registered users to be admins; otherwise, remove this line
     });
 
-    const token = generateToken(user._id);
+    const token = generateToken(user); // 👈 Pass full user object
 
     res.status(201).json({
       _id: user._id,
@@ -52,9 +55,9 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({ message: 'Please provide email and password' });
     }
 
-    // Find user by email and explicitly select the password field
+    // ✅ Select password field explicitly
     const user = await User.findOne({ email }).select('+password');
-    
+
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
@@ -64,9 +67,8 @@ exports.loginUser = async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user); // 👈 Pass full user object
 
-    // Send response without password but including isAdmin
     res.json({
       _id: user._id,
       name: user.name,
