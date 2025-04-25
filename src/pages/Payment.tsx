@@ -120,7 +120,7 @@ export function Payment() {
         }
       };
 
-      const response = await orderAPI.createOrder(orderData);
+      const response = await orderAPI.createOrder(orderData, token);
 
       if (location.state?.isBuyNow) {
         clearBuyNow();
