@@ -40,10 +40,13 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('isAdmin');
-      window.location.href = '/login';
+      // Only redirect to login if not already on login page
+      if (!window.location.pathname.includes('/login')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('isAdmin');
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error.response?.data || error);
   }

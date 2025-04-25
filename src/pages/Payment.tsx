@@ -75,6 +75,7 @@ export function Payment() {
 
     try {
       if (!validateForm()) {
+        setIsLoading(false);
         return;
       }
 
@@ -96,7 +97,13 @@ export function Payment() {
           product: item._id
         })),
         totalPrice: finalTotal,
-        status: 'Processing'
+        status: 'Processing',
+        shippingAddress: {
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode
+        }
       };
 
       // Create the order
@@ -109,10 +116,10 @@ export function Payment() {
         clearCart();
       }
 
-      toast.success('Payment successful!');
+      toast.success('Order placed successfully!');
       navigate('/order-success');
-    } catch (error) {
-      toast.error('Payment failed. Please try again.');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to place order. Please try again.');
     } finally {
       setIsLoading(false);
     }
