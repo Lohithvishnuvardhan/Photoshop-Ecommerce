@@ -69,7 +69,7 @@ export function Home() {
   return (
     <div className="bg-gray-900">
       {/* Hero Section with Rotating Camera */}
-      <div className="relative h-[80vh] overflow-hidden">
+      <div className="relative h-[60vh] overflow-hidden">
         <div className="absolute inset-0 animate-rotate-camera">
           <video
             autoPlay
@@ -84,23 +84,23 @@ export function Home() {
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent">
           <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
             <div className="max-w-xl">
-              <h1 className="text-6xl font-bold text-white mb-6 animate-fade-in">
+              <h1 className="text-5xl font-bold text-white mb-4 animate-fade-in">
                 <span className="italic">Turn Pixels into Profit.</span>
               </h1>
-              <p className="text-xl text-gray-200 mb-8">
+              <p className="text-lg text-gray-200 mb-6">
                 Professional photography equipment for every level of expertise. From beginners to pros, find your perfect gear.
               </p>
               <div className="flex gap-4">
                 <button
                   onClick={handleShopNow}
-                  className="inline-flex items-center bg-gradient-to-r from-purple-600 to-blue-500 text-white px-8 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  className="inline-flex items-center bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-2 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
                   Shop Now
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </button>
                 <Link
                   to="/about"
-                  className="inline-flex items-center bg-white bg-opacity-20 text-white px-8 py-3 rounded-lg hover:bg-opacity-30 transition-all duration-300"
+                  className="inline-flex items-center bg-white bg-opacity-20 text-white px-6 py-2 rounded-lg hover:bg-opacity-30 transition-all duration-300"
                 >
                   Learn More
                 </Link>
