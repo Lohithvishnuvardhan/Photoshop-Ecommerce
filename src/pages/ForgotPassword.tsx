@@ -14,11 +14,18 @@ export function ForgotPassword() {
     setIsLoading(true);
 
     try {
-      await api.post('/auth/forgot-password', { email });
-      setEmailSent(true);
-      toast.success('Password reset link has been sent to your email');
+      const response = await api.post('/auth/forgot-password', { email });
+      
+      if (response.data.success) {
+        setEmailSent(true);
+        toast.success('Password reset link has been sent to your email');
+      } else {
+        throw new Error(response.data.message);
+      }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to send reset email');
+      const errorMessage = error.response?.data?.message || 'Failed to send reset email';
+      toast.error(errorMessage);
+      console.error('Password reset error:', error);
     } finally {
       setIsLoading(false);
     }

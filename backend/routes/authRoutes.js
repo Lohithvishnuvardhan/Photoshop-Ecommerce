@@ -13,7 +13,9 @@ router.post('/login', loginUser);
 router.post('/forgot-password', async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ email });
+    
+    // Find user and explicitly select password field
+    const user = await User.findOne({ email }).select('+password');
 
     if (!user) {
       return res.status(404).json({ message: 'User not found with this email' });
@@ -32,11 +34,15 @@ router.post('/forgot-password', async (req, res) => {
     await sendResetEmail(email, resetToken);
 
     res.json({ 
-      message: 'Password reset instructions sent to your email'
+      message: 'Password reset instructions sent to your email',
+      success: true
     });
   } catch (error) {
     console.error('Forgot password error:', error);
-    res.status(500).json({ message: 'Error processing password reset request' });
+    res.status(500).json({ 
+      message: 'Error processing password reset request',
+      error: error.message 
+    });
   }
 });
 
@@ -64,10 +70,16 @@ router.post('/reset-password', async (req, res) => {
     user.resetPasswordExpires = undefined;
     await user.save();
 
-    res.json({ message: 'Password has been reset successfully' });
+    res.json({ 
+      message: 'Password has been reset successfully',
+      success: true 
+    });
   } catch (error) {
     console.error('Reset password error:', error);
-    res.status(500).json({ message: 'Error resetting password' });
+    res.status(500).json({ 
+      message: 'Error resetting password',
+      error: error.message 
+    });
   }
 });
 
