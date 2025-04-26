@@ -1,5 +1,8 @@
+// src/App.tsx
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
+
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { Login } from './pages/Login';
@@ -19,12 +22,13 @@ import FAQ from './pages/FAQ';
 import Profile from './pages/Profile';
 import { AdminDashboard } from './pages/admin/Dashboard';
 import { AdminProducts } from './pages/admin/Products';
+import { ForgotPassword } from './pages/ForgotPassword';
+import { ResetPassword } from './pages/ResetPassword';
+
 import { SearchProvider } from './context/SearchContext';
 import { CartProvider } from './context/Cartcontext';
 import AdminRoute from './components/AdminRoute';
 import PrivateRoute from './components/PrivateRoute';
-import { ForgotPassword } from './pages/ForgotPassword';
-import { ResetPassword } from './pages/ResetPassword';
 
 function ErrorFallback({ error }: { error: Error }) {
   return (
