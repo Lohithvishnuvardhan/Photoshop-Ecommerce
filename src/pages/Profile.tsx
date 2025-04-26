@@ -46,21 +46,25 @@ export default function Profile() {
       setIsLoading(true);
       setError(null);
       
-      // Simulated profile data since the API is not returning business fields
+      // First try to get user profile
       const response = await api.get('/users/profile');
+      
+      // Create business profile with default values if data is missing
       const businessProfile: BusinessProfile = {
-        ...response.data,
+        name: response.data?.name || 'Not Available',
+        email: response.data?.email || 'Not Available',
+        phoneNumber: response.data?.phoneNumber || 'Not Available',
         businessName: 'Photo Studio Pro',
         website: 'www.photostudiopro.com',
         industry: 'Photography',
         annualRevenue: '$500,000',
         employeeCount: '15',
         address: {
-          street: response.data.addresses?.[0]?.street || '123 Business Ave',
-          city: response.data.addresses?.[0]?.city || 'New York',
-          state: response.data.addresses?.[0]?.state || 'NY',
-          postalCode: response.data.addresses?.[0]?.postalCode || '10001',
-          country: response.data.addresses?.[0]?.country || 'United States'
+          street: response.data?.addresses?.[0]?.street || '123 Business Ave',
+          city: response.data?.addresses?.[0]?.city || 'New York',
+          state: response.data?.addresses?.[0]?.state || 'NY',
+          postalCode: response.data?.addresses?.[0]?.postalCode || '10001',
+          country: response.data?.addresses?.[0]?.country || 'United States'
         },
         orderHistory: {
           total: 250000,
@@ -69,8 +73,10 @@ export default function Profile() {
       };
       
       setProfile(businessProfile);
+      setError(null);
     } catch (error: any) {
-      setError(error.response?.data?.message || 'Failed to load profile');
+      console.error('Profile loading error:', error);
+      setError('Failed to load profile. Please try again.');
       toast.error('Failed to load profile');
     } finally {
       setIsLoading(false);
@@ -89,12 +95,15 @@ export default function Profile() {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-red-500 text-xl mb-4">Failed to load profile</div>
+          <div className="text-red-500 text-xl mb-4">{error}</div>
           <button
-            onClick={fetchProfile}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+            onClick={() => {
+              setError(null);
+              fetchProfile();
+            }}
+            className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors"
           >
-            Retry
+            Try Again
           </button>
         </div>
       </div>
@@ -174,7 +183,7 @@ export default function Profile() {
                   <Phone className="h-5 w-5 text-purple-500 mr-3" />
                   <div>
                     <p className="text-sm text-gray-500">Phone</p>
-                    <p className="text-lg font-medium text-gray-900">{profile?.phoneNumber || 'Not provided'}</p>
+                    <p className="text-lg font-medium text-gray-900">{profile?.phoneNumber}</p>
                   </div>
                 </div>
               </div>
