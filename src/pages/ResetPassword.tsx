@@ -19,16 +19,12 @@ export function ResetPassword() {
     e.preventDefault();
     
     if (password !== confirmPassword) {
-      toast.error('Passwords do not match', {
-        duration: 2000, // 2 seconds
-      });
+      toast.error('Passwords do not match');
       return;
     }
 
     if (password.length < 8) {
-      toast.error('Password must be at least 8 characters long', {
-        duration: 2000, // 2 seconds
-      });
+      toast.error('Password must be at least 8 characters long');
       return;
     }
 
@@ -36,14 +32,10 @@ export function ResetPassword() {
 
     try {
       await authAPI.resetPassword(token!, password);
-      toast.success('Password has been reset successfully', {
-        duration: 2000, // 2 seconds
-      });
+      toast.success('Password has been reset successfully');
       navigate('/login');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to reset password', {
-        duration: 2000, // 2 seconds
-      });
+      toast.error(error.message || 'Failed to reset password');
     } finally {
       setIsLoading(false);
     }
@@ -162,4 +154,4 @@ export function ResetPassword() {
       </div>
     </div>
   );
-} 
+}
