@@ -75,7 +75,7 @@ const Layout = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
               <Camera className="h-12 w-12 text-purple-500" />
-              <span className="text-4xl font-extrabold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 text-transparent bg-clip-text font-sans tracking-tight hover:from-cyan-500 hover:via-blue-600 hover:to-purple-600 transition-all duration-300">
+              <span className="text-5xl font-extrabold italic bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 text-transparent bg-clip-text font-sans tracking-tight hover:from-cyan-500 hover:via-blue-600 hover:to-purple-600 transition-all duration-300">
                 Photo Pixel
               </span>
             </Link>

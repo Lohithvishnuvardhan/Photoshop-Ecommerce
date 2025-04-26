@@ -82,7 +82,7 @@ export function Home() {
         <div className="absolute inset-0 bg-black bg-opacity-60">
           <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
             <h1 className="text-6xl font-bold text-white mb-6 animate-fade-in">
-              Capture Life's <span className="text-purple-500">Perfect</span> Moments
+              <span className="italic">Turn Pixels into Profit.</span>
             </h1>
             <p className="text-xl text-gray-200 mb-8 max-w-2xl">
               Professional photography equipment for every level of expertise. From beginners to pros, find your perfect gear.
