@@ -4,7 +4,6 @@ import { CreditCard, User, MapPin, Truck, Shield, CheckCircle } from 'lucide-rea
 import toast from 'react-hot-toast';
 import { useCart } from '../context/Cartcontext';
 import { useCartStore } from '../store/cart';
-import { orderAPI } from '../api';
 
 export function Payment() {
   const location = useLocation();
@@ -105,24 +104,7 @@ export function Payment() {
         return;
       }
 
-      const orderData = {
-        orderItems: orderItems.map((item: any) => ({
-          name: item.name,
-          quantity: Number(item.quantity),
-          image: item.image || item.imageUrl,
-          price: Number(item.price),
-          product: item._id
-        })),
-        totalPrice: Number(finalTotal),
-        shippingAddress: {
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          pincode: formData.pincode
-        }
-      };
 
-      const response = await orderAPI.createOrder(orderData, localStorage.getItem('token') || '');
 
       if (location.state?.isBuyNow) {
         clearBuyNow();
@@ -132,13 +114,9 @@ export function Payment() {
 
       setShowSuccessPopup(true);
 
+      // Show success popup for 2 seconds then redirect to home
       setTimeout(() => {
-        navigate('/order-success', {
-          state: {
-            orderDetails: response.data,
-            fromPayment: true
-          }
-        });
+        navigate('/');
       }, 2000);
 
     } catch (error: any) {
@@ -158,7 +136,7 @@ export function Payment() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h2>
             <p className="text-gray-600 mb-4">Thank you for your purchase. Your order has been confirmed.</p>
-            <div className="animate-pulse text-sm text-gray-500">Redirecting to order summary...</div>
+            <div className="animate-pulse text-sm text-gray-500">Redirecting to home page...</div>
           </div>
         </div>
       )}
