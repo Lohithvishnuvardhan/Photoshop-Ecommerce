@@ -38,4 +38,7 @@ const userSchema = new mongoose.Schema({
   timestamps: true 
 });
 
-module.exports = mongoose.model('User', userSchema);
+// Only create the model if it hasn't been registered yet
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+
+module.exports = User;
