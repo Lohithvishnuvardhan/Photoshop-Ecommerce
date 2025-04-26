@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { authAPI } from '../api';
+import api from '../utils/api';
 
 export function ForgotPassword() {
   const [email, setEmail] = useState('');
@@ -14,11 +14,16 @@ export function ForgotPassword() {
     setIsLoading(true);
 
     try {
-      await authAPI.forgotPassword(email);
-      setEmailSent(true);
-      toast.success('Password reset link has been sent to your email');
+      const response = await api.post('/auth/forgot-password', { email });
+      
+      if (response.data.success) {
+        setEmailSent(true);
+        toast.success('Password reset link has been sent to your email');
+      } else {
+        throw new Error(response.data.message);
+      }
     } catch (error: any) {
-      const errorMessage = error.message || 'Failed to send reset email';
+      const errorMessage = error.response?.data?.message || 'Failed to send reset email';
       toast.error(errorMessage);
       console.error('Password reset error:', error);
     } finally {
