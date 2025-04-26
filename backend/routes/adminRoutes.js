@@ -68,17 +68,21 @@ router.post('/products', authenticateToken, isAdmin, async (req, res) => {
   try {
     const { name, description, price, category, imageUrl, stock } = req.body;
 
+    if (!name || !description || !price || !category || !imageUrl || !stock) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
     const product = new Product({
       name,
       description,
-      price,
+      price: Number(price),
       category,
       imageUrl,
-      stock
+      stock: Number(stock)
     });
 
-    await product.save();
-    res.status(201).json(product);
+    const savedProduct = await product.save();
+    res.status(201).json(savedProduct);
   } catch (error) {
     console.error('Add product error:', error);
     res.status(500).json({ message: 'Error adding product' });
