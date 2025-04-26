@@ -1,6 +1,8 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const { sendResetEmail } = require('../config/email');
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -33,7 +35,7 @@ exports.registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      isAdmin: false // Default to regular user
+      isAdmin: false
     });
 
     const token = generateToken(user);
@@ -81,5 +83,75 @@ exports.loginUser = async (req, res) => {
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ message: 'Server error during login' });
+  }
+};
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found with this email' });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = Date.now() + 3600000; // Token valid for 1 hour
+
+    // Save token to user
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = resetTokenExpiry;
+    await user.save();
+
+    // Send reset email
+    await sendResetEmail(email, resetToken);
+
+    res.json({ 
+      message: 'Password reset instructions sent to your email',
+      success: true
+    });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ 
+      message: 'Error processing password reset request',
+      error: error.message 
+    });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    }).select('+password');
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired reset token' });
+    }
+
+    // Hash new password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    
+    // Update user password and clear reset token
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({ 
+      message: 'Password has been reset successfully',
+      success: true 
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ 
+      message: 'Error resetting password',
+      error: error.message 
+    });
   }
 };
