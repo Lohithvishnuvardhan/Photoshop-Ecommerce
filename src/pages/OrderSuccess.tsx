@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { CheckCircle, Package, Home, ShoppingBag } from 'lucide-react';
+import { CheckCircle, Package, Home, ShoppingBag, MapPin, Calendar } from 'lucide-react';
 
 export function OrderSuccess() {
   const navigate = useNavigate();
@@ -35,49 +35,81 @@ export function OrderSuccess() {
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-10 h-10 text-green-500" />
+      <div className="bg-white rounded-lg shadow-lg p-8 max-w-xl w-full">
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="w-12 h-12 text-green-500" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h2>
-          <p className="text-gray-600 mb-6">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h2>
+          <p className="text-gray-600 text-lg">
             Thank you for your purchase. Your order has been confirmed.
           </p>
+        </div>
 
-          <div className="bg-gray-50 rounded-lg p-6 mb-6">
-            <h3 className="font-semibold text-gray-900 mb-4">Order Summary</h3>
-            <div className="space-y-3 text-sm text-gray-600">
-              <div className="flex justify-between border-b pb-2">
-                <span>Order Total:</span>
-                <span className="font-medium">₹{orderDetails.totalPrice.toLocaleString()}</span>
+        <div className="space-y-6">
+          <div className="bg-gray-50 rounded-lg p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+              <Package className="w-6 h-6 mr-2 text-purple-600" />
+              Order Summary
+            </h3>
+            <div className="space-y-4">
+              {orderDetails.orderItems.map((item: any, index: number) => (
+                <div key={index} className="flex items-center space-x-4 py-3 border-b border-gray-200 last:border-0">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-16 h-16 object-cover rounded-lg"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-medium text-gray-900">{item.name}</h4>
+                    <p className="text-gray-500">Quantity: {item.quantity}</p>
+                    <p className="text-purple-600 font-medium">₹{item.price.toLocaleString()}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-gray-50 rounded-lg p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+              <MapPin className="w-6 h-6 mr-2 text-purple-600" />
+              Shipping Details
+            </h3>
+            <div className="text-gray-600">
+              <p>{orderDetails.shippingAddress.address}</p>
+              <p>{orderDetails.shippingAddress.city}, {orderDetails.shippingAddress.state}</p>
+              <p>PIN: {orderDetails.shippingAddress.pincode}</p>
+            </div>
+          </div>
+
+          <div className="bg-gray-50 rounded-lg p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+              <Calendar className="w-6 h-6 mr-2 text-purple-600" />
+              Order Details
+            </h3>
+            <div className="space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-600">Order Total:</span>
+                <span className="font-semibold text-gray-900">₹{orderDetails.totalPrice.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between border-b pb-2">
-                <span>Items:</span>
-                <span className="font-medium">{orderDetails.orderItems.length} items</span>
-              </div>
-              <div className="flex justify-between pt-2">
-                <span>Shipping Address:</span>
-                <span className="font-medium text-right">
-                  {orderDetails.shippingAddress.address},<br />
-                  {orderDetails.shippingAddress.city},<br />
-                  {orderDetails.shippingAddress.state} - {orderDetails.shippingAddress.pincode}
-                </span>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Estimated Delivery:</span>
+                <span className="font-semibold text-gray-900">3-5 Business Days</span>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="flex gap-4 pt-4">
             <button
               onClick={() => navigate('/orders')}
-              className="flex items-center justify-center px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              className="flex-1 bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors flex items-center justify-center"
             >
               <Package className="w-5 h-5 mr-2" />
               Track Order
             </button>
             <button
               onClick={() => navigate('/')}
-              className="flex items-center justify-center px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              className="flex-1 bg-gray-600 text-white py-3 rounded-lg hover:bg-gray-700 transition-colors flex items-center justify-center"
             >
               <Home className="w-5 h-5 mr-2" />
               Continue Shopping
