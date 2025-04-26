@@ -10,6 +10,7 @@ interface Product {
   category: string;
   stock: number;
   imageUrl: string;
+  description: string;
 }
 
 export function AdminProducts() {
@@ -22,7 +23,8 @@ export function AdminProducts() {
     price: 0,
     category: '',
     stock: 0,
-    imageUrl: ''
+    imageUrl: '',
+    description: ''
   });
 
   useEffect(() => {
@@ -42,12 +44,23 @@ export function AdminProducts() {
 
   const handleAddProduct = async () => {
     try {
-      await api.post('/admin/products', newProduct);
+      setIsLoading(true);
+      const response = await api.post('/admin/products', newProduct);
+      setProducts([...products, response.data]);
       toast.success('Product added successfully');
       setShowAddModal(false);
-      fetchProducts();
+      setNewProduct({
+        name: '',
+        price: 0,
+        category: '',
+        stock: 0,
+        imageUrl: '',
+        description: ''
+      });
     } catch (error) {
       toast.error('Failed to add product');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -55,8 +68,8 @@ export function AdminProducts() {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         await api.delete(`/admin/products/${productId}`);
+        setProducts(products.filter(product => product._id !== productId));
         toast.success('Product deleted successfully');
-        fetchProducts();
       } catch (error) {
         toast.error('Failed to delete product');
       }
@@ -170,6 +183,15 @@ export function AdminProducts() {
                   value={newProduct.name}
                   onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Description</label>
+                <textarea
+                  value={newProduct.description}
+                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  rows={3}
                 />
               </div>
               <div>
