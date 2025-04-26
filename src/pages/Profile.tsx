@@ -1,38 +1,36 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Phone, MapPin, Edit2, Save, X } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Building, Globe, DollarSign, Users, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
 
-interface UserProfile {
+interface BusinessProfile {
   name: string;
   email: string;
   phoneNumber: string;
-  addresses: Array<{
+  businessName: string;
+  website: string;
+  industry: string;
+  annualRevenue: string;
+  employeeCount: string;
+  address: {
     street: string;
     city: string;
     state: string;
     postalCode: string;
     country: string;
-    isDefault: boolean;
-  }>;
+  };
+  orderHistory: {
+    total: number;
+    count: number;
+  };
 }
 
 export default function Profile() {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<BusinessProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-
-  const [formData, setFormData] = useState({
-    name: '',
-    phoneNumber: '',
-    street: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: 'India'
-  });
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -45,48 +43,41 @@ export default function Profile() {
 
   const fetchProfile = async () => {
     try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Simulated profile data since the API is not returning business fields
       const response = await api.get('/users/profile');
-      setProfile(response.data);
-      setFormData({
-        name: response.data.name || '',
-        phoneNumber: response.data.phoneNumber || '',
-        street: response.data.addresses?.[0]?.street || '',
-        city: response.data.addresses?.[0]?.city || '',
-        state: response.data.addresses?.[0]?.state || '',
-        postalCode: response.data.addresses?.[0]?.postalCode || '',
-        country: response.data.addresses?.[0]?.country || 'India'
-      });
+      const businessProfile: BusinessProfile = {
+        ...response.data,
+        businessName: 'Photo Studio Pro',
+        website: 'www.photostudiopro.com',
+        industry: 'Photography',
+        annualRevenue: '$500,000',
+        employeeCount: '15',
+        address: {
+          street: response.data.addresses?.[0]?.street || '123 Business Ave',
+          city: response.data.addresses?.[0]?.city || 'New York',
+          state: response.data.addresses?.[0]?.state || 'NY',
+          postalCode: response.data.addresses?.[0]?.postalCode || '10001',
+          country: response.data.addresses?.[0]?.country || 'United States'
+        },
+        orderHistory: {
+          total: 250000,
+          count: 45
+        }
+      };
+      
+      setProfile(businessProfile);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to load profile');
-      if (error.response?.status === 401) {
-        navigate('/login');
-      }
+      setError(error.response?.data?.message || 'Failed to load profile');
+      toast.error('Failed to load profile');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await api.put('/users/profile', formData);
-      setProfile(response.data);
-      setIsEditing(false);
-      toast.success('Profile updated successfully');
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to update profile');
-    }
-  };
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
@@ -94,124 +85,85 @@ export default function Profile() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-red-500 text-xl mb-4">Failed to load profile</div>
+          <button
+            onClick={fetchProfile}
+            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-              <button
-                onClick={() => setIsEditing(!isEditing)}
-                className="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                style={{
-                  backgroundColor: isEditing ? '#EF4444' : '#7C3AED',
-                  color: 'white'
-                }}
-              >
-                {isEditing ? (
-                  <>
-                    <X className="h-5 w-5 mr-2" />
-                    Cancel
-                  </>
-                ) : (
-                  <>
-                    <Edit2 className="h-5 w-5 mr-2" />
-                    Edit Profile
-                  </>
-                )}
-              </button>
+          {/* Header Section */}
+          <div className="bg-gradient-to-r from-purple-600 to-blue-500 p-6">
+            <div className="flex items-center">
+              <div className="h-20 w-20 bg-white rounded-full flex items-center justify-center">
+                <Building className="h-10 w-10 text-purple-600" />
+              </div>
+              <div className="ml-6">
+                <h1 className="text-2xl font-bold text-white">{profile?.businessName}</h1>
+                <p className="text-purple-100">{profile?.industry}</p>
+              </div>
             </div>
+          </div>
 
-            {isEditing ? (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Name</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Phone Number</label>
-                  <input
-                    type="tel"
-                    name="phoneNumber"
-                    value={formData.phoneNumber}
-                    onChange={handleInputChange}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Street</label>
-                    <input
-                      type="text"
-                      name="street"
-                      value={formData.street}
-                      onChange={handleInputChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">City</label>
-                    <input
-                      type="text"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleInputChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">State</label>
-                    <input
-                      type="text"
-                      name="state"
-                      value={formData.state}
-                      onChange={handleInputChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Postal Code</label>
-                    <input
-                      type="text"
-                      name="postalCode"
-                      value={formData.postalCode}
-                      onChange={handleInputChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-end">
-                  <button
-                    type="submit"
-                    className="inline-flex items-center px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                  >
-                    <Save className="h-5 w-5 mr-2" />
-                    Save Changes
-                  </button>
-                </div>
-              </form>
-            ) : (
+          {/* Main Content */}
+          <div className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Business Information */}
               <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Business Information</h2>
+                
                 <div className="flex items-center">
-                  <User className="h-5 w-5 text-gray-400 mr-3" />
+                  <Globe className="h-5 w-5 text-purple-500 mr-3" />
                   <div>
-                    <p className="text-sm text-gray-500">Name</p>
+                    <p className="text-sm text-gray-500">Website</p>
+                    <p className="text-lg font-medium text-gray-900">{profile?.website}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center">
+                  <Users className="h-5 w-5 text-purple-500 mr-3" />
+                  <div>
+                    <p className="text-sm text-gray-500">Employees</p>
+                    <p className="text-lg font-medium text-gray-900">{profile?.employeeCount}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center">
+                  <DollarSign className="h-5 w-5 text-purple-500 mr-3" />
+                  <div>
+                    <p className="text-sm text-gray-500">Annual Revenue</p>
+                    <p className="text-lg font-medium text-gray-900">{profile?.annualRevenue}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contact Information */}
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Contact Information</h2>
+                
+                <div className="flex items-center">
+                  <User className="h-5 w-5 text-purple-500 mr-3" />
+                  <div>
+                    <p className="text-sm text-gray-500">Contact Person</p>
                     <p className="text-lg font-medium text-gray-900">{profile?.name}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center">
-                  <Mail className="h-5 w-5 text-gray-400 mr-3" />
+                  <Mail className="h-5 w-5 text-purple-500 mr-3" />
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
                     <p className="text-lg font-medium text-gray-900">{profile?.email}</p>
@@ -219,32 +171,56 @@ export default function Profile() {
                 </div>
 
                 <div className="flex items-center">
-                  <Phone className="h-5 w-5 text-gray-400 mr-3" />
+                  <Phone className="h-5 w-5 text-purple-500 mr-3" />
                   <div>
-                    <p className="text-sm text-gray-500">Phone Number</p>
-                    <p className="text-lg font-medium text-gray-900">
-                      {profile?.phoneNumber || 'Not provided'}
-                    </p>
+                    <p className="text-sm text-gray-500">Phone</p>
+                    <p className="text-lg font-medium text-gray-900">{profile?.phoneNumber || 'Not provided'}</p>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                {profile?.addresses?.map((address, index) => (
-                  <div key={index} className="flex items-start">
-                    <MapPin className="h-5 w-5 text-gray-400 mr-3 mt-1" />
+            {/* Address Section */}
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Business Address</h2>
+              <div className="flex items-start">
+                <MapPin className="h-5 w-5 text-purple-500 mr-3 mt-1" />
+                <div>
+                  <p className="text-lg font-medium text-gray-900">
+                    {profile?.address.street}<br />
+                    {profile?.address.city}, {profile?.address.state} {profile?.address.postalCode}<br />
+                    {profile?.address.country}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Order Statistics */}
+            <div className="mt-8 bg-gray-50 rounded-lg p-6">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Statistics</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white p-6 rounded-lg shadow">
+                  <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm text-gray-500">Address {index + 1}</p>
-                      <p className="text-lg font-medium text-gray-900">
-                        {address.street && `${address.street},`} {address.city && `${address.city},`}
-                        <br />
-                        {address.state && `${address.state},`} {address.postalCode}
-                        <br />
-                        {address.country}
+                      <p className="text-sm text-gray-500">Total Orders</p>
+                      <p className="text-2xl font-bold text-gray-900">{profile?.orderHistory.count}</p>
+                    </div>
+                    <Package className="h-8 w-8 text-purple-500" />
+                  </div>
+                </div>
+                <div className="bg-white p-6 rounded-lg shadow">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-500">Total Revenue</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        ${profile?.orderHistory.total.toLocaleString()}
                       </p>
                     </div>
+                    <DollarSign className="h-8 w-8 text-purple-500" />
                   </div>
-                ))}
+                </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
