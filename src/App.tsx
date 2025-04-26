@@ -24,6 +24,7 @@ import { CartProvider } from './context/Cartcontext';
 import AdminRoute from './components/AdminRoute';
 import PrivateRoute from './components/PrivateRoute';
 import { ForgotPassword } from './pages/ForgotPassword';
+import { ResetPassword } from './pages/ResetPassword';
 
 function ErrorFallback({ error }: { error: Error }) {
   return (
@@ -58,6 +59,7 @@ function App() {
                 <Route path="login" element={<Login />} />
                 <Route path="signup" element={<SignUp />} />
                 <Route path="forgot-password" element={<ForgotPassword />} />
+                <Route path="reset-password" element={<ResetPassword />} />
                 <Route path="payment" element={<PrivateRoute><Payment /></PrivateRoute>} />
                 <Route path="cart" element={<CartPage />} />
                 <Route path="shipping" element={<ShippingInfo />} />
