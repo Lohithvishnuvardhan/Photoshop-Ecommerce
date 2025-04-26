@@ -4,6 +4,7 @@ const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const { registerUser, loginUser } = require('../controllers/authController');
 const crypto = require('crypto');
+const { sendResetEmail } = require('../config/email');
 
 router.post('/register', registerUser);
 router.post('/login', loginUser);
@@ -27,19 +28,45 @@ router.post('/forgot-password', async (req, res) => {
     user.resetPasswordExpires = resetTokenExpiry;
     await user.save();
 
-    // In a real application, you would send an email here
-    // For demo purposes, we'll just return success
+    // Send reset email
+    await sendResetEmail(email, resetToken);
+
     res.json({ 
-      message: 'Password reset instructions sent to your email',
-      // Only for development/testing
-      debug: {
-        resetToken,
-        resetUrl: `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`
-      }
+      message: 'Password reset instructions sent to your email'
     });
   } catch (error) {
     console.error('Forgot password error:', error);
     res.status(500).json({ message: 'Error processing password reset request' });
+  }
+});
+
+// Reset Password Route
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired reset token' });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    
+    // Update user password and clear reset token
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({ message: 'Password has been reset successfully' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ message: 'Error resetting password' });
   }
 });
 
