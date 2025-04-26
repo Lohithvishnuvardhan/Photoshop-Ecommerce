@@ -1,8 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Mail, Phone, MapPin, Building, Globe, DollarSign, Users, Package } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Building, Globe, DollarSign, Users, ShoppingBag } from 'lucide-react';
 import toast from 'react-hot-toast';
 import api from '../utils/api';
+
+interface OrderItem {
+  name: string;
+  quantity: number;
+  image: string;
+  price: number;
+}
+
+interface Order {
+  _id: string;
+  orderItems: OrderItem[];
+  totalPrice: number;
+  status: string;
+  createdAt: string;
+}
 
 interface BusinessProfile {
   name: string;
@@ -20,10 +35,7 @@ interface BusinessProfile {
     postalCode: string;
     country: string;
   };
-  orderHistory: {
-    total: number;
-    count: number;
-  };
+  latestOrder?: Order;
 }
 
 export default function Profile() {
@@ -46,30 +58,32 @@ export default function Profile() {
       setIsLoading(true);
       setError(null);
       
-      // First try to get user profile
-      const response = await api.get('/users/profile');
+      // Get user profile
+      const profileResponse = await api.get('/users/profile');
       
+      // Get latest order
+      const ordersResponse = await api.get('/orders/myorders');
+      const orders = ordersResponse.data;
+      const latestOrder = orders.length > 0 ? orders[0] : null;
+
       // Create business profile with default values if data is missing
       const businessProfile: BusinessProfile = {
-        name: response.data?.name || 'Not Available',
-        email: response.data?.email || 'Not Available',
-        phoneNumber: response.data?.phoneNumber || 'Not Available',
+        name: profileResponse.data?.name || 'Not Available',
+        email: profileResponse.data?.email || 'Not Available',
+        phoneNumber: profileResponse.data?.phoneNumber || 'Not Available',
         businessName: 'Photo Studio Pro',
         website: 'www.photostudiopro.com',
         industry: 'Photography',
         annualRevenue: '$500,000',
         employeeCount: '15',
         address: {
-          street: response.data?.addresses?.[0]?.street || '123 Business Ave',
-          city: response.data?.addresses?.[0]?.city || 'New York',
-          state: response.data?.addresses?.[0]?.state || 'NY',
-          postalCode: response.data?.addresses?.[0]?.postalCode || '10001',
-          country: response.data?.addresses?.[0]?.country || 'United States'
+          street: profileResponse.data?.addresses?.[0]?.street || '123 Business Ave',
+          city: profileResponse.data?.addresses?.[0]?.city || 'New York',
+          state: profileResponse.data?.addresses?.[0]?.state || 'NY',
+          postalCode: profileResponse.data?.addresses?.[0]?.postalCode || '10001',
+          country: profileResponse.data?.addresses?.[0]?.country || 'United States'
         },
-        orderHistory: {
-          total: 250000,
-          count: 45
-        }
+        latestOrder: latestOrder
       };
       
       setProfile(businessProfile);
@@ -204,31 +218,58 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Order Statistics */}
-            <div className="mt-8 bg-gray-50 rounded-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Statistics</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500">Total Orders</p>
-                      <p className="text-2xl font-bold text-gray-900">{profile?.orderHistory.count}</p>
+            {/* Latest Order Section */}
+            <div className="mt-8">
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">Latest Order</h2>
+              {profile?.latestOrder ? (
+                <div className="bg-gray-50 rounded-lg p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <ShoppingBag className="h-6 w-6 text-purple-500 mr-2" />
+                      <span className="text-lg font-medium">Order #{profile.latestOrder._id}</span>
                     </div>
-                    <Package className="h-8 w-8 text-purple-500" />
+                    <div className="flex items-center">
+                      <span className="px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                        {profile.latestOrder.status}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {profile.latestOrder.orderItems.map((item, index) => (
+                      <div key={index} className="flex items-center space-x-4 bg-white p-4 rounded-lg">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-20 h-20 object-cover rounded-lg"
+                        />
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-900">{item.name}</h3>
+                          <p className="text-gray-500">Quantity: {item.quantity}</p>
+                          <p className="text-purple-600 font-medium">₹{item.price.toLocaleString()}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="mt-4 pt-4 border-t border-gray-200">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium text-gray-900">Total Amount:</span>
+                      <span className="text-xl font-bold text-purple-600">
+                        ₹{profile.latestOrder.totalPrice.toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-500 mt-2">
+                      Ordered on: {new Date(profile.latestOrder.createdAt).toLocaleDateString()}
+                    </div>
                   </div>
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm text-gray-500">Total Revenue</p>
-                      <p className="text-2xl font-bold text-gray-900">
-                        ${profile?.orderHistory.total.toLocaleString()}
-                      </p>
-                    </div>
-                    <DollarSign className="h-8 w-8 text-purple-500" />
-                  </div>
+              ) : (
+                <div className="bg-gray-50 rounded-lg p-6 text-center">
+                  <ShoppingBag className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600">No orders placed yet</p>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </div>
