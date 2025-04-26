@@ -13,7 +13,6 @@ export function Payment() {
   const { clearBuyNow } = useCartStore();
   const [isLoading, setIsLoading] = useState(false);
   const [orderItems] = useState(location.state?.items || []);
-  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [formData, setFormData] = useState({
     cardNumber: '',
     cardName: '',
@@ -122,7 +121,7 @@ export function Payment() {
         }
       };
 
-      const response = await orderAPI.createOrder(orderData, localStorage.getItem('token') || '');
+      await orderAPI.createOrder(orderData, localStorage.getItem('token') || '');
 
       if (location.state?.isBuyNow) {
         clearBuyNow();
@@ -130,16 +129,9 @@ export function Payment() {
         clearCart();
       }
 
-      setShowSuccessPopup(true);
-
-      setTimeout(() => {
-        navigate('/order-success', {
-          state: {
-            orderDetails: response.data,
-            fromPayment: true
-          }
-        });
-      }, 2000);
+      // Navigate to orders page instead of order success
+      navigate('/orders');
+      toast.success('Order placed successfully!');
 
     } catch (error: any) {
       console.error('Order creation error:', error);
@@ -150,19 +142,6 @@ export function Payment() {
 
   return (
     <div className="min-h-screen bg-gray-100 py-12">
-      {showSuccessPopup && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-8 text-center max-w-md mx-4">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-10 h-10 text-green-500" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h2>
-            <p className="text-gray-600 mb-4">Thank you for your purchase. Your order has been confirmed.</p>
-            <div className="animate-pulse text-sm text-gray-500">Redirecting to order summary...</div>
-          </div>
-        </div>
-      )}
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Order Summary */}
