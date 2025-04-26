@@ -78,7 +78,7 @@ export function Home() {
             className="absolute w-full h-full object-cover transform-gpu"
             poster="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848"
           >
-            <source src="https://player.vimeo.com/external/373839467.sd.mp4?s=30d44b3a1c0df4c84551c9ff2876c8b0c72d8701&profile_id=164&oauth2_token_id=57447761" type="video/mp4" />
+            <source src="public/cameravideo.mp4" type="video/mp4" />
           </video>
         </div>
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent">
