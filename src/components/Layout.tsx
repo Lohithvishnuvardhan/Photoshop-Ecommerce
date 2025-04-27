@@ -75,7 +75,7 @@ const Layout = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
               <Camera className="h-12 w-12 text-purple-500" />
-              <span className="text-5xl font-extrabold italic bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 text-transparent bg-clip-text font-sans tracking-tight hover:from-cyan-500 hover:via-blue-600 hover:to-purple-600 transition-all duration-300">
+              <span className="text-5xl font-extrabold italic bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 text-transparent bg-clip-text font-sans tracking-tight hover:from-purple-500 hover:via-purple-600 hover:to-purple-700 transition-all duration-300">
                 Photo Pixel
               </span>
             </Link>
@@ -83,13 +83,13 @@ const Layout = () => {
             {/* Search Bar */}
             <div className="flex-1 max-w-3xl mx-12 relative" ref={searchRef}>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-6 w-6 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-6 w-6 text-purple-400" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
                   placeholder="Search for cameras, lenses, accessories..."
-                  className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg"
+                  className="w-full pl-12 pr-4 py-3 bg-gray-800 border border-purple-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg"
                 />
               </div>
             </div>
@@ -98,7 +98,7 @@ const Layout = () => {
             <div className="flex items-center space-x-8">
               <Link 
                 to="/cart" 
-                className="relative text-gray-300 hover:text-white transition-colors"
+                className="relative text-purple-400 hover:text-purple-300 transition-colors"
                 aria-label="Shopping cart"
               >
                 <ShoppingCart className="h-8 w-8" />
@@ -111,13 +111,13 @@ const Layout = () => {
 
               {isAuthenticated ? (
                 <div className="flex items-center space-x-6">
-                  <Link to="/profile" className="text-gray-300 hover:text-white transition-colors">
+                  <Link to="/profile" className="text-purple-400 hover:text-purple-300 transition-colors">
                     <User className="h-8 w-8" />
                   </Link>
                   <button
                     onClick={handleLogout}
                     disabled={isLoading}
-                    className="text-gray-300 hover:text-white transition-colors disabled:opacity-50"
+                    className="text-purple-400 hover:text-purple-300 transition-colors disabled:opacity-50"
                   >
                     <LogOut className="h-8 w-8" />
                   </button>
@@ -134,7 +134,7 @@ const Layout = () => {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden text-gray-300 hover:text-white"
+                className="md:hidden text-purple-400 hover:text-purple-300"
               >
                 {isMobileMenuOpen ? (
                   <X className="h-8 w-8" />
@@ -148,22 +148,22 @@ const Layout = () => {
           {/* Navigation Menu */}
           <nav className="hidden md:block py-4">
             <div className="flex justify-center space-x-12">
-              <Link to="/cameras" className="text-gray-300 hover:text-white transition-colors text-lg">
+              <Link to="/cameras" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
                 Cameras
               </Link>
-              <Link to="/lenses" className="text-gray-300 hover:text-white transition-colors text-lg">
+              <Link to="/lenses" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
                 Lenses
               </Link>
-              <Link to="/accessories" className="text-gray-300 hover:text-white transition-colors text-lg">
+              <Link to="/accessories" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
                 Accessories
               </Link>
-              <Link to="/batteries" className="text-gray-300 hover:text-white transition-colors text-lg">
+              <Link to="/batteries" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
                 Batteries
               </Link>
-              <Link to="/about" className="text-gray-300 hover:text-white transition-colors text-lg">
+              <Link to="/about" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
                 About
               </Link>
-              <Link to="/contact" className="text-gray-300 hover:text-white transition-colors text-lg">
+              <Link to="/contact" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
                 Contact
               </Link>
               {isAuthenticated && isAdmin && (
@@ -183,12 +183,12 @@ const Layout = () => {
           {isMobileMenuOpen && (
             <div className="md:hidden py-4 border-t border-gray-800">
               <nav className="flex flex-col space-y-4">
-                <Link to="/cameras" className="text-gray-300 hover:text-white">Cameras</Link>
-                <Link to="/lenses" className="text-gray-300 hover:text-white">Lenses</Link>
-                <Link to="/accessories" className="text-gray-300 hover:text-white">Accessories</Link>
-                <Link to="/batteries" className="text-gray-300 hover:text-white">Batteries</Link>
-                <Link to="/about" className="text-gray-300 hover:text-white">About</Link>
-                <Link to="/contact" className="text-gray-300 hover:text-white">Contact</Link>
+                <Link to="/cameras" className="text-purple-400 hover:text-purple-300">Cameras</Link>
+                <Link to="/lenses" className="text-purple-400 hover:text-purple-300">Lenses</Link>
+                <Link to="/accessories" className="text-purple-400 hover:text-purple-300">Accessories</Link>
+                <Link to="/batteries" className="text-purple-400 hover:text-purple-300">Batteries</Link>
+                <Link to="/about" className="text-purple-400 hover:text-purple-300">About</Link>
+                <Link to="/contact" className="text-purple-400 hover:text-purple-300">Contact</Link>
               </nav>
             </div>
           )}
@@ -206,26 +206,26 @@ const Layout = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
               <h3 className="text-white font-semibold mb-4">About Us</h3>
-              <p className="text-gray-400">Professional photography equipment for every level of expertise.</p>
+              <p className="text-purple-300">Professional photography equipment for every level of expertise.</p>
             </div>
             <div>
               <h3 className="text-white font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2">
-                <li><Link to="/about" className="text-gray-400 hover:text-white">About</Link></li>
-                <li><Link to="/contact" className="text-gray-400 hover:text-white">Contact</Link></li>
-                <li><Link to="/faq" className="text-gray-400 hover:text-white">FAQ</Link></li>
+                <li><Link to="/about" className="text-purple-300 hover:text-purple-200">About</Link></li>
+                <li><Link to="/contact" className="text-purple-300 hover:text-purple-200">Contact</Link></li>
+                <li><Link to="/faq" className="text-purple-300 hover:text-purple-200">FAQ</Link></li>
               </ul>
             </div>
             <div>
               <h3 className="text-white font-semibold mb-4">Customer Service</h3>
               <ul className="space-y-2">
-                <li><Link to="/shipping" className="text-gray-400 hover:text-white">Shipping Info</Link></li>
-                <li><Link to="/returns" className="text-gray-400 hover:text-white">Returns</Link></li>
-                <li><Link to="/orders" className="text-gray-400 hover:text-white">Track Order</Link></li>
+                <li><Link to="/shipping" className="text-purple-300 hover:text-purple-200">Shipping Info</Link></li>
+                <li><Link to="/returns" className="text-purple-300 hover:text-purple-200">Returns</Link></li>
+                <li><Link to="/orders" className="text-purple-300 hover:text-purple-200">Track Order</Link></li>
               </ul>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
+          <div className="mt-8 pt-8 border-t border-gray-700 text-center text-purple-300">
             <p>&copy; 2024 Photo Pixel. All rights reserved.</p>
           </div>
         </div>
@@ -236,4 +236,4 @@ const Layout = () => {
 
 export default Layout;
 
-export { Layout }
+export { Layout };
