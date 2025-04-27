@@ -68,17 +68,17 @@ export function Home() {
 
   return (
     <div className="bg-gray-900">
-      {/* Hero Section with Rotating Camera */}
+      {/* Hero Section with Video */}
       <div className="relative h-[60vh] overflow-hidden">
-        <div className="absolute inset-0 animate-rotate-camera">
+        <div className="absolute inset-0">
           <video
             autoPlay
             loop
             muted
-            className="absolute w-full h-full object-cover transform-gpu"
-            poster="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848"
+            playsInline
+            className="absolute w-full h-full object-cover"
           >
-            <source src="cam.mp4" type="video/mp4" />
+            <source src="/cam.mp4" type="video/mp4" />
           </video>
         </div>
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent">

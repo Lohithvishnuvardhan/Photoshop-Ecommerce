@@ -74,8 +74,8 @@ const Layout = () => {
           <div className="flex items-center justify-between py-4">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
-              <Camera className="h-12 w-12 text-purple-500" />
-              <span className="text-5xl font-extrabold italic bg-gradient-to-r from-purple-400 via-purple-500 to-purple-600 text-transparent bg-clip-text font-sans tracking-tight hover:from-purple-500 hover:via-purple-600 hover:to-purple-700 transition-all duration-300">
+              <Camera className="h-12 w-12 text-amber-500" strokeWidth={1.5} />
+              <span className="text-5xl font-extrabold italic bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-transparent bg-clip-text font-sans tracking-tight hover:from-amber-500 hover:via-amber-600 hover:to-amber-700 transition-all duration-300">
                 Photo Pixel
               </span>
             </Link>
