@@ -90,6 +90,10 @@ exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
     
+    if (!email) {
+      return res.status(400).json({ message: 'Please provide an email address' });
+    }
+
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({ message: 'No account found with this email address' });
@@ -104,13 +108,27 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = resetTokenExpiry;
     await user.save();
 
-    // Send reset email
-    await sendResetEmail(email, resetToken);
-
-    res.json({ 
-      message: 'Password reset instructions sent to your email',
-      success: true
-    });
+    try {
+      // Send reset email
+      await sendResetEmail(email, resetToken);
+      
+      res.json({ 
+        message: 'Password reset instructions sent to your email',
+        success: true
+      });
+    } catch (emailError) {
+      console.error('Email sending error:', emailError);
+      
+      // If email fails, remove the reset token from user
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+      
+      return res.status(500).json({ 
+        message: 'Failed to send reset email. Please try again later.',
+        error: emailError.message 
+      });
+    }
   } catch (error) {
     console.error('Forgot password error:', error);
     res.status(500).json({ 
@@ -124,6 +142,10 @@ exports.resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
     
+    if (!token || !newPassword) {
+      return res.status(400).json({ message: 'Please provide token and new password' });
+    }
+
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() }

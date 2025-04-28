@@ -2,9 +2,15 @@ const nodemailer = require('nodemailer');
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASSWORD
+  },
+  tls: {
+    rejectUnauthorized: false
   }
 });
 
@@ -18,7 +24,6 @@ const sendResetEmail = async (email, resetToken) => {
       subject: 'Password Reset Request - Photo Pixel',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
-          <img src="https://your-logo-url.com/logo.png" alt="Photo Pixel" style="width: 150px; margin-bottom: 20px;">
           <h2 style="color: #4F46E5; margin-bottom: 20px;">Reset Your Password</h2>
           <p style="color: #374151; margin-bottom: 20px;">You recently requested to reset your password for your Photo Pixel account. Click the button below to proceed:</p>
           <a href="${resetUrl}" style="

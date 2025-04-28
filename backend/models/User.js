@@ -54,10 +54,7 @@ const userSchema = new mongoose.Schema({
   timestamps: true 
 });
 
-// Index for faster email lookups
-userSchema.index({ email: 1 });
-
-// Index for password reset queries
+// Remove the duplicate index definition and only use the unique: true option
 userSchema.index({ 
   resetPasswordToken: 1, 
   resetPasswordExpires: 1 
