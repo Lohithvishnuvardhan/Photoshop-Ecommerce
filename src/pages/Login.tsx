@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -13,7 +13,14 @@ export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { items: cartItems } = useCart();
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    // Only redirect if user is authenticated and trying to access a protected route
+    if (isAuthenticated && location.state?.from && location.state.from.pathname !== '/') {
+      navigate(location.state.from.pathname);
+    }
+  }, [isAuthenticated, navigate, location]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,10 +39,9 @@ export function Login() {
       const from = location.state?.from;
       const paymentData = location.state?.paymentData;
       
-      if (response.user?.isAdmin) {
+      if (response.isAdmin) {
         navigate('/admin/dashboard');
       } else if (from === '/payment' && paymentData) {
-        // Redirect back to payment with the saved items
         navigate('/payment', { 
           state: { 
             items: paymentData.items,

@@ -48,27 +48,30 @@ function App() {
           <Router>
             <Routes>
               <Route path="/" element={<Layout />}>
+                {/* Public Routes */}
                 <Route index element={<Home />} />
-                <Route path="cameras" element={<Cameras />} />
-                <Route path="lenses" element={<Lenses />} />
-                <Route path="accessories" element={<Accessories />} />
-                <Route path="batteries" element={<Batteries />} />
-                <Route path="about" element={<About />} />
-                <Route path="contact" element={<Contact />} />
-                <Route path="profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
-                <Route path="orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
-                <Route path="track-order" element={<TrackOrder />} />
-                <Route path="admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-                <Route path="admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
                 <Route path="login" element={<Login />} />
                 <Route path="signup" element={<SignUp />} />
                 <Route path="forgot-password" element={<ForgotPassword />} />
                 <Route path="reset-password" element={<ResetPassword />} />
+
+                {/* Protected Routes */}
+                <Route path="cameras" element={<PrivateRoute><Cameras /></PrivateRoute>} />
+                <Route path="lenses" element={<PrivateRoute><Lenses /></PrivateRoute>} />
+                <Route path="accessories" element={<PrivateRoute><Accessories /></PrivateRoute>} />
+                <Route path="batteries" element={<PrivateRoute><Batteries /></PrivateRoute>} />
+                <Route path="about" element={<PrivateRoute><About /></PrivateRoute>} />
+                <Route path="contact" element={<PrivateRoute><Contact /></PrivateRoute>} />
+                <Route path="profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+                <Route path="orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
+                <Route path="track-order" element={<PrivateRoute><TrackOrder /></PrivateRoute>} />
+                <Route path="admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+                <Route path="admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
                 <Route path="payment" element={<PrivateRoute><Payment /></PrivateRoute>} />
-                <Route path="cart" element={<CartPage />} />
-                <Route path="shipping" element={<ShippingInfo />} />
-                <Route path="returns" element={<Returns />} />
-                <Route path="faq" element={<FAQ />} />
+                <Route path="cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
+                <Route path="shipping" element={<PrivateRoute><ShippingInfo /></PrivateRoute>} />
+                <Route path="returns" element={<PrivateRoute><Returns /></PrivateRoute>} />
+                <Route path="faq" element={<PrivateRoute><FAQ /></PrivateRoute>} />
               </Route>
             </Routes>
           </Router>
