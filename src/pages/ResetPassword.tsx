@@ -1,5 +1,3 @@
-// src/pages/ResetPassword.tsx
-
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Lock, Eye, EyeOff } from 'lucide-react';

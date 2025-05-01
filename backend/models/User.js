@@ -54,7 +54,6 @@ const userSchema = new mongoose.Schema({
   timestamps: true 
 });
 
-// Remove the duplicate index definition and only use the unique: true option
 userSchema.index({ 
   resetPasswordToken: 1, 
   resetPasswordExpires: 1 
