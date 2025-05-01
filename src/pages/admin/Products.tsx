@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Search, TrendingUp, Package, DollarSign, AlertTriangle, BarChart2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Download, Filter, MoreVertical, CheckCircle, XCircle } from 'lucide-react';
 import api from '../../utils/api';
 import toast from 'react-hot-toast';
 
@@ -11,6 +11,11 @@ interface Product {
   stock: number;
   imageUrl: string;
   description: string;
+  status?: 'active' | 'inactive';
+  featured?: boolean;
+  sku?: string;
+  brand?: string;
+  lastUpdated?: Date;
 }
 
 export function AdminProducts() {
@@ -18,54 +23,30 @@ export function AdminProducts() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [filterCategory, setFilterCategory] = useState('all');
   const [sortBy, setSortBy] = useState('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [showFilters, setShowFilters] = useState(false);
+  const [stockFilter, setStockFilter] = useState('all');
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  
   const [newProduct, setNewProduct] = useState({
     name: '',
     price: 0,
     category: '',
     stock: 0,
     imageUrl: '',
-    description: ''
-  });
-
-  // Business metrics
-  const [metrics, setMetrics] = useState({
-    totalProducts: 0,
-    totalValue: 0,
-    lowStock: 0,
-    topCategory: '',
-    averagePrice: 0
+    description: '',
+    sku: '',
+    brand: '',
+    status: 'active' as const,
+    featured: false
   });
 
   useEffect(() => {
     fetchProducts();
   }, []);
-
-  useEffect(() => {
-    if (products.length) {
-      calculateMetrics();
-    }
-  }, [products]);
-
-  const calculateMetrics = () => {
-    const totalValue = products.reduce((sum, product) => sum + (product.price * product.stock), 0);
-    const lowStock = products.filter(product => product.stock < 5).length;
-    const categoryCount = products.reduce((acc, product) => {
-      acc[product.category] = (acc[product.category] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-    const topCategory = Object.entries(categoryCount).sort((a, b) => b[1] - a[1])[0]?.[0] || '';
-    const averagePrice = totalValue / products.reduce((sum, product) => sum + product.stock, 0);
-
-    setMetrics({
-      totalProducts: products.length,
-      totalValue,
-      lowStock,
-      topCategory,
-      averagePrice
-    });
-  };
 
   const fetchProducts = async () => {
     try {
@@ -91,7 +72,11 @@ export function AdminProducts() {
         category: '',
         stock: 0,
         imageUrl: '',
-        description: ''
+        description: '',
+        sku: '',
+        brand: '',
+        status: 'active',
+        featured: false
       });
     } catch (error) {
       toast.error('Failed to add product');
@@ -112,24 +97,64 @@ export function AdminProducts() {
     }
   };
 
-  const filteredProducts = products
-    .filter(product =>
-      (product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.category.toLowerCase().includes(searchQuery.toLowerCase())) &&
-      (selectedCategory === 'all' || product.category === selectedCategory)
-    )
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'price':
-          return b.price - a.price;
-        case 'stock':
-          return b.stock - a.stock;
-        default:
-          return a.name.localeCompare(b.name);
+  const handleBulkDelete = async () => {
+    if (window.confirm(`Are you sure you want to delete ${selectedProducts.length} products?`)) {
+      try {
+        await Promise.all(selectedProducts.map(id => api.delete(`/admin/products/${id}`)));
+        setProducts(products.filter(product => !selectedProducts.includes(product._id)));
+        setSelectedProducts([]);
+        toast.success('Products deleted successfully');
+      } catch (error) {
+        toast.error('Failed to delete products');
       }
+    }
+  };
+
+  const handleExport = () => {
+    const csv = products.map(product => 
+      Object.values(product).join(',')
+    ).join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'products.csv';
+    a.click();
+  };
+
+  const filteredProducts = products
+    .filter(product => {
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.sku?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.brand?.toLowerCase().includes(searchQuery.toLowerCase());
+
+      const matchesCategory = filterCategory === 'all' || product.category === filterCategory;
+      
+      const matchesStock = stockFilter === 'all' ||
+        (stockFilter === 'inStock' && product.stock > 0) ||
+        (stockFilter === 'lowStock' && product.stock <= 5) ||
+        (stockFilter === 'outOfStock' && product.stock === 0);
+
+      const matchesPrice = (!priceRange.min || product.price >= Number(priceRange.min)) &&
+        (!priceRange.max || product.price <= Number(priceRange.max));
+
+      return matchesSearch && matchesCategory && matchesStock && matchesPrice;
+    })
+    .sort((a, b) => {
+      const compareValue = (val1: any, val2: any) => {
+        if (typeof val1 === 'string') {
+          return val1.localeCompare(val2);
+        }
+        return val1 - val2;
+      };
+
+      const comparison = compareValue(a[sortBy as keyof Product], b[sortBy as keyof Product]);
+      return sortOrder === 'asc' ? comparison : -comparison;
     });
 
-  const categories = ['all', ...new Set(products.map(product => product.category))];
+  const categories = Array.from(new Set(products.map(p => p.category)));
 
   if (isLoading) {
     return (
@@ -142,55 +167,37 @@ export function AdminProducts() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Business Metrics Dashboard */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center justify-between">
-              <Package className="h-8 w-8 text-blue-500" />
-              <span className="text-sm text-gray-500">Total Products</span>
-            </div>
-            <p className="text-2xl font-bold mt-2">{metrics.totalProducts}</p>
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-2xl font-semibold text-gray-900">Products Management</h1>
+            <p className="mt-1 text-sm text-gray-600">
+              {filteredProducts.length} products • Last updated {new Date().toLocaleDateString()}
+            </p>
           </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center justify-between">
-              <DollarSign className="h-8 w-8 text-green-500" />
-              <span className="text-sm text-gray-500">Inventory Value</span>
-            </div>
-            <p className="text-2xl font-bold mt-2">₹{metrics.totalValue.toLocaleString()}</p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center justify-between">
-              <AlertTriangle className="h-8 w-8 text-red-500" />
-              <span className="text-sm text-gray-500">Low Stock Items</span>
-            </div>
-            <p className="text-2xl font-bold mt-2">{metrics.lowStock}</p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center justify-between">
-              <TrendingUp className="h-8 w-8 text-purple-500" />
-              <span className="text-sm text-gray-500">Top Category</span>
-            </div>
-            <p className="text-2xl font-bold mt-2">{metrics.topCategory}</p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex items-center justify-between">
-              <BarChart2 className="h-8 w-8 text-yellow-500" />
-              <span className="text-sm text-gray-500">Average Price</span>
-            </div>
-            <p className="text-2xl font-bold mt-2">₹{Math.round(metrics.averagePrice).toLocaleString()}</p>
+          <div className="flex space-x-4">
+            <button
+              onClick={handleExport}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            >
+              <Download className="h-5 w-5 mr-2 text-gray-500" />
+              Export
+            </button>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+            >
+              <Plus className="h-5 w-5 mr-2" />
+              Add Product
+            </button>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow">
           <div className="p-6 border-b border-gray-200">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div className="flex-1">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+              <div className="flex-1 w-full sm:w-auto sm:mr-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     type="text"
                     placeholder="Search products..."
@@ -201,46 +208,121 @@ export function AdminProducts() {
                 </div>
               </div>
               
-              <div className="flex gap-4">
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                >
-                  {categories.map(category => (
-                    <option key={category} value={category}>
-                      {category.charAt(0).toUpperCase() + category.slice(1)}
-                    </option>
-                  ))}
-                </select>
-                
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
-                  className="border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                >
-                  <option value="name">Sort by Name</option>
-                  <option value="price">Sort by Price</option>
-                  <option value="stock">Sort by Stock</option>
-                </select>
-                
+              <div className="flex items-center space-x-4 w-full sm:w-auto">
                 <button
-                  onClick={() => setShowAddModal(true)}
-                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  onClick={() => setShowFilters(!showFilters)}
+                  className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                 >
-                  <Plus className="h-5 w-5 mr-2" />
-                  Add Product
+                  <Filter className="h-5 w-5 mr-2 text-gray-500" />
+                  Filters
                 </button>
+                
+                {selectedProducts.length > 0 && (
+                  <button
+                    onClick={handleBulkDelete}
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
+                  >
+                    <Trash2 className="h-5 w-5 mr-2" />
+                    Delete Selected ({selectedProducts.length})
+                  </button>
+                )}
               </div>
             </div>
+
+            {showFilters && (
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Category</label>
+                  <select
+                    value={filterCategory}
+                    onChange={(e) => setFilterCategory(e.target.value)}
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  >
+                    <option value="all">All Categories</option>
+                    {categories.map(category => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Stock Status</label>
+                  <select
+                    value={stockFilter}
+                    onChange={(e) => setStockFilter(e.target.value)}
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  >
+                    <option value="all">All</option>
+                    <option value="inStock">In Stock</option>
+                    <option value="lowStock">Low Stock</option>
+                    <option value="outOfStock">Out of Stock</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Price Range</label>
+                  <div className="mt-1 flex space-x-2">
+                    <input
+                      type="number"
+                      placeholder="Min"
+                      value={priceRange.min}
+                      onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
+                      className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Max"
+                      value={priceRange.max}
+                      onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
+                      className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Sort By</label>
+                  <div className="mt-1 flex space-x-2">
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value)}
+                      className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    >
+                      <option value="name">Name</option>
+                      <option value="price">Price</option>
+                      <option value="stock">Stock</option>
+                      <option value="category">Category</option>
+                    </select>
+                    <button
+                      onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                      className="px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                    >
+                      {sortOrder === 'asc' ? '↑' : '↓'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <input
+                      type="checkbox"
+                      checked={selectedProducts.length === products.length}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedProducts(products.map(p => p._id));
+                        } else {
+                          setSelectedProducts([]);
+                        }
+                      }}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
@@ -252,28 +334,57 @@ export function AdminProducts() {
                 {filteredProducts.map((product) => (
                   <tr key={product._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <img
-                        src={product.imageUrl}
-                        alt={product.name}
-                        className="h-12 w-12 object-cover rounded-lg"
+                      <input
+                        type="checkbox"
+                        checked={selectedProducts.includes(product._id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setSelectedProducts([...selectedProducts, product._id]);
+                          } else {
+                            setSelectedProducts(selectedProducts.filter(id => id !== product._id));
+                          }
+                        }}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                       />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                      <div className="text-sm text-gray-500">{product.description}</div>
+                      <div className="flex items-center">
+                        <img
+                          src={product.imageUrl}
+                          alt={product.name}
+                          className="h-10 w-10 object-cover rounded-lg"
+                        />
+                        <div className="ml-4">
+                          <div className="text-sm font-medium text-gray-900">{product.name}</div>
+                          <div className="text-sm text-gray-500">SKU: {product.sku || 'N/A'}</div>
+                        </div>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.category}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{product.price.toLocaleString()}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.stock}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         product.stock > 10
                           ? 'bg-green-100 text-green-800'
                           : product.stock > 0
                           ? 'bg-yellow-100 text-yellow-800'
                           : 'bg-red-100 text-red-800'
                       }`}>
-                        {product.stock > 10 ? 'In Stock' : product.stock > 0 ? 'Low Stock' : 'Out of Stock'}
+                        {product.stock} in stock
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        product.status === 'active'
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {product.status === 'active' ? (
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                        ) : (
+                          <XCircle className="h-4 w-4 mr-1" />
+                        )}
+                        {product.status}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -290,6 +401,11 @@ export function AdminProducts() {
                         >
                           <Trash2 className="h-5 w-5" />
                         </button>
+                        <div className="relative">
+                          <button className="text-gray-400 hover:text-gray-500">
+                            <MoreVertical className="h-5 w-5" />
+                          </button>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -324,14 +440,25 @@ export function AdminProducts() {
                   rows={3}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Price</label>
-                <input
-                  type="number"
-                  value={newProduct.price}
-                  onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Price</label>
+                  <input
+                    type="number"
+                    value={newProduct.price}
+                    onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })}
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Stock</label>
+                  <input
+                    type="number"
+                    value={newProduct.stock}
+                    onChange={(e) => setNewProduct({ ...newProduct, stock: Number(e.target.value) })}
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Category</label>
@@ -348,11 +475,20 @@ export function AdminProducts() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">Stock</label>
+                <label className="block text-sm font-medium text-gray-700">SKU</label>
                 <input
-                  type="number"
-                  value={newProduct.stock}
-                  onChange={(e) => setNewProduct({ ...newProduct, stock: Number(e.target.value) })}
+                  type="text"
+                  value={newProduct.sku}
+                  onChange={(e) => setNewProduct({ ...newProduct, sku: e.target.value })}
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Brand</label>
+                <input
+                  type="text"
+                  value={newProduct.brand}
+                  onChange={(e) => setNewProduct({ ...newProduct, brand: e.target.value })}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
@@ -364,6 +500,17 @@ export function AdminProducts() {
                   onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={newProduct.featured}
+                  onChange={(e) => setNewProduct({ ...newProduct, featured: e.target.checked })}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label className="ml-2 block text-sm text-gray-900">
+                  Featured Product
+                </label>
               </div>
             </div>
             <div className="mt-6 flex justify-end space-x-3">
