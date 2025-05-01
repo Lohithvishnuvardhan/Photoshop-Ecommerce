@@ -221,7 +221,7 @@ const Layout = () => {
               <ul className="space-y-2">
                 <li><Link to="/shipping" className="text-purple-300 hover:text-purple-200">Shipping Info</Link></li>
                 <li><Link to="/returns" className="text-purple-300 hover:text-purple-200">Returns</Link></li>
-                <li><Link to="/orders" className="text-purple-300 hover:text-purple-200">Track Order</Link></li>
+                <li><Link to="/track-order" className="text-purple-300 hover:text-purple-200">Track Order</Link></li>
               </ul>
             </div>
           </div>

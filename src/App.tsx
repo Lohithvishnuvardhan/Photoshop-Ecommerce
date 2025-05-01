@@ -1,5 +1,3 @@
-// src/App.tsx
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 
@@ -20,6 +18,7 @@ import ShippingInfo from './pages/ShippingInfo';
 import Returns from './pages/Returns';
 import FAQ from './pages/FAQ';
 import Profile from './pages/Profile';
+import TrackOrder from './pages/TrackOrder';
 import { AdminDashboard } from './pages/admin/Dashboard';
 import { AdminProducts } from './pages/admin/Products';
 import { ForgotPassword } from './pages/ForgotPassword';
@@ -58,6 +57,7 @@ function App() {
                 <Route path="contact" element={<Contact />} />
                 <Route path="profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
                 <Route path="orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
+                <Route path="track-order" element={<TrackOrder />} />
                 <Route path="admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
                 <Route path="admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
                 <Route path="login" element={<Login />} />
