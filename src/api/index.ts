@@ -10,6 +10,21 @@ interface LoginResponse {
   token: string;
 }
 
+interface OrderItem {
+  name: string;
+  quantity: number;
+  image: string;
+  price: number;
+}
+
+interface Order {
+  _id: string;
+  orderItems: OrderItem[];
+  totalPrice: number;
+  status: string;
+  createdAt: string;
+}
+
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
   headers: {
@@ -89,6 +104,27 @@ export const authAPI = {
       await api.post('/auth/reset-password', { token, newPassword });
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Password reset failed');
+    }
+  }
+};
+
+export const orderAPI = {
+  createOrder: async (orderData: any) => {
+    try {
+      const response = await api.post('/orders', orderData);
+      return response.data;
+    } catch (error: any) {
+      console.error('Create order error:', error.response || error);
+      throw new Error(error.response?.data?.message || 'Failed to create order');
+    }
+  },
+
+  getOrders: async (): Promise<Order[]> => {
+    try {
+      const response = await api.get<Order[]>('/orders/myorders');
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch orders');
     }
   }
 };
