@@ -19,18 +19,25 @@ const Layout = () => {
   const { isAuthenticated, isAdmin, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const navTimeoutRef = useRef<NodeJS.Timeout>();
+  const visibilityTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     function handleMouseMove(event: MouseEvent) {
       if (event.clientY <= 100) {
         setShowNav(true);
+        
+        // Clear any existing timeouts
         if (navTimeoutRef.current) {
           clearTimeout(navTimeoutRef.current);
         }
-      } else {
-        navTimeoutRef.current = setTimeout(() => {
+        if (visibilityTimeoutRef.current) {
+          clearTimeout(visibilityTimeoutRef.current);
+        }
+
+        // Set new timeout for 5 seconds
+        visibilityTimeoutRef.current = setTimeout(() => {
           setShowNav(false);
-        }, 300); // Delay before hiding nav
+        }, 5000); // 5 seconds
       }
     }
 
@@ -39,6 +46,9 @@ const Layout = () => {
       document.removeEventListener('mousemove', handleMouseMove);
       if (navTimeoutRef.current) {
         clearTimeout(navTimeoutRef.current);
+      }
+      if (visibilityTimeoutRef.current) {
+        clearTimeout(visibilityTimeoutRef.current);
       }
     };
   }, []);
@@ -90,6 +100,17 @@ const Layout = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleNavClick = () => {
+    // Reset the visibility timeout when a navigation item is clicked
+    if (visibilityTimeoutRef.current) {
+      clearTimeout(visibilityTimeoutRef.current);
+    }
+    // Keep the menu visible for another 5 seconds after clicking
+    visibilityTimeoutRef.current = setTimeout(() => {
+      setShowNav(false);
+    }, 5000);
   };
 
   return (
@@ -156,45 +177,88 @@ const Layout = () => {
             </div>
           </div>
 
-          {/* Navigation Menu - Only visible on hover near top */}
-          <nav 
-            className={`transition-all duration-300 overflow-hidden ${
-              showNav ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'
+          {/* Navigation Menu */}
+          <div 
+            className={`absolute left-0 right-0 bg-gray-900 border-b border-gray-800 transition-all duration-300 ${
+              showNav ? 'opacity-100 visible' : 'opacity-0 invisible'
             }`}
+            onMouseEnter={() => {
+              setShowNav(true);
+              if (visibilityTimeoutRef.current) {
+                clearTimeout(visibilityTimeoutRef.current);
+              }
+              visibilityTimeoutRef.current = setTimeout(() => {
+                setShowNav(false);
+              }, 20000);
+            }}
           >
-            <div className="py-4">
-              <div className="flex justify-center space-x-12">
-                <Link to="/cameras" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                  Cameras
-                </Link>
-                <Link to="/lenses" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                  Lenses
-                </Link>
-                <Link to="/accessories" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                  Accessories
-                </Link>
-                <Link to="/batteries" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                  Batteries
-                </Link>
-                <Link to="/about" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                  About
-                </Link>
-                <Link to="/contact" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                  Contact
-                </Link>
-                {isAuthenticated && isAdmin && (
-                  <>
-                    <Link to="/admin/dashboard" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                      Admin Dashboard
-                    </Link>
-                    <Link to="/admin/products" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                      Manage Products
-                    </Link>
-                  </>
-                )}
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="py-4">
+                <div className="flex justify-center space-x-12">
+                  <Link 
+                    to="/cameras" 
+                    className="text-purple-400 hover:text-purple-300 transition-colors text-lg"
+                    onClick={handleNavClick}
+                  >
+                    Cameras
+                  </Link>
+                  <Link 
+                    to="/lenses" 
+                    className="text-purple-400 hover:text-purple-300 transition-colors text-lg"
+                    onClick={handleNavClick}
+                  >
+                    Lenses
+                  </Link>
+                  <Link 
+                    to="/accessories" 
+                    className="text-purple-400 hover:text-purple-300 transition-colors text-lg"
+                    onClick={handleNavClick}
+                  >
+                    Accessories
+                  </Link>
+                  <Link 
+                    to="/batteries" 
+                    className="text-purple-400 hover:text-purple-300 transition-colors text-lg"
+                    onClick={handleNavClick}
+                  >
+                    Batteries
+                  </Link>
+                  <Link 
+                    to="/about" 
+                    className="text-purple-400 hover:text-purple-300 transition-colors text-lg"
+                    onClick={handleNavClick}
+                  >
+                    About
+                  </Link>
+                  <Link 
+                    to="/contact" 
+                    className="text-purple-400 hover:text-purple-300 transition-colors text-lg"
+                    onClick={handleNavClick}
+                  >
+                    Contact
+                  </Link>
+                  {isAuthenticated && isAdmin && (
+                    <>
+                      <Link 
+                        to="/admin/dashboard" 
+                        className="text-purple-400 hover:text-purple-300 transition-colors text-lg"
+                        onClick={handleNavClick}
+                      >
+                        Admin Dashboard
+                      </Link>
+                      <Link 
+                        to="/admin/products" 
+                        className="text-purple-400 hover:text-purple-300 transition-colors text-lg"
+                        onClick={handleNavClick}
+                      >
+                        Manage Products
+                      </Link>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
-          </nav>
+          </div>
         </div>
       </header>
 
