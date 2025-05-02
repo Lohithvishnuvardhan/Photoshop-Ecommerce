@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, User, Search, LogOut, X, Menu, Camera } from 'lucide-react';
+import { ShoppingCart, User, Search, LogOut, Camera } from 'lucide-react';
 import { useCartStore } from '../store/cart';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
@@ -9,7 +9,8 @@ const Layout = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [, setShowResults] = useState(false);
   const [, setSearchResults] = useState<any[]>([]);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [, setIsMobileMenuOpen] = useState(false);
+  const [showNav, setShowNav] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -17,6 +18,30 @@ const Layout = () => {
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
   const { isAuthenticated, isAdmin, logout } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const navTimeoutRef = useRef<NodeJS.Timeout>();
+
+  useEffect(() => {
+    function handleMouseMove(event: MouseEvent) {
+      if (event.clientY <= 100) {
+        setShowNav(true);
+        if (navTimeoutRef.current) {
+          clearTimeout(navTimeoutRef.current);
+        }
+      } else {
+        navTimeoutRef.current = setTimeout(() => {
+          setShowNav(false);
+        }, 300); // Delay before hiding nav
+      }
+    }
+
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      if (navTimeoutRef.current) {
+        clearTimeout(navTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -71,8 +96,8 @@ const Layout = () => {
     <div className="min-h-screen bg-gray-900">
       <header className="border-b border-gray-800 sticky top-0 z-50 bg-gray-900/95 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Top Bar */}
           <div className="flex items-center justify-between py-4">
-            {/* Logo */}
             <Link to="/" className="flex items-center space-x-3">
               <Camera className="h-12 w-12 text-amber-500" strokeWidth={1.5} />
               <span className="text-5xl font-extrabold italic bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-transparent bg-clip-text font-sans tracking-tight hover:from-amber-500 hover:via-amber-600 hover:to-amber-700 transition-all duration-300">
@@ -80,7 +105,6 @@ const Layout = () => {
               </span>
             </Link>
 
-            {/* Search Bar */}
             <div className="flex-1 max-w-3xl mx-12 relative" ref={searchRef}>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-6 w-6 text-purple-400" />
@@ -94,7 +118,6 @@ const Layout = () => {
               </div>
             </div>
 
-            {/* Navigation and Auth */}
             <div className="flex items-center space-x-8">
               <Link 
                 to="/cart" 
@@ -130,77 +153,55 @@ const Layout = () => {
                   Sign In
                 </Link>
               )}
-
-              {/* Mobile Menu Button */}
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="md:hidden text-purple-400 hover:text-purple-300"
-              >
-                {isMobileMenuOpen ? (
-                  <X className="h-8 w-8" />
-                ) : (
-                  <Menu className="h-8 w-8" />
-                )}
-              </button>
             </div>
           </div>
 
-          {/* Navigation Menu */}
-          <nav className="hidden md:block py-4">
-            <div className="flex justify-center space-x-12">
-              <Link to="/cameras" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                Cameras
-              </Link>
-              <Link to="/lenses" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                Lenses
-              </Link>
-              <Link to="/accessories" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                Accessories
-              </Link>
-              <Link to="/batteries" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                Batteries
-              </Link>
-              <Link to="/about" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                About
-              </Link>
-              <Link to="/contact" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                Contact
-              </Link>
-              {isAuthenticated && isAdmin && (
-                <>
-                  <Link to="/admin/dashboard" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                    Admin Dashboard
-                  </Link>
-                  <Link to="/admin/products" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
-                    Manage Products
-                  </Link>
-                </>
-              )}
+          {/* Navigation Menu - Only visible on hover near top */}
+          <nav 
+            className={`transition-all duration-300 overflow-hidden ${
+              showNav ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'
+            }`}
+          >
+            <div className="py-4">
+              <div className="flex justify-center space-x-12">
+                <Link to="/cameras" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
+                  Cameras
+                </Link>
+                <Link to="/lenses" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
+                  Lenses
+                </Link>
+                <Link to="/accessories" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
+                  Accessories
+                </Link>
+                <Link to="/batteries" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
+                  Batteries
+                </Link>
+                <Link to="/about" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
+                  About
+                </Link>
+                <Link to="/contact" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
+                  Contact
+                </Link>
+                {isAuthenticated && isAdmin && (
+                  <>
+                    <Link to="/admin/dashboard" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
+                      Admin Dashboard
+                    </Link>
+                    <Link to="/admin/products" className="text-purple-400 hover:text-purple-300 transition-colors text-lg">
+                      Manage Products
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </nav>
-
-          {/* Mobile Menu */}
-          {isMobileMenuOpen && (
-            <div className="md:hidden py-4 border-t border-gray-800">
-              <nav className="flex flex-col space-y-4">
-                <Link to="/cameras" className="text-purple-400 hover:text-purple-300">Cameras</Link>
-                <Link to="/lenses" className="text-purple-400 hover:text-purple-300">Lenses</Link>
-                <Link to="/accessories" className="text-purple-400 hover:text-purple-300">Accessories</Link>
-                <Link to="/batteries" className="text-purple-400 hover:text-purple-300">Batteries</Link>
-                <Link to="/about" className="text-purple-400 hover:text-purple-300">About</Link>
-                <Link to="/contact" className="text-purple-400 hover:text-purple-300">Contact</Link>
-              </nav>
-            </div>
-          )}
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-grow">
         <Outlet />
       </main>
 
-      {/* Footer */}
       <footer className="bg-gray-800 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

@@ -1,27 +1,21 @@
 const express = require('express');
 const router = express.Router();
-const Product = require('../models/Product');
+const { 
+  getAllProducts, 
+  getProductById, 
+  createProduct, 
+  updateProduct, 
+  deleteProduct 
+} = require('../controllers/productController');
+const authenticateToken = require('../middleware/authMiddleware');
 
-// Get all products
-router.get('/', async (req, res) => {
-  try {
-    const products = await Product.find();
-    res.json(products);
-  } catch (err) {
-    res.status(500).json({ message: 'Failed to fetch products' });
-  }
-});
+// Public routes
+router.get('/', getAllProducts);
+router.get('/:id', getProductById);
 
-// Get single product by ID
-router.get('/:id', async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ message: 'Product not found' });
-
-    res.json(product);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
+// Protected routes - require authentication
+router.post('/', authenticateToken, createProduct);
+router.put('/:id', authenticateToken, updateProduct);
+router.delete('/:id', authenticateToken, deleteProduct);
 
 module.exports = router;
