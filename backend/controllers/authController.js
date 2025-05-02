@@ -87,54 +87,28 @@ exports.loginUser = async (req, res) => {
 };
 
 exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
   try {
-    const { email } = req.body;
-    
-    if (!email) {
-      return res.status(400).json({ message: 'Please provide an email address' });
-    }
-
     const user = await User.findOne({ email });
+
     if (!user) {
-      return res.status(404).json({ message: 'No account found with this email address' });
+      return res.status(404).json({ error: "User not found" });
     }
 
-    // Generate reset token
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExpiry = Date.now() + 3600000; // Token valid for 1 hour
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
-    // Save token to user
-    user.resetPasswordToken = resetToken;
-    user.resetPasswordExpires = resetTokenExpiry;
+    user.resetToken = token;
+    user.tokenExpiry = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    try {
-      // Send reset email
-      await sendResetEmail(email, resetToken);
-      
-      res.json({ 
-        message: 'Password reset instructions sent to your email',
-        success: true
-      });
-    } catch (emailError) {
-      console.error('Email sending error:', emailError);
-      
-      // If email fails, remove the reset token from user
-      user.resetPasswordToken = undefined;
-      user.resetPasswordExpires = undefined;
-      await user.save();
-      
-      return res.status(500).json({ 
-        message: 'Failed to send reset email. Please try again later.',
-        error: emailError.message 
-      });
-    }
+    await sendResetEmail(email, token); // ✅ Await sending email
+
+    res.status(200).json({ message: "Reset email sent successfully" });
   } catch (error) {
-    console.error('Forgot password error:', error);
-    res.status(500).json({ 
-      message: 'Error processing password reset request',
-      error: error.message 
-    });
+    console.error("❌ Forgot password error:", error); // ✅ Log the error to debug
+    res.status(500).json({ error: "Failed to send reset email" });
   }
 };
 
