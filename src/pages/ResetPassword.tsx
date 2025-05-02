@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 import { authAPI } from '../api';
 import toast from 'react-hot-toast';
@@ -10,10 +10,15 @@ export function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [searchParams] = useSearchParams();
+  const { token } = useParams();
   const navigate = useNavigate();
 
-  const token = searchParams.get('token');
+  useEffect(() => {
+    if (!token) {
+      toast.error('Invalid reset link');
+      navigate('/login');
+    }
+  }, [token, navigate]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,20 +40,14 @@ export function ResetPassword() {
       toast.success('Password reset successfully');
       navigate('/login');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to reset password');
+      toast.error(error.response?.data?.message || 'Failed to reset password');
     } finally {
       setIsLoading(false);
     }
   };
 
   if (!token) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-900 to-gray-800">
-        <div className="bg-gray-800 py-8 px-6 rounded-lg shadow-lg">
-          <p className="text-center text-red-500">Invalid or expired reset link</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
@@ -58,7 +57,6 @@ export function ResetPassword() {
         <p className="text-sm text-center text-gray-400 mt-2">Must be at least 8 characters long</p>
 
         <form className="mt-6 space-y-6" onSubmit={handleSubmit}>
-          {/* New Password */}
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-200">
               New Password
@@ -91,7 +89,6 @@ export function ResetPassword() {
             </div>
           </div>
 
-          {/* Confirm Password */}
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-200">
               Confirm Password
@@ -124,25 +121,22 @@ export function ResetPassword() {
             </div>
           </div>
 
-          {/* Submit Button */}
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className={`w-full flex justify-center items-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 ${
-                isLoading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-            >
-              {isLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                  Resetting...
-                </>
-              ) : (
-                'Reset Password'
-              )}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={`w-full flex justify-center items-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 ${
+              isLoading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+          >
+            {isLoading ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                Resetting...
+              </>
+            ) : (
+              'Reset Password'
+            )}
+          </button>
         </form>
       </div>
     </div>

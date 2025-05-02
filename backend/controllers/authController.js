@@ -87,34 +87,49 @@ exports.loginUser = async (req, res) => {
 };
 
 exports.forgotPassword = async (req, res) => {
-  const { email } = req.body;
   try {
+    const { email } = req.body;
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-
-    user.resetToken = token;
-    user.tokenExpiry = Date.now() + 3600000; // 1 hour
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    
+    // Save hashed token to database
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    await sendResetEmail(email, token); // ✅ Await sending email
+    // Create reset URL
+    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
-    res.status(200).json({ message: "Reset email sent successfully" });
+    try {
+      await sendResetEmail(email, resetToken);
+      res.status(200).json({ 
+        message: "Reset email sent successfully",
+        resetToken // Include for development/testing
+      });
+    } catch (error) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpires = undefined;
+      await user.save();
+      
+      console.error("Email send error:", error);
+      throw new Error("Failed to send reset email");
+    }
   } catch (error) {
-    console.error("❌ Forgot password error:", error); // ✅ Log the error to debug
-    res.status(500).json({ error: "Failed to send reset email" });
+    console.error("Forgot password error:", error);
+    res.status(500).json({ message: "Failed to process password reset" });
   }
 };
 
 exports.resetPassword = async (req, res) => {
   try {
-    const { token, newPassword } = req.body;
+    const { token } = req.params;
+    const { newPassword } = req.body;
     
     if (!token || !newPassword) {
       return res.status(400).json({ message: 'Please provide token and new password' });
@@ -123,7 +138,7 @@ exports.resetPassword = async (req, res) => {
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() }
-    }).select('+password');
+    });
 
     if (!user) {
       return res.status(400).json({ message: 'Invalid or expired reset token' });

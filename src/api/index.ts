@@ -101,9 +101,9 @@ export const authAPI = {
 
   resetPassword: async (token: string, newPassword: string): Promise<void> => {
     try {
-      await api.post('/auth/reset-password', { token, newPassword });
+      await api.post(`/auth/reset-password/${token}`, { newPassword });
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Password reset failed');
+      throw error;
     }
   }
 };

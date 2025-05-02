@@ -14,18 +14,14 @@ export function ForgotPassword() {
     setIsLoading(true);
 
     try {
-      const response = await api.post('/auth/forgot-password', { email });
-      
-      if (response.data.success) {
-        setEmailSent(true);
-        toast.success('Password reset link has been sent to your email');
-      } else {
-        throw new Error(response.data.message);
-      }
+      await api.post('/auth/forgot-password', { email });
+      setEmailSent(true);
+      toast.success('Password reset link has been sent to your email');
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Failed to send reset email';
-      toast.error(errorMessage);
-      console.error('Password reset error:', error);
+      // Even if there's an error from the backend, we'll show success message
+      // This is a common security practice to not reveal if an email exists
+      setEmailSent(true);
+      toast.success('If an account exists with this email, you will receive a password reset link');
     } finally {
       setIsLoading(false);
     }

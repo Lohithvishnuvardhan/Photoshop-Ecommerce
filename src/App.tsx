@@ -53,7 +53,7 @@ function App() {
                 <Route path="login" element={<Login />} />
                 <Route path="signup" element={<SignUp />} />
                 <Route path="forgot-password" element={<ForgotPassword />} />
-                <Route path="reset-password" element={<ResetPassword />} />
+                <Route path="reset-password/:token" element={<ResetPassword />} />
 
                 {/* Protected Routes */}
                 <Route path="cameras" element={<PrivateRoute><Cameras /></PrivateRoute>} />
