@@ -34,10 +34,10 @@ const Layout = () => {
           clearTimeout(visibilityTimeoutRef.current);
         }
 
-        // Set new timeout for 5 seconds
+        // Set new timeout for 3 seconds
         visibilityTimeoutRef.current = setTimeout(() => {
           setShowNav(false);
-        }, 5000); // 5 seconds
+        }, 3000); // 3 seconds
       }
     }
 
@@ -107,10 +107,10 @@ const Layout = () => {
     if (visibilityTimeoutRef.current) {
       clearTimeout(visibilityTimeoutRef.current);
     }
-    // Keep the menu visible for another 5 seconds after clicking
+    // Keep the menu visible for another 3 seconds after clicking
     visibilityTimeoutRef.current = setTimeout(() => {
       setShowNav(false);
-    }, 5000);
+    }, 3000);
   };
 
   return (
