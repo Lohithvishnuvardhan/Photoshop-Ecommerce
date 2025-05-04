@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Star, Shield, Truck, Clock, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCartStore } from '../store/cart';
+import { useState, useEffect } from 'react';
+import api from '../utils/api';
 
-const lenses = [
+// Static lenses data
+const staticLenses = [
   {
     _id: '5',
     name: 'Canon RF 24-70mm f/2.8L IS USM',
@@ -111,6 +114,49 @@ const Lenses = () => {
   const { addToCart } = useCart();
   const { addToBuyNow, buyNowItems, buyNowTotal } = useCartStore();
   const navigate = useNavigate();
+  const [allLenses, setAllLenses] = useState([...staticLenses]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAdminLenses = async () => {
+      try {
+        const response = await api.get('/products');
+        const adminLenses = response.data.filter((product: any) => 
+          product.category === 'Lenses' && 
+          !staticLenses.some(lens => lens._id === product._id)
+        );
+
+        // Add default specs and features for admin-added lenses if they don't exist
+        const formattedAdminLenses = adminLenses.map((lens: any) => ({
+          ...lens,
+          specs: lens.specs || [
+            'Professional Grade Optics',
+            'Multi-Coating Technology',
+            'Durable Construction',
+            'Precision Focus System'
+          ],
+          features: lens.features || [
+            'High-Quality Build',
+            'Weather Resistant',
+            'Smooth Operation',
+            'Premium Image Quality'
+          ],
+          rating: lens.rating || 4.5,
+          reviews: lens.reviews || 0,
+          stock: lens.stock || 0
+        }));
+
+        setAllLenses([...staticLenses, ...formattedAdminLenses]);
+      } catch (error) {
+        console.error('Error fetching lenses:', error);
+        toast.error('Failed to fetch additional lenses');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAdminLenses();
+  }, []);
 
   const handleAddToCart = (lens: any) => {
     const product = {
@@ -158,6 +204,14 @@ const Lenses = () => {
     });
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -179,7 +233,7 @@ const Lenses = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {lenses.map((lens) => (
+          {allLenses.map((lens) => (
             <div key={lens._id} className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
               <div className="relative">
                 <img
@@ -221,7 +275,7 @@ const Lenses = () => {
                 <div className="mb-6">
                   <h4 className="text-lg font-semibold mb-2">Key Features</h4>
                   <ul className="grid grid-cols-2 gap-2">
-                    {lens.features.map((feature, index) => (
+                    {lens.features.map((feature: string, index: number) => (
                       <li key={index} className="flex items-center text-gray-600">
                         <Camera className="h-4 w-4 text-purple-500 mr-2" />
                         {feature}
@@ -233,7 +287,7 @@ const Lenses = () => {
                 <div className="mb-6">
                   <h4 className="text-lg font-semibold mb-2">Specifications</h4>
                   <ul className="grid grid-cols-2 gap-2">
-                    {lens.specs.map((spec, index) => (
+                    {lens.specs.map((spec: string, index: number) => (
                       <li key={index} className="flex items-center text-gray-600">
                         <span className="mr-2">•</span>
                         {spec}
@@ -254,12 +308,14 @@ const Lenses = () => {
                     <button 
                       onClick={() => handleAddToCart(lens)}
                       className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      disabled={lens.stock === 0}
                     >
                       Add to Cart
                     </button>
                     <button 
                       onClick={() => handleBuyNow(lens)}
                       className="bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      disabled={lens.stock === 0}
                     >
                       Buy Now
                     </button>

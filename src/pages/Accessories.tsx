@@ -3,8 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Shield, Truck, Clock, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCartStore } from '../store/cart';
+import { useState, useEffect } from 'react';
+import api from '../utils/api';
 
-const accessories = [
+// Static accessories data
+const staticAccessories = [
   {
     id: 9,
     name: 'Peak Design Camera Strap',
@@ -107,6 +110,51 @@ const Accessories = () => {
   const { addToCart } = useCart();
   const { addToBuyNow, buyNowItems, buyNowTotal } = useCartStore();
   const navigate = useNavigate();
+  const [allAccessories, setAllAccessories] = useState([...staticAccessories]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAdminAccessories = async () => {
+      try {
+        const response = await api.get('/products');
+        const adminAccessories = response.data.filter((product: any) => 
+          product.category === 'Accessories' && 
+          !staticAccessories.some(acc => acc.id === product._id)
+        );
+
+        // Add default specs and features for admin-added accessories if they don't exist
+        const formattedAdminAccessories = adminAccessories.map((acc: any) => ({
+          ...acc,
+          id: acc._id,
+          specs: acc.specs || [
+            'Professional Grade Construction',
+            'Durable Materials',
+            'Premium Build Quality',
+            'Advanced Features',
+            'Ergonomic Design',
+            'Universal Compatibility'
+          ],
+          features: acc.features || [
+            'High-Quality Build',
+            'User-Friendly Design',
+            'Versatile Usage'
+          ],
+          inStock: acc.stock > 0,
+          isProGrade: true,
+          image: acc.imageUrl
+        }));
+
+        setAllAccessories([...staticAccessories, ...formattedAdminAccessories]);
+      } catch (error) {
+        console.error('Error fetching accessories:', error);
+        toast.error('Failed to fetch additional accessories');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAdminAccessories();
+  }, []);
 
   const handleAddToCart = (accessory: any) => {
     const product = {
@@ -154,6 +202,14 @@ const Accessories = () => {
     });
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -175,7 +231,7 @@ const Accessories = () => {
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {accessories.map((accessory) => (
+          {allAccessories.map((accessory) => (
             <div key={accessory.id} className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
               <div className="relative">
                 <img
@@ -187,7 +243,7 @@ const Accessories = () => {
                   Professional Grade
                 </div>
                 <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                  In Stock
+                  {accessory.inStock ? 'In Stock' : 'Out of Stock'}
                 </div>
               </div>
               <div className="p-6">
@@ -201,7 +257,7 @@ const Accessories = () => {
                 <div className="mb-6">
                   <h4 className="text-lg font-semibold mb-2">Key Features</h4>
                   <ul className="grid grid-cols-2 gap-2">
-                    {accessory.features.map((feature, index) => (
+                    {accessory.features.map((feature: string, index: number) => (
                       <li key={index} className="flex items-center text-gray-600">
                         <Camera className="h-4 w-4 text-purple-500 mr-2" />
                         {feature}
@@ -213,7 +269,7 @@ const Accessories = () => {
                 <div className="mb-6">
                   <h4 className="text-lg font-semibold mb-2">Specifications</h4>
                   <ul className="grid grid-cols-2 gap-2">
-                    {accessory.specs.map((spec, index) => (
+                    {accessory.specs.map((spec: string, index: number) => (
                       <li key={index} className="flex items-center text-gray-600">
                         <span className="mr-2">•</span>
                         {spec}
@@ -234,12 +290,14 @@ const Accessories = () => {
                     <button 
                       onClick={() => handleAddToCart(accessory)}
                       className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      disabled={!accessory.inStock}
                     >
                       Add to Cart
                     </button>
                     <button 
                       onClick={() => handleBuyNow(accessory)}
                       className="bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      disabled={!accessory.inStock}
                     >
                       Buy Now
                     </button>

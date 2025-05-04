@@ -23,6 +23,7 @@ import { AdminDashboard } from './pages/admin/Dashboard';
 import { AdminProducts } from './pages/admin/Products';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
+import { OrderSuccess } from './pages/OrderSuccess';
 
 import { SearchProvider } from './context/SearchContext';
 import { CartProvider } from './context/Cartcontext';
@@ -72,6 +73,7 @@ function App() {
                 <Route path="shipping" element={<PrivateRoute><ShippingInfo /></PrivateRoute>} />
                 <Route path="returns" element={<PrivateRoute><Returns /></PrivateRoute>} />
                 <Route path="faq" element={<PrivateRoute><FAQ /></PrivateRoute>} />
+                <Route path="order-success" element={<PrivateRoute><OrderSuccess /></PrivateRoute>} />
               </Route>
             </Routes>
           </Router>

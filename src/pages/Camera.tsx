@@ -1,10 +1,12 @@
+import { useState, useEffect } from 'react';
 import { useCart } from '../context/Cartcontext';
 import { useNavigate } from 'react-router-dom';
 import { Star, Shield, Truck, Clock, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCartStore } from '../store/cart';
+import api from '../utils/api';
 
-const cameras = [
+const defaultCameras = [
   {
     _id: '1',
     name: 'Canon EOS R5',
@@ -76,23 +78,82 @@ const cameras = [
       'Enhanced Battery Life',
       'Dual UHS-II Card Slots'
     ]
-  },
+  }
 ];
 
-const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0
-  }).format(price);
-};
+interface Camera {
+  _id: string;
+  name: string;
+  price: number;
+  imageUrl: string;
+  description: string;
+  category: string;
+  stock: number;
+  specs?: string[];
+  rating?: number;
+  reviews?: number;
+  features?: string[];
+}
 
 const Cameras = () => {
+  const [cameras, setCameras] = useState<Camera[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { addToCart } = useCart();
   const { addToBuyNow, buyNowItems, buyNowTotal } = useCartStore();
   const navigate = useNavigate();
 
-  const handleAddToCart = (camera: any) => {
+  useEffect(() => {
+    fetchCameras();
+  }, []);
+
+  const fetchCameras = async () => {
+    try {
+      const response = await api.get('/products');
+      // Filter only camera products from API
+      const cameraProducts = response.data.filter((product: Camera) => 
+        product.category.toLowerCase() === 'cameras'
+      );
+      
+      // Add default values for specs, features, rating, and reviews if not present
+      const processedCameras = cameraProducts.map((camera: Camera) => ({
+        ...camera,
+        specs: camera.specs || [
+          'Full-Frame CMOS Sensor',
+          'Advanced AF System',
+          'Dual Card Slots',
+          'Weather-Sealed Construction'
+        ],
+        features: camera.features || [
+          'Advanced Autofocus',
+          'High-Speed Shooting',
+          'Professional Build Quality',
+          'Enhanced Stabilization'
+        ],
+        rating: camera.rating || 4.8,
+        reviews: camera.reviews || 50
+      }));
+
+      // Combine default cameras with fetched cameras
+      // Filter out any default cameras that have the same ID as fetched cameras
+      const combinedCameras = [
+        ...defaultCameras.filter(defaultCam => 
+          !processedCameras.some((fetchedCam: { _id: string; }) => fetchedCam._id === defaultCam._id)
+        ),
+        ...processedCameras
+      ];
+
+      setCameras(combinedCameras);
+    } catch (error) {
+      console.error('Error fetching cameras:', error);
+      toast.error('Failed to load cameras');
+      // If API fails, fall back to default cameras
+      setCameras(defaultCameras);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddToCart = (camera: Camera) => {
     const product = {
       _id: camera._id,
       name: camera.name,
@@ -110,7 +171,7 @@ const Cameras = () => {
     });
   };
 
-  const handleBuyNow = (camera: any) => {
+  const handleBuyNow = (camera: Camera) => {
     const product = {
       _id: camera._id,
       name: camera.name,
@@ -136,6 +197,22 @@ const Cameras = () => {
         isBuyNow: true
       } 
     });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(price);
   };
 
   return (
@@ -186,11 +263,11 @@ const Cameras = () => {
                         <Star
                           key={i}
                           className={`h-5 w-5 ${
-                            i < Math.floor(camera.rating)
+                            i < Math.floor(camera.rating || 0)
                               ? 'text-yellow-400'
                               : 'text-gray-300'
                           }`}
-                          fill={i < Math.floor(camera.rating) ? 'currentColor' : 'none'}
+                          fill={i < Math.floor(camera.rating || 0) ? 'currentColor' : 'none'}
                         />
                       ))}
                     </div>
@@ -201,7 +278,7 @@ const Cameras = () => {
                 <div className="mb-6">
                   <h4 className="text-lg font-semibold mb-2">Key Features</h4>
                   <ul className="grid grid-cols-2 gap-2">
-                    {camera.features.map((feature, index) => (
+                    {camera.features?.map((feature, index) => (
                       <li key={index} className="flex items-center text-gray-600">
                         <Camera className="h-4 w-4 text-purple-500 mr-2" />
                         {feature}
@@ -213,7 +290,7 @@ const Cameras = () => {
                 <div className="mb-6">
                   <h4 className="text-lg font-semibold mb-2">Specifications</h4>
                   <ul className="grid grid-cols-2 gap-2">
-                    {camera.specs.map((spec, index) => (
+                    {camera.specs?.map((spec, index) => (
                       <li key={index} className="flex items-center text-gray-600">
                         <span className="mr-2">•</span>
                         {spec}

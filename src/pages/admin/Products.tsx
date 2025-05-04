@@ -13,6 +13,10 @@ interface Product {
   description: string;
   status?: 'active' | 'inactive';
   featured?: boolean;
+  specs?: string[];
+  features?: string[];
+  rating?: number;
+  reviews?: number;
   sku?: string;
   brand?: string;
   lastUpdated?: Date;
@@ -41,8 +45,165 @@ export function AdminProducts() {
     sku: '',
     brand: '',
     status: 'active' as const,
-    featured: false
+    featured: false,
+    specs: [] as string[],
+    features: [] as string[],
+    rating: 4.5,
+    reviews: 0
   });
+
+  const [specInput, setSpecInput] = useState('');
+  const [featureInput, setFeatureInput] = useState('');
+
+  const handleAddSpec = () => {
+    if (specInput.trim()) {
+      setNewProduct(prev => ({
+        ...prev,
+        specs: [...(prev.specs || []), specInput.trim()]
+      }));
+      setSpecInput('');
+    }
+  };
+
+  const handleAddFeature = () => {
+    if (featureInput.trim()) {
+      setNewProduct(prev => ({
+        ...prev,
+        features: [...(prev.features || []), featureInput.trim()]
+      }));
+      setFeatureInput('');
+    }
+  };
+
+  const handleRemoveSpec = (index: number) => {
+    setNewProduct(prev => ({
+      ...prev,
+      specs: prev.specs?.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleRemoveFeature = (index: number) => {
+    setNewProduct(prev => ({
+      ...prev,
+      features: prev.features?.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleAddProduct = async () => {
+    try {
+      setIsLoading(true);
+
+      if (!newProduct.name || !newProduct.price || !newProduct.category || !newProduct.imageUrl || !newProduct.stock) {
+        toast.error('Please fill in all required fields');
+        return;
+      }
+
+      const productToSave = {
+        ...newProduct,
+        specs: newProduct.specs?.length ? newProduct.specs : getDefaultSpecs(newProduct.category),
+        features: newProduct.features?.length ? newProduct.features : getDefaultFeatures(newProduct.category)
+      };
+
+      const response = await api.post('/admin/products', productToSave);
+      setProducts([...products, response.data]);
+      toast.success('Product added successfully');
+      setShowAddModal(false);
+      resetNewProduct();
+    } catch (error) {
+      toast.error('Failed to add product');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resetNewProduct = () => {
+    setNewProduct({
+      name: '',
+      price: 0,
+      category: '',
+      stock: 0,
+      imageUrl: '',
+      description: '',
+      sku: '',
+      brand: '',
+      status: 'active',
+      featured: false,
+      specs: [],
+      features: [],
+      rating: 4.5,
+      reviews: 0
+    });
+  };
+
+  const getDefaultSpecs = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'cameras':
+        return [
+          'Full-Frame CMOS Sensor',
+          'Advanced AF System',
+          'Dual Card Slots',
+          'Weather-Sealed Construction'
+        ];
+      case 'lenses':
+        return [
+          'Advanced Optical Design',
+          'Weather-Sealed Construction',
+          'Fast Autofocus System',
+          'Premium Build Quality'
+        ];
+      case 'accessories':
+        return [
+          'Professional Grade Materials',
+          'Durable Construction',
+          'Universal Compatibility',
+          'Ergonomic Design'
+        ];
+      case 'batteries':
+        return [
+          'High Capacity',
+          'Long Battery Life',
+          'Fast Charging Support',
+          'Overcharge Protection'
+        ];
+      default:
+        return [];
+    }
+  };
+
+  const getDefaultFeatures = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'cameras':
+        return [
+          'Advanced Autofocus',
+          'High-Speed Shooting',
+          'Professional Build Quality',
+          'Enhanced Stabilization'
+        ];
+      case 'lenses':
+        return [
+          'Superior Edge Sharpness',
+          'Beautiful Bokeh',
+          'Fast Aperture',
+          'Image Stabilization'
+        ];
+      case 'accessories':
+        return [
+          'Quick Release System',
+          'Adjustable Design',
+          'Premium Materials',
+          'Professional Grade'
+        ];
+      case 'batteries':
+        return [
+          'Smart Power Management',
+          'Temperature Control',
+          'Safety Protection',
+          'LED Indicators'
+        ];
+      default:
+        return [];
+    }
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -54,32 +215,6 @@ export function AdminProducts() {
       setProducts(response.data);
     } catch (error) {
       toast.error('Failed to fetch products');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAddProduct = async () => {
-    try {
-      setIsLoading(true);
-      const response = await api.post('/admin/products', newProduct);
-      setProducts([...products, response.data]);
-      toast.success('Product added successfully');
-      setShowAddModal(false);
-      setNewProduct({
-        name: '',
-        price: 0,
-        category: '',
-        stock: 0,
-        imageUrl: '',
-        description: '',
-        sku: '',
-        brand: '',
-        status: 'active',
-        featured: false
-      });
-    } catch (error) {
-      toast.error('Failed to add product');
     } finally {
       setIsLoading(false);
     }
@@ -416,30 +551,37 @@ export function AdminProducts() {
         </div>
       </div>
 
-      {/* Add Product Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-semibold mb-4">Add New Product</h2>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Name</label>
-                <input
-                  type="text"
-                  value={newProduct.name}
-                  onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Name</label>
+                  <input
+                    type="text"
+                    value={newProduct.name}
+                    onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Category</label>
+                  <select
+                    value={newProduct.category}
+                    onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  >
+                    <option value="">Select category</option>
+                    <option value="Cameras">Cameras</option>
+                    <option value="Lenses">Lenses</option>
+                    <option value="Accessories">Accessories</option>
+                    <option value="Batteries">Batteries</option>
+                  </select>
+                </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Description</label>
-                <textarea
-                  value={newProduct.description}
-                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  rows={3}
-                />
-              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700">Price</label>
@@ -460,38 +602,17 @@ export function AdminProducts() {
                   />
                 </div>
               </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700">Category</label>
-                <select
-                  value={newProduct.category}
-                  onChange={(e) => setNewProduct({ ...newProduct, category: e.target.value })}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                >
-                  <option value="">Select category</option>
-                  <option value="Cameras">Cameras</option>
-                  <option value="Lenses">Lenses</option>
-                  <option value="Accessories">Accessories</option>
-                  <option value="Batteries">Batteries</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">SKU</label>
-                <input
-                  type="text"
-                  value={newProduct.sku}
-                  onChange={(e) => setNewProduct({ ...newProduct, sku: e.target.value })}
+                <label className="block text-sm font-medium text-gray-700">Description</label>
+                <textarea
+                  value={newProduct.description}
+                  onChange={(e) => setNewProduct({ ...newProduct, description: e.target.value })}
+                  rows={3}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Brand</label>
-                <input
-                  type="text"
-                  value={newProduct.brand}
-                  onChange={(e) => setNewProduct({ ...newProduct, brand: e.target.value })}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700">Image URL</label>
                 <input
@@ -501,6 +622,92 @@ export function AdminProducts() {
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Specifications</label>
+                <div className="flex space-x-2 mb-2">
+                  <input
+                    type="text"
+                    value={specInput}
+                    onChange={(e) => setSpecInput(e.target.value)}
+                    className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Add specification"
+                  />
+                  <button
+                    onClick={handleAddSpec}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Add
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {newProduct.specs?.map((spec, index) => (
+                    <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                      <span>{spec}</span>
+                      <button
+                        onClick={() => handleRemoveSpec(index)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Features</label>
+                <div className="flex space-x-2 mb-2">
+                  <input
+                    type="text"
+                    value={featureInput}
+                    onChange={(e) => setFeatureInput(e.target.value)}
+                    className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Add feature"
+                  />
+                  <button
+                    onClick={handleAddFeature}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Add
+                  </button>
+                </div>
+                <div className="space-y-2">
+                  {newProduct.features?.map((feature, index) => (
+                    <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                      <span>{feature}</span>
+                      <button
+                        onClick={() => handleRemoveFeature(index)}
+                        className="text-red-600 hover:text-red-800"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">SKU</label>
+                  <input
+                    type="text"
+                    value={newProduct.sku}
+                    onChange={(e) => setNewProduct({ ...newProduct, sku: e.target.value })}
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Brand</label>
+                  <input
+                    type="text"
+                    value={newProduct.brand}
+                    onChange={(e) => setNewProduct({ ...newProduct, brand: e.target.value })}
+                    className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  />
+                </div>
+              </div>
+
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -512,20 +719,22 @@ export function AdminProducts() {
                   Featured Product
                 </label>
               </div>
-            </div>
-            <div className="mt-6 flex justify-end space-x-3">
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-500"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleAddProduct}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Add Product
-              </button>
+
+              <div className="mt-6 flex justify-end space-x-3">
+                
+                <button
+                  onClick={() => setShowAddModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-500"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddProduct}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Add Product
+                </button>
+              </div>
             </div>
           </div>
         </div>

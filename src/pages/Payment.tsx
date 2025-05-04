@@ -122,7 +122,7 @@ export function Payment() {
         }
       };
 
-      await api.post('/orders', orderData);
+      const response = await api.post('/orders', orderData);
 
       if (location.state?.isBuyNow) {
         clearBuyNow();
@@ -132,9 +132,18 @@ export function Payment() {
 
       setShowSuccessPopup(true);
       
-      // Show success popup for 2 seconds then redirect
+      // Navigate to order success page with order details
       setTimeout(() => {
-        navigate('/orders');
+        navigate('/order-success', { 
+          state: { 
+            orderDetails: {
+              items: orderItems,
+              totalAmount: finalTotal,
+              orderId: response.data._id,
+              shippingAddress: orderData.shippingAddress
+            }
+          }
+        });
       }, 2000);
 
     } catch (error: any) {
