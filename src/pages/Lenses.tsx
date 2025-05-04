@@ -1,77 +1,105 @@
 import { useCart } from '../context/Cartcontext';
 import { useNavigate } from 'react-router-dom';
-import { Star, Shield, Truck, Clock, Aperture } from 'lucide-react';
+import { Star, Shield, Truck, Clock, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useCartStore } from '../store/cart';
+import { useState, useEffect } from 'react';
+import api from '../utils/api';
 
-const lenses = [
+// Static lenses data
+const staticLenses = [
   {
-    id: 5,
-    name: 'Canon RF 24-70mm f/2.8L',
-    price: 189990,
-    image: 'https://images.unsplash.com/photo-1502920917128-1aa500764cbd?auto=format&fit=crop&q=80',
+    _id: '5',
+    name: 'Canon RF 24-70mm f/2.8L IS USM',
+    price: 219990,
+    imageUrl: "src/public/images/canon.jpg",
     description: 'Professional Standard Zoom Lens',
-    specs: ['Constant f/2.8 Aperture', 'Nano USM AF System', 'Weather-Sealed Design', 'Control Ring'],
+    specs: [
+      'Constant f/2.8 Aperture',
+      'Image Stabilization',
+      'Nano USM AF System',
+      'Weather-Sealed Construction'
+    ],
     rating: 4.9,
     reviews: 156,
-    inStock: true,
+    stock: 8,
+    category: 'Lenses',
     features: [
-      'L-Series Professional Quality',
-      'Air Sphere Coating (ASC)',
       'Customizable Control Ring',
-      'Fluorine Coating'
+      'Dust and Water Resistant',
+      'Minimum Focus Distance: 0.21m',
+      'Advanced Optical Design'
     ]
   },
   {
-    id: 6,
-    name: 'Sony FE 70-200mm f/2.8 GM',
-    price: 209990,
-    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80',
+    _id: '6',
+    name: 'Sony FE 70-200mm f/2.8 GM II',
+    price: 259990,
+    imageUrl: "src/public/images/sony.jpg",
     description: 'Professional Telephoto Zoom Lens',
-    specs: ['XA Lens Elements', 'Nano AR Coating', 'Dual SSM AF System', 'Dust and Moisture Resistant'],
-    rating: 4.8,
-    reviews: 142,
-    inStock: true,
-    features: [
-      'Extreme Aspherical Elements',
-      'Focus Range Limiter',
+    specs: [
+      'Constant f/2.8 Aperture',
+      'Dual XD Linear Motors',
       'Optical SteadyShot',
       'Nano AR Coating II'
-    ]
-  },
-  {
-    id: 7,
-    name: 'Nikon Z 50mm f/1.8 S',
-    price: 47990,
-    image: 'https://images.unsplash.com/photo-1495512046360-dad6e8b83667?auto=format&fit=crop&q=80',
-    description: 'Standard Prime Lens',
-    specs: ['Multi-Focus System', 'Nano Crystal Coat', 'Customizable Control Ring', 'Weather-Sealed'],
-    rating: 4.7,
-    reviews: 98,
-    inStock: true,
-    features: [
-      'Stepping Motor AF System',
-      'Programmable Control Ring',
-      'Dust and Drip Resistant',
-      'ED Glass Elements'
-    ]
-  },
-  {
-    id: 8,
-    name: 'Sigma 85mm f/1.4 DG DN Art',
-    price: 94990,
-    image: 'https://images.unsplash.com/photo-1617575521317-d2974f3b56d2?auto=format&fit=crop&q=80',
-    description: 'Portrait Prime Lens',
-    specs: ['11 Rounded Aperture Blades', 'Hypersonic AF Motor', 'Dust & Splash Proof', 'Click/De-Click Aperture Ring'],
+    ],
     rating: 4.8,
-    reviews: 87,
-    inStock: true,
+    reviews: 92,
+    stock: 5,
+    category: 'Lenses',
     features: [
-      'Super Multi-Layer Coating',
-      'AFL Button',
-      'Manual Focus Lock',
-      'Brass Bayonet Mount'
+      'Advanced AF System',
+      'Improved Close-up Performance',
+      'Reduced Weight Design',
+      'Dust and Moisture Resistant'
     ]
   },
+  {
+    _id: '7',
+    name: 'Nikon Z 50mm f/1.2 S',
+    price: 199990,
+    imageUrl: "src/public/images/Nikon.jpg",
+    description: 'Professional Prime Lens',
+    specs: [
+      'Ultra-Fast f/1.2 Aperture',
+      'Multi-Focus System',
+      'ARNEO Coating',
+      'Customizable Control Ring'
+    ],
+    rating: 4.9,
+    reviews: 78,
+    stock: 6,
+    category: 'Lenses',
+    features: [
+      'Superior Edge-to-Edge Sharpness',
+      'Beautiful Bokeh Rendering',
+      'Weather-Sealed Design',
+      'Nano Crystal Coat'
+    ]
+  },
+  {
+    _id: '8',
+    name: 'Sigma 14-24mm f/2.8 DG DN Art',
+    price: 129990,
+    imageUrl: 'https://images.unsplash.com/photo-1617005082133-548c4dd27f35?auto=format&fit=crop&q=80',
+    description: 'Ultra-Wide Zoom Lens',
+    specs: [
+      'Constant f/2.8 Aperture',
+      'Mirrorless Design',
+      'Super Multi-Layer Coating',
+      'Brass Bayonet Mount'
+    ],
+    rating: 4.7,
+    reviews: 64,
+    stock: 10,
+    category: 'Lenses',
+    features: [
+      'Zero Distortion Design',
+      'Weather-Sealed Construction',
+      'Minimum Focus: 28cm',
+      'Advanced Optical Elements'
+    ]
+  }
 ];
 
 const formatPrice = (price: number) => {
@@ -84,10 +112,64 @@ const formatPrice = (price: number) => {
 
 const Lenses = () => {
   const { addToCart } = useCart();
+  const { addToBuyNow, buyNowItems, buyNowTotal } = useCartStore();
   const navigate = useNavigate();
+  const [allLenses, setAllLenses] = useState([...staticLenses]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAdminLenses = async () => {
+      try {
+        const response = await api.get('/products');
+        const adminLenses = response.data.filter((product: any) => 
+          product.category === 'Lenses' && 
+          !staticLenses.some(lens => lens._id === product._id)
+        );
+
+        // Add default specs and features for admin-added lenses if they don't exist
+        const formattedAdminLenses = adminLenses.map((lens: any) => ({
+          ...lens,
+          specs: lens.specs || [
+            'Professional Grade Optics',
+            'Multi-Coating Technology',
+            'Durable Construction',
+            'Precision Focus System'
+          ],
+          features: lens.features || [
+            'High-Quality Build',
+            'Weather Resistant',
+            'Smooth Operation',
+            'Premium Image Quality'
+          ],
+          rating: lens.rating || 4.5,
+          reviews: lens.reviews || 0,
+          stock: lens.stock || 0
+        }));
+
+        setAllLenses([...staticLenses, ...formattedAdminLenses]);
+      } catch (error) {
+        console.error('Error fetching lenses:', error);
+        toast.error('Failed to fetch additional lenses');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAdminLenses();
+  }, []);
 
   const handleAddToCart = (lens: any) => {
-    addToCart(lens);
+    const product = {
+      _id: lens._id,
+      name: lens.name,
+      price: lens.price,
+      description: lens.description,
+      imageUrl: lens.imageUrl,
+      category: 'Lenses',
+      stock: lens.stock
+    };
+    
+    addToCart(product);
     toast.success(`${lens.name} added to cart!`, {
       position: 'bottom-right',
       duration: 2000,
@@ -95,8 +177,40 @@ const Lenses = () => {
   };
 
   const handleBuyNow = (lens: any) => {
-    navigate('/payment', { state: { product: lens } });
+    const product = {
+      _id: lens._id,
+      name: lens.name,
+      price: lens.price,
+      description: lens.description,
+      imageUrl: lens.imageUrl,
+      category: 'Lenses',
+      stock: lens.stock
+    };
+
+    addToBuyNow(product);
+    
+    navigate('/payment', { 
+      state: { 
+        items: [...buyNowItems, {
+          _id: lens._id,
+          name: lens.name,
+          price: lens.price,
+          quantity: 1,
+          image: lens.imageUrl
+        }],
+        totalAmount: buyNowTotal + lens.price,
+        isBuyNow: true
+      } 
+    });
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -113,32 +227,26 @@ const Lenses = () => {
             </div>
             <div className="flex items-center text-purple-600">
               <Shield className="h-5 w-5 mr-2" />
-              <span>5-Year Warranty</span>
+              <span>Warranty Included</span>
             </div>
           </div>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {lenses.map((lens) => (
-            <div key={lens.id} className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
+          {allLenses.map((lens) => (
+            <div key={lens._id} className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
               <div className="relative">
                 <img
-                  src={lens.image}
+                  src={lens.imageUrl}
                   alt={lens.name}
                   className="w-full h-[400px] object-cover"
                 />
                 <div className="absolute top-4 right-4 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                  Pro Choice
+                  Professional Grade
                 </div>
-                {lens.inStock ? (
-                  <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    In Stock
-                  </div>
-                ) : (
-                  <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    Out of Stock
-                  </div>
-                )}
+                <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  {lens.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                </div>
               </div>
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
@@ -167,9 +275,9 @@ const Lenses = () => {
                 <div className="mb-6">
                   <h4 className="text-lg font-semibold mb-2">Key Features</h4>
                   <ul className="grid grid-cols-2 gap-2">
-                    {lens.features.map((feature, index) => (
+                    {lens.features.map((feature: string, index: number) => (
                       <li key={index} className="flex items-center text-gray-600">
-                        <Aperture className="h-4 w-4 text-purple-500 mr-2" />
+                        <Camera className="h-4 w-4 text-purple-500 mr-2" />
                         {feature}
                       </li>
                     ))}
@@ -179,7 +287,7 @@ const Lenses = () => {
                 <div className="mb-6">
                   <h4 className="text-lg font-semibold mb-2">Specifications</h4>
                   <ul className="grid grid-cols-2 gap-2">
-                    {lens.specs.map((spec, index) => (
+                    {lens.specs.map((spec: string, index: number) => (
                       <li key={index} className="flex items-center text-gray-600">
                         <span className="mr-2">•</span>
                         {spec}
@@ -200,12 +308,14 @@ const Lenses = () => {
                     <button 
                       onClick={() => handleAddToCart(lens)}
                       className="bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      disabled={lens.stock === 0}
                     >
                       Add to Cart
                     </button>
                     <button 
                       onClick={() => handleBuyNow(lens)}
                       className="bg-gradient-to-r from-green-600 to-green-500 text-white px-6 py-3 rounded-lg hover:from-green-700 hover:to-green-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      disabled={lens.stock === 0}
                     >
                       Buy Now
                     </button>

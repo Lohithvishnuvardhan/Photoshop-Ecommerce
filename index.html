@@ -5,7 +5,18 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Photo Pixel - Professional Photography Equipment</title>
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://rsms.me/inter/inter.css" as="style">
+    <link rel="preload" href="/logo2.png" as="image">
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://rsms.me">
+    
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    
+    <!-- Add modulepreload for critical JS -->
+    <link rel="modulepreload" href="/src/main.tsx">
   </head>
   <body>
     <div id="root"></div>

@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .animate-fade-in {
+    animation: fade-in 1s ease-out;
+  }
+
+  .animate-rotate-camera {
+    animation: rotate-camera 20s infinite ease-in-out;
+    transform-style: preserve-3d;
+  }
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
@@ -13,8 +24,16 @@
   }
 }
 
-.animate-fade-in {
-  animation: fade-in 1s ease-out;
+@keyframes rotate-camera {
+  0% {
+    transform: perspective(1000px) rotateY(0deg) scale(1.1);
+  }
+  50% {
+    transform: perspective(1000px) rotateY(180deg) scale(1.2);
+  }
+  100% {
+    transform: perspective(1000px) rotateY(360deg) scale(1.1);
+  }
 }
 
 /* Custom Scrollbar */
@@ -45,6 +64,13 @@ body {
   font-family: 'Inter var', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
 }
 
 /* Loading Animation */

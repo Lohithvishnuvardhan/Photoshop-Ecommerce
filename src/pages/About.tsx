@@ -7,7 +7,7 @@ const About = () => {
           
           <div className="prose lg:prose-xl">
             <p className="text-lg mb-6">
-              Welcome to PhotoPro, your premier destination for professional photography equipment. Since 2010, we've been serving photographers of all levels with the highest quality cameras, lenses, and accessories.
+              Welcome to PhotoPixel, your premier destination for professional photography equipment. Since 2010, we've been serving photographers of all levels with the highest quality cameras, lenses, and accessories.
             </p>
             
             <div className="my-8">

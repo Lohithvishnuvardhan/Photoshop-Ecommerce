@@ -6,27 +6,23 @@ interface LoginResponse {
   _id: string;
   name: string;
   email: string;
+  isAdmin: boolean;
   token: string;
 }
 
-interface HealthCheckResponse {
-  status: string;
-  mongodb: 'connected' | 'disconnected';
+interface OrderItem {
+  name: string;
+  quantity: number;
+  image: string;
+  price: number;
 }
 
-interface CartResponse {
-  products: Array<{
-    productId: {
-      _id: string;
-      name: string;
-      price: number;
-      description: string;
-      imageUrl: string;
-      stock: number;
-      category: string;
-    };
-    quantity: number;
-  }>;
+interface Order {
+  _id: string;
+  orderItems: OrderItem[];
+  totalPrice: number;
+  status: string;
+  createdAt: string;
 }
 
 const api: AxiosInstance = axios.create({
@@ -55,9 +51,14 @@ api.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      localStorage.removeItem('userId');
+      localStorage.removeItem('isAdmin');
+      
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
     }
-    return Promise.reject(error.response?.data || error);
+    return Promise.reject(error);
   }
 );
 
@@ -65,96 +66,66 @@ export const authAPI = {
   login: async (email: string, password: string): Promise<LoginResponse> => {
     try {
       const response = await api.post<LoginResponse>('/auth/login', { email, password });
-      localStorage.setItem('token', response.data.token);
+      const { token, isAdmin, _id } = response.data;
+      
+      localStorage.setItem('token', token);
+      localStorage.setItem('userId', _id);
+      localStorage.setItem('isAdmin', isAdmin.toString());
+      
       return response.data;
     } catch (error: any) {
-      throw new Error(error.message || 'Login failed');
+      throw new Error(error.response?.data?.message || 'Login failed');
     }
   },
 
   register: async (name: string, email: string, password: string): Promise<LoginResponse> => {
     try {
       const response = await api.post<LoginResponse>('/auth/register', { name, email, password });
-      localStorage.setItem('token', response.data.token);
+      const { token, isAdmin, _id } = response.data;
+      
+      localStorage.setItem('token', token);
+      localStorage.setItem('userId', _id);
+      localStorage.setItem('isAdmin', isAdmin.toString());
+      
       return response.data;
     } catch (error: any) {
-      throw new Error(error.message || 'Registration failed');
+      throw new Error(error.response?.data?.message || 'Registration failed');
     }
   },
 
   logout: () => {
     localStorage.removeItem('token');
-  }
-};
-
-export const cartAPI = {
-  getCart: async () => {
-    const response = await api.get<CartResponse>('/cart');
-    return response.data.products.map(item => ({
-      product: item.productId,
-      quantity: item.quantity
-    }));
+    localStorage.removeItem('userId');
+    localStorage.removeItem('isAdmin');
   },
 
-  addToCart: async (productId: string, quantity: number) => {
-    const response = await api.post<CartResponse>('/cart/add', { productId, quantity });
-    return {
-      products: response.data.products.map(item => ({
-        product: item.productId,
-        quantity: item.quantity
-      }))
-    };
-  },
-
-  updateQuantity: async (productId: string, quantity: number) => {
-    const response = await api.put<CartResponse>(`/cart/${productId}`, { quantity });
-    return {
-      products: response.data.products.map(item => ({
-        product: item.productId,
-        quantity: item.quantity
-      }))
-    };
-  },
-
-  removeFromCart: async (productId: string) => {
-    const response = await api.delete<CartResponse>(`/cart/${productId}`);
-    return {
-      products: response.data.products.map(item => ({
-        product: item.productId,
-        quantity: item.quantity
-      }))
-    };
-  }
-};
-
-export const productsAPI = {
-  getAll: async () => {
-    const response = await api.get('/products');
-    return response.data;
-  },
-
-  getById: async (id: string) => {
-    const response = await api.get(`/products/${id}`);
-    return response.data;
+  resetPassword: async (token: string, newPassword: string): Promise<void> => {
+    try {
+      await api.post(`/auth/reset-password/${token}`, { newPassword });
+    } catch (error: any) {
+      throw error;
+    }
   }
 };
 
 export const orderAPI = {
   createOrder: async (orderData: any) => {
-    const response = await api.post('/orders', orderData);
-    return response.data;
+    try {
+      const response = await api.post('/orders', orderData);
+      return response.data;
+    } catch (error: any) {
+      console.error('Create order error:', error.response || error);
+      throw new Error(error.response?.data?.message || 'Failed to create order');
+    }
   },
 
-  getOrders: async () => {
-    const response = await api.get('/orders');
-    return response.data;
-  }
-};
-
-export const healthAPI = {
-  check: async (): Promise<HealthCheckResponse> => {
-    const response = await api.get<HealthCheckResponse>('/health');
-    return response.data;
+  getOrders: async (): Promise<Order[]> => {
+    try {
+      const response = await api.get<Order[]>('/orders/myorders');
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch orders');
+    }
   }
 };
 

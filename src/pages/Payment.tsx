@@ -1,137 +1,212 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CreditCard, User, MapPin, Plus, Minus } from 'lucide-react';
+import { CreditCard, User, MapPin, Truck, Shield, CheckCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { CartItem } from '../types';
-
-interface LocationState {
-  items?: CartItem[];
-  product?: {
-    _id: string;
-    name: string;
-    price: number;
-    imageUrl: string;
-    description: string;
-    stock: number;
-  };
-}
+import { useCart } from '../context/Cartcontext';
+import { useCartStore } from '../store/cart';
+import api from '../utils/api';
 
 export function Payment() {
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as LocationState;
-  
-  const [quantities, setQuantities] = useState<Record<string, number>>(() => {
-    if (state?.items) {
-      return state.items.reduce((acc, item) => ({
-        ...acc,
-        [item.product._id]: item.quantity
-      }), {});
-    }
-    if (state?.product) {
-      return { [state.product._id]: 1 };
-    }
-    return {};
-  });
-
+  const { clearCart } = useCart();
+  const { clearBuyNow } = useCartStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const [orderItems] = useState(location.state?.items || []);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [formData, setFormData] = useState({
     cardNumber: '',
     cardName: '',
-    expiry: '',
+    expiryDate: '',
     cvv: '',
     address: '',
     city: '',
-    postalCode: '',
+    state: '',
+    pincode: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.success('Payment processed successfully!');
-    setTimeout(() => {
-      navigate('/');
-    }, 2000);
+  useEffect(() => {
+    if (!location.state?.items?.length) {
+      navigate('/cart');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login', { 
+        state: { 
+          from: location.pathname,
+          paymentData: {
+            items: orderItems,
+            isBuyNow: location.state?.isBuyNow
+          }
+        }
+      });
+    }
+  }, [navigate, location, orderItems]);
+
+  const calculateTotal = () => {
+    const subtotal = orderItems.reduce((sum: number, item: { price: number; quantity: number; }) => 
+      sum + (item.price * item.quantity), 0);
+    const shipping = subtotal > 50000 ? 0 : 999;
+    return { subtotal, shipping, final: subtotal + shipping };
   };
+
+  const { subtotal, shipping, final: finalTotal } = calculateTotal();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    let formattedValue = value;
+
+    if (name === 'cardNumber') {
+      formattedValue = value
+        .replace(/\s/g, '')
+        .replace(/(\d{4})/g, '$1 ')
+        .trim()
+        .slice(0, 19);
+    }
+
+    if (name === 'expiryDate') {
+      formattedValue = value
+        .replace(/\D/g, '')
+        .replace(/(\d{2})(\d)/, '$1/$2')
+        .slice(0, 5);
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      [name]: formattedValue
+    }));
   };
 
-  const handleQuantityChange = (itemId: string, change: number) => {
-    setQuantities(prev => {
-      const newQuantity = (prev[itemId] || 1) + change;
-      if (newQuantity >= 1) {
-        return { ...prev, [itemId]: newQuantity };
+  const validateForm = () => {
+    if (formData.cardNumber.replace(/\s/g, '').length !== 16) {
+      toast.error('Please enter a valid card number');
+      return false;
+    }
+    if (formData.cvv.length !== 3) {
+      toast.error('Please enter a valid CVV');
+      return false;
+    }
+    if (!formData.address || !formData.city || !formData.state || !formData.pincode) {
+      toast.error('Please fill in all address fields');
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      if (!validateForm()) {
+        setIsLoading(false);
+        return;
       }
-      return prev;
-    });
+
+      // Create the order
+      const orderData = {
+        orderItems: orderItems.map((item: any) => ({
+          name: item.name,
+          quantity: item.quantity,
+          image: item.image || item.imageUrl,
+          price: item.price
+        })),
+        totalPrice: finalTotal,
+        shippingAddress: {
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode
+        }
+      };
+
+      const response = await api.post('/orders', orderData);
+
+      if (location.state?.isBuyNow) {
+        clearBuyNow();
+      } else {
+        clearCart();
+      }
+
+      setShowSuccessPopup(true);
+      
+      // Navigate to order success page with order details
+      setTimeout(() => {
+        navigate('/order-success', { 
+          state: { 
+            orderDetails: {
+              items: orderItems,
+              totalAmount: finalTotal,
+              orderId: response.data._id,
+              shippingAddress: orderData.shippingAddress
+            }
+          }
+        });
+      }, 2000);
+
+    } catch (error: any) {
+      console.error('Order creation error:', error);
+      toast.error(error.response?.data?.message || 'Failed to create order');
+      setIsLoading(false);
+    }
   };
-
-  if (!state?.items && !state?.product) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900">No items selected</h2>
-          <button
-            onClick={() => navigate('/')}
-            className="mt-4 bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700"
-          >
-            Return to Home
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  const displayItems = state.items ?? (state.product ? [{ product: state.product, quantity: 1 }] : []);
-  const total = displayItems.reduce((sum, item) => 
-    sum + item.product.price * (quantities[item.product._id] || 1), 
-    0
-  );
 
   return (
     <div className="min-h-screen bg-gray-100 py-12">
+      {showSuccessPopup && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 text-center max-w-md mx-4">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-10 h-10 text-green-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h2>
+            <p className="text-gray-600 mb-4">Thank you for your purchase. Your order has been confirmed.</p>
+            <div className="animate-pulse text-sm text-gray-500">Redirecting to orders page...</div>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Order Summary */}
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-2xl font-bold mb-4">Order Summary</h2>
             <div className="space-y-4">
-              {displayItems.map((item) => (
-                <div key={item.product._id} className="flex items-center space-x-4 pb-4 border-b border-gray-200">
+              {orderItems.map((item: any) => (
+                <div key={item._id} className="flex items-center space-x-4 pb-4 border-b border-gray-200">
                   <img
-                    src={item.product.imageUrl}
-                    alt={item.product.name}
+                    src={item.image || item.imageUrl}
+                    alt={item.name}
                     className="w-24 h-24 object-cover rounded-md"
                   />
                   <div className="flex-1">
-                    <h3 className="font-semibold">{item.product.name}</h3>
-                    <p className="text-gray-600">Price: ₹{item.product.price.toLocaleString()}</p>
-                    <div className="flex items-center mt-4 space-x-4">
-                      <button
-                        onClick={() => handleQuantityChange(item.product._id, -1)}
-                        className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
-                      >
-                        <Minus className="h-4 w-4" />
-                      </button>
-                      <span className="text-lg font-semibold">{quantities[item.product._id] || 1}</span>
-                      <button
-                        onClick={() => handleQuantityChange(item.product._id, 1)}
-                        className="p-2 rounded-full bg-gray-100 hover:bg-gray-200"
-                      >
-                        <Plus className="h-4 w-4" />
-                      </button>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold">{item.name}</h3>
+                        <p className="text-gray-600">Price: ₹{item.price.toLocaleString()}</p>
+                        <p className="text-gray-600">Quantity: {item.quantity}</p>
+                        <p className="mt-2 text-purple-600 font-semibold">
+                          Subtotal: ₹{(item.price * item.quantity).toLocaleString()}
+                        </p>
+                      </div>
                     </div>
-                    <p className="mt-2 text-purple-600 font-semibold">
-                      Subtotal: ₹{((quantities[item.product._id] || 1) * item.product.price).toLocaleString()}
-                    </p>
                   </div>
                 </div>
               ))}
-              <div className="pt-4 border-t border-gray-200">
+              <div className="pt-4 space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-xl font-bold">Total:</span>
-                  <span className="text-2xl font-bold text-purple-600">₹{total.toLocaleString()}</span>
+                  <span>Subtotal</span>
+                  <span>₹{subtotal.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Shipping</span>
+                  <span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span>
+                </div>
+                <div className="flex justify-between items-center text-lg font-bold pt-2 border-t">
+                  <span>Total</span>
+                  <span>₹{finalTotal.toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -184,8 +259,8 @@ export function Payment() {
                   </label>
                   <input
                     type="text"
-                    name="expiry"
-                    value={formData.expiry}
+                    name="expiryDate"
+                    value={formData.expiryDate}
                     onChange={handleInputChange}
                     placeholder="MM/YY"
                     className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
@@ -202,6 +277,7 @@ export function Payment() {
                     value={formData.cvv}
                     onChange={handleInputChange}
                     placeholder="123"
+                    maxLength={3}
                     className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
                     required
                   />
@@ -243,26 +319,66 @@ export function Payment() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Postal Code
+                    State
                   </label>
                   <input
                     type="text"
-                    name="postalCode"
-                    value={formData.postalCode}
+                    name="state"
+                    value={formData.state}
                     onChange={handleInputChange}
-                    placeholder="123456"
+                    placeholder="State"
                     className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
                     required
                   />
                 </div>
               </div>
 
-              <button
-                type="submit"
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-500 text-white py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                Pay ₹{total.toLocaleString()}
-              </button>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  PIN Code
+                </label>
+                <input
+                  type="text"
+                  name="pincode"
+                  value={formData.pincode}
+                  onChange={handleInputChange}
+                  placeholder="123456"
+                  className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-purple-500"
+                  required
+                />
+              </div>
+
+              <div className="flex justify-between items-center mt-6">
+                <div className="flex space-x-4 text-sm text-gray-600">
+                  <div className="flex items-center">
+                    <Shield className="w-4 h-4 mr-1" />
+                    Secure Payment
+                  </div>
+                  <div className="flex items-center">
+                    <Truck className="w-4 h-4 mr-1" />
+                    Free Shipping
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  disabled={isLoading || orderItems.length === 0}
+                  className={`flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    (isLoading || orderItems.length === 0) ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
+                >
+                  {isLoading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="w-5 h-5 mr-2" />
+                      Pay ₹{finalTotal.toLocaleString()}
+                    </>
+                  )}
+                </button>
+              </div>
             </form>
           </div>
         </div>

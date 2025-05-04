@@ -68,39 +68,43 @@ export function Home() {
 
   return (
     <div className="bg-gray-900">
-      {/* Hero Section with Video Background */}
-      <div className="relative h-[80vh] overflow-hidden">
-        <video
-          autoPlay
-          loop
-          muted
-          className="absolute w-full h-full object-cover"
-          poster="https://images.unsplash.com/photo-1452780212940-6f5c0d14d848"
-        >
-          <source src="https://player.vimeo.com/external/373839467.sd.mp4?s=30d44b3a1c0df4c84551c9ff2876c8b0c72d8701&profile_id=164&oauth2_token_id=57447761" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-black bg-opacity-60">
-          <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col justify-center">
-            <h1 className="text-6xl font-bold text-white mb-6 animate-fade-in">
-              Capture Life's <span className="text-purple-500">Perfect</span> Moments
-            </h1>
-            <p className="text-xl text-gray-200 mb-8 max-w-2xl">
-              Professional photography equipment for every level of expertise. From beginners to pros, find your perfect gear.
-            </p>
-            <div className="flex gap-4">
-              <button
-                onClick={handleShopNow}
-                className="inline-flex items-center bg-gradient-to-r from-purple-600 to-blue-500 text-white px-8 py-3 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-              >
-                Shop Now
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </button>
-              <Link
-                to="/about"
-                className="inline-flex items-center bg-white bg-opacity-20 text-white px-8 py-3 rounded-lg hover:bg-opacity-30 transition-all duration-300"
-              >
-                Learn More
-              </Link>
+      {/* Hero Section with Video */}
+      <div className="relative h-[60vh] overflow-hidden">
+        <div className="absolute inset-0">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute w-full h-full object-cover"
+          >
+            <source src="/cam.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-transparent">
+          <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
+            <div className="max-w-xl">
+              <h1 className="text-5xl font-bold text-white mb-4 animate-fade-in">
+                <span className="italic">Turn Pixels into Profit.</span>
+              </h1>
+              <p className="text-lg text-gray-200 mb-6">
+                Professional photography equipment for every level of expertise. From beginners to pros, find your perfect gear.
+              </p>
+              <div className="flex gap-4">
+                <button
+                  onClick={handleShopNow}
+                  className="inline-flex items-center bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-2 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                >
+                  Shop Now
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </button>
+                <Link
+                  to="/about"
+                  className="inline-flex items-center bg-white bg-opacity-20 text-white px-6 py-2 rounded-lg hover:bg-opacity-30 transition-all duration-300"
+                >
+                  Learn More
+                </Link>
+              </div>
             </div>
           </div>
         </div>

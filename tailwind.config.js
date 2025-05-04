@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  content: [
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}', // ✅ includes all your React components and pages
+  ],
   theme: {
     extend: {
       colors: {
@@ -41,27 +44,27 @@ export default {
         'fade-in': {
           '0%': {
             opacity: '0',
-            transform: 'translateY(20px)'
+            transform: 'translateY(20px)',
           },
           '100%': {
             opacity: '1',
-            transform: 'translateY(0)'
-          }
-        }
+            transform: 'translateY(0)',
+          },
+        },
       },
-      typography: {
+      typography: (theme) => ({
         DEFAULT: {
           css: {
-            color: '#9ca3af',
+            color: theme('colors.gray.400'),
             a: {
-              color: '#a855f7',
+              color: theme('colors.purple.500'),
               '&:hover': {
-                color: '#9333ea',
+                color: theme('colors.purple.600'),
               },
             },
           },
         },
-      },
+      }),
     },
   },
   plugins: [

@@ -1,19 +1,23 @@
+import { useState, useEffect } from 'react';
 import { useCart } from '../context/Cartcontext';
 import { useNavigate } from 'react-router-dom';
 import { Star, Shield, Truck, Clock, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useCartStore } from '../store/cart';
+import api from '../utils/api';
 
-const cameras = [
+const defaultCameras = [
   {
-    id: 1,
+    _id: '1',
     name: 'Canon EOS R5',
     price: 324900,
-    image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80',
     description: '45MP Full-Frame Mirrorless Camera',
     specs: ['45MP Full-Frame CMOS Sensor', '8K RAW Video Recording', 'Dual Card Slots', 'In-Body Image Stabilization'],
     rating: 4.9,
     reviews: 128,
-    inStock: true,
+    stock: 10,
+    category: 'Cameras',
     features: [
       'Advanced Dual Pixel CMOS AF II',
       'Up to 20fps Electronic Shutter',
@@ -22,15 +26,16 @@ const cameras = [
     ]
   },
   {
-    id: 2,
+    _id: '2',
     name: 'Sony A7 IV',
     price: 209990,
-    image: 'https://images.unsplash.com/photo-1621520291095-aa6c7137f048?auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1621520291095-aa6c7137f048?auto=format&fit=crop&q=80',
     description: '33MP Full-Frame Mirrorless Camera',
     specs: ['33MP Full-Frame Sensor', '4K 60p Video', '10fps Continuous Shooting', 'Advanced AF System'],
     rating: 4.8,
     reviews: 95,
-    inStock: true,
+    stock: 15,
+    category: 'Cameras',
     features: [
       'Real-time Eye AF',
       'Creative Look Presets',
@@ -39,15 +44,16 @@ const cameras = [
     ]
   },
   {
-    id: 3,
+    _id: '3',
     name: 'Nikon Z6 II',
     price: 164990,
-    image: 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1616423640778-28d1b53229bd?auto=format&fit=crop&q=80',
     description: '24.5MP Full-Frame Mirrorless Camera',
     specs: ['24.5MP BSI Sensor', 'Dual EXPEED 6 Processors', '14fps Continuous Shooting', 'Dual Memory Card Slots'],
     rating: 4.7,
     reviews: 82,
-    inStock: true,
+    stock: 12,
+    category: 'Cameras',
     features: [
       '273-Point AF System',
       'ProRes RAW Output',
@@ -56,46 +62,157 @@ const cameras = [
     ]
   },
   {
-    id: 4,
+    _id: '4',
     name: 'Fujifilm X-T4',
     price: 149990,
-    image: 'https://images.unsplash.com/photo-1581591524425-c7e0978865fc?auto=format&fit=crop&q=80',
+    imageUrl: 'https://images.unsplash.com/photo-1581591524425-c7e0978865fc?auto=format&fit=crop&q=80',
     description: '26.1MP APS-C Mirrorless Camera',
     specs: ['26.1MP X-Trans Sensor', '6.5-Stop IBIS', '4K/60p Video', '15fps Mechanical Shutter'],
     rating: 4.8,
     reviews: 76,
-    inStock: true,
+    stock: 8,
+    category: 'Cameras',
     features: [
       'Film Simulation Modes',
       'Vari-angle LCD Screen',
       'Enhanced Battery Life',
       'Dual UHS-II Card Slots'
     ]
-  },
+  }
 ];
 
-const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 0
-  }).format(price);
-};
+interface Camera {
+  _id: string;
+  name: string;
+  price: number;
+  imageUrl: string;
+  description: string;
+  category: string;
+  stock: number;
+  specs?: string[];
+  rating?: number;
+  reviews?: number;
+  features?: string[];
+}
 
 const Cameras = () => {
+  const [cameras, setCameras] = useState<Camera[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { addToCart } = useCart();
+  const { addToBuyNow, buyNowItems, buyNowTotal } = useCartStore();
   const navigate = useNavigate();
 
-  const handleAddToCart = (camera: any) => {
-    addToCart(camera);
+  useEffect(() => {
+    fetchCameras();
+  }, []);
+
+  const fetchCameras = async () => {
+    try {
+      const response = await api.get('/products');
+      // Filter only camera products from API
+      const cameraProducts = response.data.filter((product: Camera) => 
+        product.category.toLowerCase() === 'cameras'
+      );
+      
+      // Add default values for specs, features, rating, and reviews if not present
+      const processedCameras = cameraProducts.map((camera: Camera) => ({
+        ...camera,
+        specs: camera.specs || [
+          'Full-Frame CMOS Sensor',
+          'Advanced AF System',
+          'Dual Card Slots',
+          'Weather-Sealed Construction'
+        ],
+        features: camera.features || [
+          'Advanced Autofocus',
+          'High-Speed Shooting',
+          'Professional Build Quality',
+          'Enhanced Stabilization'
+        ],
+        rating: camera.rating || 4.8,
+        reviews: camera.reviews || 50
+      }));
+
+      // Combine default cameras with fetched cameras
+      // Filter out any default cameras that have the same ID as fetched cameras
+      const combinedCameras = [
+        ...defaultCameras.filter(defaultCam => 
+          !processedCameras.some((fetchedCam: { _id: string; }) => fetchedCam._id === defaultCam._id)
+        ),
+        ...processedCameras
+      ];
+
+      setCameras(combinedCameras);
+    } catch (error) {
+      console.error('Error fetching cameras:', error);
+      toast.error('Failed to load cameras');
+      // If API fails, fall back to default cameras
+      setCameras(defaultCameras);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAddToCart = (camera: Camera) => {
+    const product = {
+      _id: camera._id,
+      name: camera.name,
+      price: camera.price,
+      description: camera.description,
+      imageUrl: camera.imageUrl,
+      category: 'Cameras',
+      stock: camera.stock
+    };
+    
+    addToCart(product);
     toast.success(`${camera.name} added to cart!`, {
       position: 'bottom-right',
       duration: 2000,
     });
   };
 
-  const handleBuyNow = (camera: any) => {
-    navigate('/payment', { state: { product: camera } });
+  const handleBuyNow = (camera: Camera) => {
+    const product = {
+      _id: camera._id,
+      name: camera.name,
+      price: camera.price,
+      description: camera.description,
+      imageUrl: camera.imageUrl,
+      category: 'Cameras',
+      stock: camera.stock
+    };
+
+    addToBuyNow(product);
+    
+    navigate('/payment', { 
+      state: { 
+        items: [...buyNowItems, {
+          _id: camera._id,
+          name: camera.name,
+          price: camera.price,
+          quantity: 1,
+          image: camera.imageUrl
+        }],
+        totalAmount: buyNowTotal + camera.price,
+        isBuyNow: true
+      } 
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      </div>
+    );
+  }
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 0
+    }).format(price);
   };
 
   return (
@@ -120,25 +237,19 @@ const Cameras = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {cameras.map((camera) => (
-            <div key={camera.id} className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
+            <div key={camera._id} className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
               <div className="relative">
                 <img
-                  src={camera.image}
+                  src={camera.imageUrl}
                   alt={camera.name}
                   className="w-full h-[400px] object-cover"
                 />
                 <div className="absolute top-4 right-4 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
                   Best Seller
                 </div>
-                {camera.inStock ? (
-                  <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    In Stock
-                  </div>
-                ) : (
-                  <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    Out of Stock
-                  </div>
-                )}
+                <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  In Stock
+                </div>
               </div>
               <div className="p-6">
                 <div className="flex justify-between items-start mb-4">
@@ -152,11 +263,11 @@ const Cameras = () => {
                         <Star
                           key={i}
                           className={`h-5 w-5 ${
-                            i < Math.floor(camera.rating)
+                            i < Math.floor(camera.rating || 0)
                               ? 'text-yellow-400'
                               : 'text-gray-300'
                           }`}
-                          fill={i < Math.floor(camera.rating) ? 'currentColor' : 'none'}
+                          fill={i < Math.floor(camera.rating || 0) ? 'currentColor' : 'none'}
                         />
                       ))}
                     </div>
@@ -167,7 +278,7 @@ const Cameras = () => {
                 <div className="mb-6">
                   <h4 className="text-lg font-semibold mb-2">Key Features</h4>
                   <ul className="grid grid-cols-2 gap-2">
-                    {camera.features.map((feature, index) => (
+                    {camera.features?.map((feature, index) => (
                       <li key={index} className="flex items-center text-gray-600">
                         <Camera className="h-4 w-4 text-purple-500 mr-2" />
                         {feature}
@@ -179,7 +290,7 @@ const Cameras = () => {
                 <div className="mb-6">
                   <h4 className="text-lg font-semibold mb-2">Specifications</h4>
                   <ul className="grid grid-cols-2 gap-2">
-                    {camera.specs.map((spec, index) => (
+                    {camera.specs?.map((spec, index) => (
                       <li key={index} className="flex items-center text-gray-600">
                         <span className="mr-2">•</span>
                         {spec}
