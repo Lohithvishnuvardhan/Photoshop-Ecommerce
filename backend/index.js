@@ -15,7 +15,7 @@ const app = express();
 const corsOptions = {
   origin: [
     process.env.FRONTEND_URL,
-    'https://photopixelfrontend-c5tch58fs-lohiths-projects-9997415a.vercel.app'
+    'https://photopixelfrontend-2rnynmoug-lohiths-projects-9997415a.vercel.app'
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
