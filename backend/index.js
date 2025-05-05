@@ -18,17 +18,24 @@ connectDB();
 const app = express();
 
 // CORS configuration
-app.use(cors({
+const corsOptions = {
   origin: [
     process.env.FRONTEND_URL,
     'https://photopixel-frontend.onrender.com'
   ],
-  credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
 
+app.use(cors(corsOptions));
 app.use(express.json());
+
+// Basic route for testing
+app.get('/', (req, res) => {
+  res.json({ message: 'PhotoPixel API is running!' });
+});
 
 // Route middlewares
 app.use('/api/auth', authRoutes);

@@ -4,8 +4,8 @@ services:
     env: node
     region: singapore
     plan: free
-    buildCommand: cd backend && npm install
-    startCommand: cd backend && npm start
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: MONGO_URI
         sync: false
@@ -19,6 +19,10 @@ services:
         value: https://photopixel-frontend.onrender.com
       - key: PORT
         value: 10000
+      - key: NODE_ENV
+        value: production
+      - key: CORS_ORIGIN
+        value: https://photopixel-frontend.onrender.com
 
   - type: web
     name: photopixel-frontend
