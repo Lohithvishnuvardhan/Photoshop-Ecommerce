@@ -19,7 +19,10 @@ const app = express();
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'https://photopixel.onrender.com',
+  origin: [
+    process.env.FRONTEND_URL,
+    'https://photopixel-frontend.onrender.com'
+  ],
   credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

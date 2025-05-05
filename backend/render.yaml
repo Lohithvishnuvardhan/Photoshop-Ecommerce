@@ -2,8 +2,10 @@ services:
   - type: web
     name: photopixel-backend
     env: node
-    buildCommand: npm install
-    startCommand: npm start
+    region: singapore
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
     envVars:
       - key: MONGO_URI
         sync: false
@@ -14,13 +16,17 @@ services:
       - key: EMAIL_PASSWORD
         sync: false
       - key: FRONTEND_URL
-        sync: false
+        value: https://photopixel-frontend.onrender.com
+      - key: PORT
+        value: 10000
 
   - type: web
     name: photopixel-frontend
     env: static
+    region: singapore
+    plan: free
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL
-        value: https://photopixel-backend.onrender.com
+        value: https://photopixel-backend.onrender.com/api
