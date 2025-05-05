@@ -60,7 +60,7 @@ app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-const PORT = process.env.PORT || 5001; // Changed default port to 5001
+const PORT = process.env.PORT || 5001;
 
 const startServer = async () => {
   try {
@@ -72,11 +72,11 @@ const startServer = async () => {
     // Handle server errors
     server.on('error', (error) => {
       if (error.code === 'EADDRINUSE') {
-        console.error(`Port ${PORT} is already in use. Trying port ${PORT + 1}`);
-        server.close();
-        startServer(PORT + 1);
+        console.error(`Port ${PORT} is already in use`);
+        process.exit(1); // Exit the process instead of trying multiple ports
       } else {
         console.error('Server error:', error);
+        process.exit(1);
       }
     });
   } catch (error) {

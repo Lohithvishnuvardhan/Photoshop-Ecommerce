@@ -6,7 +6,10 @@ const authenticateToken = (req, res, next) => {
     const token = authHeader && authHeader.split(" ")[1];
 
     if (!token) {
-      return res.status(401).json({ message: "No authentication token provided" });
+      return res.status(401).json({ 
+        success: false,
+        message: "No authentication token provided" 
+      });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -20,7 +23,10 @@ const authenticateToken = (req, res, next) => {
     next();
   } catch (err) {
     console.error('Auth error:', err);
-    return res.status(401).json({ message: "Invalid or expired token" });
+    return res.status(401).json({ 
+      success: false,
+      message: err.message || "Invalid or expired token" 
+    });
   }
 };
 

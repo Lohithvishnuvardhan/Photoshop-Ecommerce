@@ -12,20 +12,21 @@ const addressSchema = new mongoose.Schema({
 const userSchema = new mongoose.Schema({
   name: { 
     type: String, 
-    required: true 
+    required: [true, 'Name is required'] 
   },
   email: { 
     type: String, 
-    required: true, 
+    required: [true, 'Email is required'], 
     unique: true,
     trim: true,
-    lowercase: true
+    lowercase: true,
+    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
   },
   password: { 
     type: String, 
-    required: true,
+    required: [true, 'Password is required'],
     select: false,
-    minlength: 8
+    minlength: [8, 'Password must be at least 8 characters']
   },
   phoneNumber: { 
     type: String 

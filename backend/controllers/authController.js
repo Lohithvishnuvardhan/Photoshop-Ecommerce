@@ -22,12 +22,18 @@ exports.registerUser = async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      return res.status(400).json({ message: 'Please provide all required fields' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'Please provide all required fields' 
+      });
     }
 
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ message: 'User already exists with this email' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'User already exists with this email' 
+      });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -41,6 +47,7 @@ exports.registerUser = async (req, res) => {
     const token = generateToken(user);
 
     res.status(201).json({
+      success: true,
       _id: user._id,
       name: user.name,
       email: user.email,
@@ -49,7 +56,10 @@ exports.registerUser = async (req, res) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error during registration' });
+    res.status(500).json({ 
+      success: false,
+      message: error.message || 'Server error during registration' 
+    });
   }
 };
 
@@ -58,22 +68,32 @@ exports.loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ message: 'Please provide email and password' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'Please provide email and password' 
+      });
     }
 
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ 
+        success: false,
+        message: 'Invalid email or password' 
+      });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ 
+        success: false,
+        message: 'Invalid email or password' 
+      });
     }
 
     const token = generateToken(user);
 
     res.json({
+      success: true,
       _id: user._id,
       name: user.name,
       email: user.email,
@@ -82,7 +102,10 @@ exports.loginUser = async (req, res) => {
     });
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error during login' });
+    res.status(500).json({ 
+      success: false,
+      message: error.message || 'Server error during login' 
+    });
   }
 };
 
@@ -92,23 +115,22 @@ exports.forgotPassword = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ 
+        success: false,
+        message: "User not found" 
+      });
     }
 
-    // Generate reset token
     const resetToken = crypto.randomBytes(32).toString('hex');
     
-    // Save hashed token to database
     user.resetPasswordToken = resetToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    // Create reset URL
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-
     try {
       await sendResetEmail(email, resetToken);
       res.status(200).json({ 
+        success: true,
         message: "Reset email sent successfully",
         resetToken // Include for development/testing
       });
@@ -117,12 +139,14 @@ exports.forgotPassword = async (req, res) => {
       user.resetPasswordExpires = undefined;
       await user.save();
       
-      console.error("Email send error:", error);
       throw new Error("Failed to send reset email");
     }
   } catch (error) {
     console.error("Forgot password error:", error);
-    res.status(500).json({ message: "Failed to process password reset" });
+    res.status(500).json({ 
+      success: false,
+      message: error.message || "Failed to process password reset" 
+    });
   }
 };
 
@@ -132,7 +156,10 @@ exports.resetPassword = async (req, res) => {
     const { newPassword } = req.body;
     
     if (!token || !newPassword) {
-      return res.status(400).json({ message: 'Please provide token and new password' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'Please provide token and new password' 
+      });
     }
 
     const user = await User.findOne({
@@ -141,32 +168,32 @@ exports.resetPassword = async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ message: 'Invalid or expired reset token' });
+      return res.status(400).json({ 
+        success: false,
+        message: 'Invalid or expired reset token' 
+      });
     }
 
-    // Hash new password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
     
-    // Update user password and clear reset token
     user.password = hashedPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
     await user.save();
 
-    // Generate new login token
     const loginToken = generateToken(user);
 
     res.json({ 
-      message: 'Password has been reset successfully',
       success: true,
+      message: 'Password has been reset successfully',
       token: loginToken
     });
   } catch (error) {
     console.error('Reset password error:', error);
     res.status(500).json({ 
-      message: 'Error resetting password',
-      error: error.message 
+      success: false,
+      message: error.message || 'Error resetting password'
     });
   }
 };
