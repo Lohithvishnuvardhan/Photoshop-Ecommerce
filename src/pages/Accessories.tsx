@@ -6,12 +6,13 @@ import { useCartStore } from '../store/cart';
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
 
+// Static accessories data
 const staticAccessories = [
   {
     id: 9,
     name: 'Peak Design Camera Strap',
     price: 5990,
-    image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80",
+    image: "/src/public/images/Access1.jpg",
     description: 'Professional Camera Strap with Quick-Release System',
     specs: [
       'Quick-Release System for Easy Attachment',
@@ -33,7 +34,7 @@ const staticAccessories = [
     id: 10,
     name: 'Manfrotto MT055XPRO4 Tripod',
     price: 24990,
-    image: 'https://images.unsplash.com/photo-1542567455-cd733f23fbb1?auto=format&fit=crop&q=80',
+    image: "/src/public/images/godox.jpg",
     description: 'Professional Carbon Fiber Tripod with Advanced Features',
     specs: [
       'Carbon Fiber Construction',
@@ -55,7 +56,7 @@ const staticAccessories = [
     id: 11,
     name: 'Godox V1 Flash',
     price: 32990,
-    image: "https://images.unsplash.com/photo-1598971861713-54ad16a7e72e?auto=format&fit=crop&q=80",
+    image: "/src/public/images/godox.jpg",
     description: 'Professional Round Head Flash with Advanced Features',
     specs: [
       'Round Head Design',
@@ -77,7 +78,7 @@ const staticAccessories = [
     id: 12,
     name: 'Peak Design Everyday Backpack',
     price: 21990,
-    image: "https://images.unsplash.com/photo-1547949003-9792a18a2601?auto=format&fit=crop&q=80",
+    image: "/src/public/images/access2.jpg",
     description: 'Professional Camera Backpack with Innovative Design',
     specs: [
       '30L Capacity',
@@ -121,6 +122,7 @@ const Accessories = () => {
           !staticAccessories.some(acc => acc.id === product._id)
         );
 
+        // Add default specs and features for admin-added accessories if they don't exist
         const formattedAdminAccessories = adminAccessories.map((acc: any) => ({
           ...acc,
           id: acc._id,
