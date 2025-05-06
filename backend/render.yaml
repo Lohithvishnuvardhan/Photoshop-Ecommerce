@@ -16,13 +16,13 @@ services:
       - key: EMAIL_PASSWORD
         sync: false
       - key: FRONTEND_URL
-        value: https://photopixel-frontend.onrender.com
+        value: https://photopixelfrontend.vercel.app
       - key: PORT
         value: 10000
       - key: NODE_ENV
         value: production
       - key: CORS_ORIGIN
-        value: https://photopixel-frontend.onrender.com
+        value: https://photopixelfrontend.vercel.app
 
   - type: web
     name: photopixel-frontend
@@ -33,4 +33,4 @@ services:
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL
-        value: https://photopixel-backend.onrender.com/api
+        value: https://photopixel-backend.onrender.com

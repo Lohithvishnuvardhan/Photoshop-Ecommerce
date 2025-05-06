@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://photopixel-backend.onrender.com/api',
+  baseURL: 'https://photopixel-backend.onrender.com',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -23,6 +23,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    console.error('API Error:', error.response?.data || error.message);
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('userId');
