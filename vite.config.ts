@@ -6,7 +6,17 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: false,
-    host: true
+    host: true,
+    proxy: {
+      '/': {
+        rewrite: (path) => {
+          if (path !== '/' && !path.includes('.')) {
+            return '/';
+          }
+          return path;
+        }
+      }
+    },
   },
   resolve: {
     alias: {
@@ -39,5 +49,5 @@ export default defineConfig({
     },
     assetsDir: 'assets',
     chunkSizeWarningLimit: 1000
-  },
+  }
 });
