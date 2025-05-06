@@ -25,5 +25,5 @@ dist-ssr
 
 # Ignore unwanted folders
 .bolt/
-backend/.env
+
 Photoshop-Backend/
