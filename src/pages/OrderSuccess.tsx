@@ -32,6 +32,17 @@ export function OrderSuccess() {
     }
   }, [orderDetails, navigate]);
 
+  const handleViewOrders = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Store the intended destination
+      localStorage.setItem('redirectAfterLogin', '/view-order');
+      navigate('/login');
+    } else {
+      navigate('/view-order');
+    }
+  };
+
   if (!orderDetails) {
     return null;
   }
@@ -97,7 +108,7 @@ export function OrderSuccess() {
 
           <div className="flex justify-center space-x-4">
             <button
-              onClick={() => navigate('/orders')}
+              onClick={handleViewOrders}
               className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors inline-flex items-center"
             >
               <ShoppingBag className="w-5 h-5 mr-2" />

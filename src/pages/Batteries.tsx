@@ -6,13 +6,12 @@ import { useCartStore } from '../store/cart';
 import { useState, useEffect } from 'react';
 import api from '../utils/api';
 
-// Static batteries data
 const staticBatteries = [
   {
     id: 13,
     name: 'Canon LP-E6NH Battery',
     price: 14000,
-    image: "src/public/images/battery.jpg",
+    image: "https://images.unsplash.com/photo-1621164078462-6df874315735?auto=format&fit=crop&q=80",
     description: 'High Capacity Battery for Canon EOS R Series',
     specs: [
       '2130mAh Capacity',
@@ -34,7 +33,7 @@ const staticBatteries = [
     id: 14,
     name: 'Sony NP-FZ100 Battery',
     price: 12990,
-    image: "src/public/images/battery1.jpg",
+    image: "https://images.unsplash.com/photo-1621164078463-9a00b84d616c?auto=format&fit=crop&q=80",
     description: 'Professional Battery for Sony Alpha Cameras',
     specs: [
       '2280mAh Capacity',
@@ -56,7 +55,7 @@ const staticBatteries = [
     id: 15,
     name: 'Nikon EN-EL15c Battery',
     price: 11990,
-    image: "src/public/images/battery2.jpg",
+    image: "https://images.unsplash.com/photo-1621164078464-6f7e0a8f9e44?auto=format&fit=crop&q=80",
     description: 'Advanced Battery for Nikon Z Series',
     specs: [
       '2280mAh Capacity',
@@ -78,7 +77,7 @@ const staticBatteries = [
     id: 16,
     name: 'Fujifilm NP-W235 Battery',
     price: 9990,
-    image: "src/public/images/battery3.jpg",
+    image: "https://images.unsplash.com/photo-1621164078465-7e84d2be2c0a?auto=format&fit=crop&q=80",
     description: 'High-Performance Battery for Fujifilm Cameras',
     specs: [
       '2200mAh Capacity',
@@ -122,7 +121,6 @@ const Batteries = () => {
           !staticBatteries.some(battery => battery.id === product._id)
         );
 
-        // Add default specs and features for admin-added batteries if they don't exist
         const formattedAdminBatteries = adminBatteries.map((battery: any) => ({
           ...battery,
           id: battery._id,
