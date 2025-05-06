@@ -12,7 +12,7 @@ const staticAccessories = [
     id: 9,
     name: 'Peak Design Camera Strap',
     price: 5990,
-    image: "/src/public/images/Access1.jpg",
+    image: "public/images/Access1.jpg",
     description: 'Professional Camera Strap with Quick-Release System',
     specs: [
       'Quick-Release System for Easy Attachment',
@@ -34,7 +34,7 @@ const staticAccessories = [
     id: 10,
     name: 'Manfrotto MT055XPRO4 Tripod',
     price: 24990,
-    image: "/src/public/images/godox.jpg",
+    image: "https://m.media-amazon.com/images/I/51UFAE2RyDL._AC_UF1000,1000_QL80_.jpg",
     description: 'Professional Carbon Fiber Tripod with Advanced Features',
     specs: [
       'Carbon Fiber Construction',
@@ -56,7 +56,7 @@ const staticAccessories = [
     id: 11,
     name: 'Godox V1 Flash',
     price: 32990,
-    image: "/src/public/images/godox.jpg",
+    image: "public/images/godox.jpg",
     description: 'Professional Round Head Flash with Advanced Features',
     specs: [
       'Round Head Design',
@@ -78,7 +78,7 @@ const staticAccessories = [
     id: 12,
     name: 'Peak Design Everyday Backpack',
     price: 21990,
-    image: "/src/public/images/access2.jpg",
+    image: "public/images/access2.jpg",
     description: 'Professional Camera Backpack with Innovative Design',
     specs: [
       '30L Capacity',

@@ -33,14 +33,7 @@ export function OrderSuccess() {
   }, [orderDetails, navigate]);
 
   const handleViewOrders = () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      // Store the intended destination
-      localStorage.setItem('redirectAfterLogin', '/view-order');
-      navigate('/login');
-    } else {
-      navigate('/view-order');
-    }
+    navigate('/view-order');
   };
 
   if (!orderDetails) {
