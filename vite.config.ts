@@ -4,16 +4,9 @@ import path from 'path';
 
 export default defineConfig({
   server: {
-    port: 5173, // Changed to default Vite port
+    port: 5173,
     strictPort: false,
-    host: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
+    host: true
   },
   resolve: {
     alias: {

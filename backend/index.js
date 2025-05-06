@@ -14,7 +14,8 @@ const app = express();
 // CORS configuration
 const corsOptions = {
   origin: [
-    'https://photopixelfrontend-7wwzjubjg-lohiths-projects-9997415a.vercel.app'
+    'https://photopixelfrontend.vercel.app',
+    'http://localhost:5173' // Keep local development URL
   ],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -72,7 +73,7 @@ const startServer = async () => {
     server.on('error', (error) => {
       if (error.code === 'EADDRINUSE') {
         console.error(`Port ${PORT} is already in use`);
-        process.exit(1); // Exit the process instead of trying multiple ports
+        process.exit(1);
       } else {
         console.error('Server error:', error);
         process.exit(1);
