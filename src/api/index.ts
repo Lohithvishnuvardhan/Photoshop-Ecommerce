@@ -124,7 +124,6 @@ export const orderAPI = {
       const response = await api.get<Order[]>('/orders/myorders');
       return response.data;
     } catch (error: any) {
-      console.error('Fetch orders error:', error.response || error);
       throw new Error(error.response?.data?.message || 'Failed to fetch orders');
     }
   }
