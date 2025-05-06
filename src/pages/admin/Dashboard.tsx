@@ -2,12 +2,31 @@ import { useState, useEffect } from 'react';
 import { Users, Package, ShoppingBag, DollarSign, ArrowUp, ArrowDown } from 'lucide-react';
 import api from '../../api';
 
+interface OrderItem {
+  name: string;
+  quantity: number;
+  image: string;
+  price: number;
+}
+
+interface Order {
+  _id: string;
+  user: {
+    name: string;
+    email: string;
+  };
+  orderItems: OrderItem[];
+  totalPrice: number;
+  status: string;
+  createdAt: string;
+}
+
 interface DashboardStats {
   totalOrders: number;
   totalUsers: number;
   totalProducts: number;
   totalRevenue: number;
-  recentOrders: any[];
+  recentOrders: Order[];
 }
 
 export function AdminDashboard() {
@@ -33,6 +52,16 @@ export function AdminDashboard() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   if (isLoading) {
@@ -142,10 +171,27 @@ export function AdminDashboard() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {stats.recentOrders.map((order) => (
                   <tr key={order._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order._id}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.customer}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.products}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₹{order.total.toLocaleString()}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {order._id}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div>
+                        <div className="text-sm font-medium text-gray-900">{order.user.name}</div>
+                        <div className="text-sm text-gray-500">{order.user.email}</div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="space-y-1">
+                        {order.orderItems.map((item, index) => (
+                          <div key={index} className="text-sm text-gray-900">
+                            {item.name} x {item.quantity}
+                          </div>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      ₹{order.totalPrice.toLocaleString()}
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         order.status === 'Completed' ? 'bg-green-100 text-green-800' :
@@ -156,7 +202,7 @@ export function AdminDashboard() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(order.date).toLocaleDateString()}
+                      {formatDate(order.createdAt)}
                     </td>
                   </tr>
                 ))}
