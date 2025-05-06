@@ -12,7 +12,7 @@ const staticLenses = [
     _id: '5',
     name: 'Canon RF 24-70mm f/2.8L IS USM',
     price: 219990,
-    imageUrl: "public/images/canon.jpg",
+    imageUrl: "https://i.pcmag.com/imagery/reviews/03Urtsla2p00JqUsuhKXvij-1..v1623334533.jpg",
     description: 'Professional Standard Zoom Lens',
     specs: [
       'Constant f/2.8 Aperture',
@@ -33,7 +33,7 @@ const staticLenses = [
   },
   {
     _id: '6',
-    name: 'Sony FE 70-200mm f/2.8 GM II',
+    name: "https://i.ytimg.com/vi/A5W5tfLbhWY/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDNe-Y5ppM1BB7xqgjKbmMdjcnYIQ",
     price: 259990,
     imageUrl: "public/images/sony.jpg",
     description: 'Professional Telephoto Zoom Lens',
@@ -56,7 +56,7 @@ const staticLenses = [
   },
   {
     _id: '7',
-    name: 'Nikon Z 50mm f/1.2 S',
+    name: "https://i.pcmag.com/imagery/reviews/00qMwxhCghOfgOKvnS8WRTM-1..v1613771781.jpg",
     price: 199990,
     imageUrl: "public/images/Nikon.jpg",
     description: 'Professional Prime Lens',
