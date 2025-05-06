@@ -109,12 +109,10 @@ const Cameras = () => {
   const fetchCameras = async () => {
     try {
       const response = await api.get('/products');
-      // Filter only camera products from API
       const cameraProducts = response.data.filter((product: Camera) => 
         product.category.toLowerCase() === 'cameras'
       );
       
-      // Add default values for specs, features, rating, and reviews if not present
       const processedCameras = cameraProducts.map((camera: Camera) => ({
         ...camera,
         specs: camera.specs || [
@@ -133,8 +131,6 @@ const Cameras = () => {
         reviews: camera.reviews || 50
       }));
 
-      // Combine default cameras with fetched cameras
-      // Filter out any default cameras that have the same ID as fetched cameras
       const combinedCameras = [
         ...defaultCameras.filter(defaultCam => 
           !processedCameras.some((fetchedCam: { _id: string; }) => fetchedCam._id === defaultCam._id)
@@ -146,7 +142,6 @@ const Cameras = () => {
     } catch (error) {
       console.error('Error fetching cameras:', error);
       toast.error('Failed to load cameras');
-      // If API fails, fall back to default cameras
       setCameras(defaultCameras);
     } finally {
       setIsLoading(false);
@@ -217,13 +212,13 @@ const Cameras = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-4xl font-bold text-gray-900">Professional Cameras</h1>
             <p className="mt-2 text-gray-600">Discover our selection of high-end cameras for professionals</p>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4">
             <div className="flex items-center text-green-600">
               <Truck className="h-5 w-5 mr-2" />
               <span>Free Shipping</span>
@@ -235,7 +230,7 @@ const Cameras = () => {
           </div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
           {cameras.map((camera) => (
             <div key={camera._id} className="bg-white rounded-2xl shadow-lg overflow-hidden transform transition duration-300 hover:scale-105">
               <div className="relative">
