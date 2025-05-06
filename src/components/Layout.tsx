@@ -110,8 +110,8 @@ const Layout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900">
-      <header className="border-b border-gray-800 sticky top-0 z-50 bg-gray-900/95 backdrop-blur-sm">
+    <div className="min-h-screen bg-gray-900 flex flex-col overflow-x-hidden">
+      <header className="border-b border-gray-800 sticky top-0 z-50 bg-gray-900/95 backdrop-blur-sm w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Top Bar */}
           <div className="flex flex-col md:flex-row md:items-center md:justify-between py-4 space-y-4 md:space-y-0">

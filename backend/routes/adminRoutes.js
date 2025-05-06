@@ -31,25 +31,110 @@ router.get('/dashboard', authenticateToken, isAdmin, async (req, res) => {
     const recentOrders = await Order.find()
       .sort({ createdAt: -1 })
       .limit(10)
-      .populate('user', 'name email');
+      .populate({
+        path: 'user',
+        select: 'name email'
+      });
+
+    const formattedOrders = recentOrders.map(order => ({
+      _id: order._id,
+      customer: order.user ? order.user.email : 'Unknown User',
+      products: order.orderItems.length,
+      total: order.totalPrice,
+      status: order.status,
+      date: order.createdAt
+    }));
 
     res.json({
       totalOrders,
       totalUsers,
       totalProducts,
       totalRevenue: totalRevenue[0]?.total || 0,
-      recentOrders: recentOrders.map(order => ({
-        _id: order._id,
-        customer: order.user.email,
-        products: order.orderItems.length,
-        total: order.totalPrice,
-        status: order.status,
-        date: order.createdAt
-      }))
+      recentOrders: formattedOrders
     });
   } catch (error) {
     console.error('Dashboard stats error:', error);
     res.status(500).json({ message: 'Error fetching dashboard stats' });
+  }
+});
+
+// Get all orders (admin view)
+router.get('/orders', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .sort({ createdAt: -1 })
+      .populate('user', 'name email');
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching orders' });
+  }
+});
+
+// Update order status
+router.put('/orders/:id', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    ).populate('user', 'name email');
+
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating order status' });
+  }
+});
+
+// Delete order
+router.delete('/orders/:id', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+    
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+
+    await Order.findByIdAndDelete(req.params.id);
+
+    // Get updated dashboard stats after deletion
+    const totalOrders = await Order.countDocuments();
+    const totalRevenue = await Order.aggregate([
+      { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+    ]);
+
+    const recentOrders = await Order.find()
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .populate({
+        path: 'user',
+        select: 'name email'
+      });
+
+    const formattedOrders = recentOrders.map(order => ({
+      _id: order._id,
+      customer: order.user ? order.user.email : 'Unknown User',
+      products: order.orderItems.length,
+      total: order.totalPrice,
+      status: order.status,
+      date: order.createdAt
+    }));
+
+    res.json({
+      message: 'Order deleted successfully',
+      updatedStats: {
+        totalOrders,
+        totalRevenue: totalRevenue[0]?.total || 0,
+        recentOrders: formattedOrders
+      }
+    });
+  } catch (error) {
+    console.error('Error deleting order:', error);
+    res.status(500).json({ message: 'Error deleting order' });
   }
 });
 
@@ -120,38 +205,6 @@ router.delete('/products/:id', authenticateToken, isAdmin, async (req, res) => {
     res.json({ message: 'Product deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: 'Error deleting product' });
-  }
-});
-
-// Get all orders (admin view)
-router.get('/orders', authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const orders = await Order.find()
-      .sort({ createdAt: -1 })
-      .populate('user', 'name email');
-    res.json(orders);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching orders' });
-  }
-});
-
-// Update order status
-router.put('/orders/:id', authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const { status } = req.body;
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
-
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
-
-    res.json(order);
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating order status' });
   }
 });
 
