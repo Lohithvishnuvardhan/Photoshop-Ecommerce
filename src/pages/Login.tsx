@@ -16,7 +16,6 @@ export function Login() {
   const { login, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    // Only redirect if user is authenticated and trying to access a protected route
     if (isAuthenticated && location.state?.from && location.state.from.pathname !== '/') {
       navigate(location.state.from.pathname);
     }

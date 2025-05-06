@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
-import api from '../utils/api';
 import toast from 'react-hot-toast';
+import { useAuth } from '../hooks/useAuth';
 
 export function SignUp() {
   const [name, setName] = useState('');
@@ -13,6 +13,7 @@ export function SignUp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { register } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,24 +31,12 @@ export function SignUp() {
     setIsLoading(true);
 
     try {
-      const response = await api.post('/auth/register', {
-        name,
-        email,
-        password
-      });
-
-      if (response.data.success) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('userId', response.data._id);
-        localStorage.setItem('isAdmin', response.data.isAdmin.toString());
-        toast.success('Account created successfully!');
-        navigate('/');
-      } else {
-        throw new Error(response.data.message || 'Registration failed');
-      }
+      await register(name, email, password);
+      toast.success('Account created successfully!');
+      navigate('/');
     } catch (error: any) {
       console.error('Registration error:', error);
-      toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
+      toast.error(error.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

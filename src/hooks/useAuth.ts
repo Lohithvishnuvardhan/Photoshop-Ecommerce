@@ -33,6 +33,7 @@ export const useAuth = create<AuthState>()(
           
           localStorage.setItem('token', data.token);
           localStorage.setItem('isAdmin', String(data.isAdmin));
+          localStorage.setItem('userId', data._id);
           
           set({ 
             user: data,
@@ -48,17 +49,24 @@ export const useAuth = create<AuthState>()(
       register: async (name: string, email: string, password: string) => {
         try {
           const response = await api.post('/auth/register', { name, email, password });
+          const { data } = response;
+          
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('userId', data._id);
+          localStorage.setItem('isAdmin', String(data.isAdmin));
+          
           set({ 
-            user: response.data,
+            user: data,
             isAuthenticated: true,
-            isAdmin: response.data.isAdmin
+            isAdmin: data.isAdmin
           });
-        } catch (error) {
-          throw error;
+        } catch (error: any) {
+          throw new Error(error.response?.data?.message || 'Registration failed');
         }
       },
       logout: () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('userId');
         localStorage.removeItem('isAdmin');
         set({ 
           user: null, 
