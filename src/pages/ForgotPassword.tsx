@@ -88,7 +88,7 @@ export function ForgotPassword() {
             </form>
           ) : (
             <div className="text-center">
-              <div className="rounded-full bg-green-500 w-12 h-12 flex items-center justify-center mx-auto">
+              <div className="rounded-full bg-green-500 w-12 h-12 flex items-center justify-center mx-auto mb-4">
                 <Mail className="h-6 w-6 text-white" />
               </div>
               <h3 className="mt-4 text-xl font-medium text-white">Check your email</h3>

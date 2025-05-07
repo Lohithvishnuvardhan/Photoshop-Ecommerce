@@ -1,32 +1,30 @@
 import { useState, useEffect } from 'react';
 import { Users, Package, ShoppingBag, DollarSign, ArrowUp, ArrowDown } from 'lucide-react';
-import api from '../../api';
-
-interface OrderItem {
-  name: string;
-  quantity: number;
-  image: string;
-  price: number;
-}
-
-interface Order {
-  _id: string;
-  user: {
-    name: string;
-    email: string;
-  };
-  orderItems: OrderItem[];
-  totalPrice: number;
-  status: string;
-  createdAt: string;
-}
+import api from '../../utils/api';
 
 interface DashboardStats {
   totalOrders: number;
   totalUsers: number;
   totalProducts: number;
   totalRevenue: number;
-  recentOrders: Order[];
+  orderChange: number;
+  userChange: number;
+  productChange: number;
+  recentOrders: {
+    _id: string;
+    customer: string;
+    email: string;
+    products: number;
+    total: number;
+    status: string;
+    date: string;
+    orderItems: {
+      name: string;
+      quantity: number;
+      image: string;
+      price: number;
+    }[];
+  }[];
 }
 
 export function AdminDashboard() {
@@ -35,6 +33,9 @@ export function AdminDashboard() {
     totalUsers: 0,
     totalProducts: 0,
     totalRevenue: 0,
+    orderChange: 0,
+    userChange: 0,
+    productChange: 0,
     recentOrders: []
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -93,8 +94,14 @@ export function AdminDashboard() {
               </div>
             </div>
             <div className="flex items-center text-sm">
-              <ArrowUp className="h-4 w-4 text-green-500 mr-1" />
-              <span className="text-green-500 font-medium">12%</span>
+              {stats.orderChange >= 0 ? (
+                <ArrowUp className="h-4 w-4 text-green-500 mr-1" />
+              ) : (
+                <ArrowDown className="h-4 w-4 text-red-500 mr-1" />
+              )}
+              <span className={stats.orderChange >= 0 ? "text-green-500" : "text-red-500"}>
+                {Math.abs(stats.orderChange)}%
+              </span>
               <span className="text-gray-500 ml-2">vs last month</span>
             </div>
           </div>
@@ -110,8 +117,14 @@ export function AdminDashboard() {
               </div>
             </div>
             <div className="flex items-center text-sm">
-              <ArrowUp className="h-4 w-4 text-green-500 mr-1" />
-              <span className="text-green-500 font-medium">8%</span>
+              {stats.userChange >= 0 ? (
+                <ArrowUp className="h-4 w-4 text-green-500 mr-1" />
+              ) : (
+                <ArrowDown className="h-4 w-4 text-red-500 mr-1" />
+              )}
+              <span className={stats.userChange >= 0 ? "text-green-500" : "text-red-500"}>
+                {Math.abs(stats.userChange)}%
+              </span>
               <span className="text-gray-500 ml-2">vs last month</span>
             </div>
           </div>
@@ -127,8 +140,14 @@ export function AdminDashboard() {
               </div>
             </div>
             <div className="flex items-center text-sm">
-              <ArrowUp className="h-4 w-4 text-green-500 mr-1" />
-              <span className="text-green-500 font-medium">5%</span>
+              {stats.productChange >= 0 ? (
+                <ArrowUp className="h-4 w-4 text-green-500 mr-1" />
+              ) : (
+                <ArrowDown className="h-4 w-4 text-red-500 mr-1" />
+              )}
+              <span className={stats.productChange >= 0 ? "text-green-500" : "text-red-500"}>
+                {Math.abs(stats.productChange)}%
+              </span>
               <span className="text-gray-500 ml-2">vs last month</span>
             </div>
           </div>
@@ -144,8 +163,8 @@ export function AdminDashboard() {
               </div>
             </div>
             <div className="flex items-center text-sm">
-              <ArrowDown className="h-4 w-4 text-red-500 mr-1" />
-              <span className="text-red-500 font-medium">3%</span>
+              <ArrowUp className="h-4 w-4 text-green-500 mr-1" />
+              <span className="text-green-500 font-medium">15%</span>
               <span className="text-gray-500 ml-2">vs last month</span>
             </div>
           </div>
@@ -162,6 +181,7 @@ export function AdminDashboard() {
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -174,23 +194,17 @@ export function AdminDashboard() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       {order._id}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{order.user.name}</div>
-                        <div className="text-sm text-gray-500">{order.user.email}</div>
-                      </div>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {order.customer}
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="space-y-1">
-                        {order.orderItems.map((item, index) => (
-                          <div key={index} className="text-sm text-gray-900">
-                            {item.name} x {item.quantity}
-                          </div>
-                        ))}
-                      </div>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {order.email}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {order.products}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      ₹{order.totalPrice.toLocaleString()}
+                      ₹{order.total.toLocaleString()}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
@@ -202,7 +216,7 @@ export function AdminDashboard() {
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(order.createdAt)}
+                      {formatDate(order.date)}
                     </td>
                   </tr>
                 ))}

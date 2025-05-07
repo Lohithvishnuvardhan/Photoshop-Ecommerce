@@ -21,137 +21,90 @@ const isAdmin = async (req, res, next) => {
 // Get dashboard stats
 router.get('/dashboard', authenticateToken, isAdmin, async (req, res) => {
   try {
+    // Get total orders
     const totalOrders = await Order.countDocuments();
+    
+    // Get total users
     const totalUsers = await User.countDocuments();
+    
+    // Get total products
     const totalProducts = await Product.countDocuments();
+    
+    // Calculate total revenue
     const totalRevenue = await Order.aggregate([
       { $group: { _id: null, total: { $sum: "$totalPrice" } } }
     ]);
 
+    // Get orders from last month
+    const lastMonth = new Date();
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+    
+    const lastMonthOrders = await Order.countDocuments({
+      createdAt: { $gte: lastMonth }
+    });
+
+    const lastMonthUsers = await User.countDocuments({
+      createdAt: { $gte: lastMonth }
+    });
+
+    const lastMonthProducts = await Product.countDocuments({
+      createdAt: { $gte: lastMonth }
+    });
+
+    // Get recent orders
     const recentOrders = await Order.find()
       .sort({ createdAt: -1 })
       .limit(10)
       .populate('user', 'name email');
+
+    // Calculate percentage changes
+    const previousMonth = new Date();
+    previousMonth.setMonth(previousMonth.getMonth() - 2);
+    
+    const previousMonthOrders = await Order.countDocuments({
+      createdAt: { $gte: previousMonth, $lt: lastMonth }
+    });
+
+    const previousMonthUsers = await User.countDocuments({
+      createdAt: { $gte: previousMonth, $lt: lastMonth }
+    });
+
+    const previousMonthProducts = await Product.countDocuments({
+      createdAt: { $gte: previousMonth, $lt: lastMonth }
+    });
+
+    // Calculate percentage changes
+    const orderChange = previousMonthOrders === 0 ? 100 : 
+      ((lastMonthOrders - previousMonthOrders) / previousMonthOrders) * 100;
+    
+    const userChange = previousMonthUsers === 0 ? 100 :
+      ((lastMonthUsers - previousMonthUsers) / previousMonthUsers) * 100;
+    
+    const productChange = previousMonthProducts === 0 ? 100 :
+      ((lastMonthProducts - previousMonthProducts) / previousMonthProducts) * 100;
 
     res.json({
       totalOrders,
       totalUsers,
       totalProducts,
       totalRevenue: totalRevenue[0]?.total || 0,
+      orderChange: Math.round(orderChange),
+      userChange: Math.round(userChange),
+      productChange: Math.round(productChange),
       recentOrders: recentOrders.map(order => ({
         _id: order._id,
-        customer: order.user.email,
+        customer: order.user.name,
+        email: order.user.email,
         products: order.orderItems.length,
         total: order.totalPrice,
         status: order.status,
-        date: order.createdAt
+        date: order.createdAt,
+        orderItems: order.orderItems
       }))
     });
   } catch (error) {
     console.error('Dashboard stats error:', error);
     res.status(500).json({ message: 'Error fetching dashboard stats' });
-  }
-});
-
-// Get all products (admin view)
-router.get('/products', authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const products = await Product.find().sort({ createdAt: -1 });
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching products' });
-  }
-});
-
-// Add new product
-router.post('/products', authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const { name, description, price, category, imageUrl, stock } = req.body;
-
-    if (!name || !description || !price || !category || !imageUrl || !stock) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-
-    const product = new Product({
-      name,
-      description,
-      price: Number(price),
-      category,
-      imageUrl,
-      stock: Number(stock)
-    });
-
-    const savedProduct = await product.save();
-    res.status(201).json(savedProduct);
-  } catch (error) {
-    console.error('Add product error:', error);
-    res.status(500).json({ message: 'Error adding product' });
-  }
-});
-
-// Update product
-router.put('/products/:id', authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body },
-      { new: true }
-    );
-
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-
-    res.json(product);
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating product' });
-  }
-});
-
-// Delete product
-router.delete('/products/:id', authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const product = await Product.findByIdAndDelete(req.params.id);
-    
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-
-    res.json({ message: 'Product deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ message: 'Error deleting product' });
-  }
-});
-
-// Get all orders (admin view)
-router.get('/orders', authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const orders = await Order.find()
-      .sort({ createdAt: -1 })
-      .populate('user', 'name email');
-    res.json(orders);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching orders' });
-  }
-});
-
-// Update order status
-router.put('/orders/:id', authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const { status } = req.body;
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
-
-    if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
-    }
-
-    res.json(order);
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating order status' });
   }
 });
 
