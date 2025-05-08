@@ -8,16 +8,6 @@ export default defineConfig({
     port: 5173,
     strictPort: false,
     host: true,
-    proxy: {
-      '/': {
-        rewrite: (path) => {
-          if (path !== '/' && !path.includes('.')) {
-            return '/';
-          }
-          return path;
-        }
-      }
-    },
   },
   resolve: {
     alias: {
@@ -46,15 +36,6 @@ export default defineConfig({
           state: ['zustand'],
           http: ['axios']
         }
-      }
-    },
-    assetsDir: 'assets',
-    chunkSizeWarningLimit: 1000,
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true,
-        drop_debugger: true
       }
     }
   }
