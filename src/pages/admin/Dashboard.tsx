@@ -41,6 +41,7 @@ export function AdminDashboard() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isDeletingAll, setIsDeletingAll] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchDashboardStats();
@@ -48,27 +49,48 @@ export function AdminDashboard() {
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await api.get('/admin/dashboard');
+      setError(null);
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication token not found');
+      }
+
+      const response = await api.get('/admin/dashboard', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      if (!response.data) {
+        throw new Error('No data received from server');
+      }
+
       setStats(response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching dashboard stats:', error);
-      toast.error('Failed to fetch dashboard stats');
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch dashboard stats';
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDeleteAllOrders = async () => {
+    if (!stats.totalOrders) {
+      toast.error('No orders to delete');
+      return;
+    }
+
     if (window.confirm('Are you sure you want to delete ALL orders? This action cannot be undone!')) {
       try {
         setIsDeletingAll(true);
         await api.delete('/admin/orders');
         toast.success('All orders deleted successfully');
-        // Refresh dashboard stats
         fetchDashboardStats();
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error deleting all orders:', error);
-        toast.error('Failed to delete orders');
+        toast.error(error.response?.data?.message || 'Failed to delete orders');
       } finally {
         setIsDeletingAll(false);
       }
@@ -80,7 +102,6 @@ export function AdminDashboard() {
       if (window.confirm('Are you sure you want to delete this order?')) {
         await api.delete(`/admin/orders/${orderId}`);
         
-        // Update stats after deletion
         setStats(prevStats => ({
           ...prevStats,
           totalOrders: prevStats.totalOrders - 1,
@@ -90,9 +111,9 @@ export function AdminDashboard() {
 
         toast.success('Order deleted successfully');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error deleting order:', error);
-      toast.error('Failed to delete order');
+      toast.error(error.response?.data?.message || 'Failed to delete order');
     }
   };
 
@@ -110,6 +131,25 @@ export function AdminDashboard() {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 p-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white rounded-lg shadow-lg p-6 text-center">
+            <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Dashboard</h2>
+            <p className="text-gray-600 mb-6">{error}</p>
+            <button
+              onClick={fetchDashboardStats}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -145,7 +185,6 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between mb-4">
@@ -234,7 +273,6 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        {/* Recent Orders */}
         <div className="bg-white rounded-lg shadow">
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-900">Recent Orders</h2>
@@ -293,6 +331,13 @@ export function AdminDashboard() {
                     </td>
                   </tr>
                 ))}
+                {stats.recentOrders.length === 0 && (
+                  <tr>
+                    <td colSpan={8} className="px-6 py-4 text-center text-gray-500">
+                      No orders found
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
