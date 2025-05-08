@@ -76,7 +76,7 @@ router.get('/dashboard', authenticateToken, isAdmin, async (req, res) => {
       createdAt: { $gte: lastMonth }
     });
 
-    // Get recent orders
+    // Get recent orders with populated user data
     const recentOrders = await Order.find()
       .sort({ createdAt: -1 })
       .limit(10)
@@ -118,69 +118,19 @@ router.get('/dashboard', authenticateToken, isAdmin, async (req, res) => {
       productChange: Math.round(productChange),
       recentOrders: recentOrders.map(order => ({
         _id: order._id,
-        customer: order.user.name,
-        email: order.user.email,
+        customer: order.user?.name || 'Guest User',
+        email: order.user?.email || 'N/A',
         products: order.orderItems.length,
         total: order.totalPrice,
         status: order.status,
         date: order.createdAt,
-        orderItems: order.orderItems
+        orderItems: order.orderItems,
+        paymentStatus: order.paymentStatus
       }))
     });
   } catch (error) {
     console.error('Dashboard stats error:', error);
     res.status(500).json({ message: 'Error fetching dashboard stats' });
-  }
-});
-
-// Get all products
-router.get('/products', authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const products = await Product.find().sort({ createdAt: -1 });
-    res.json(products);
-  } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ message: 'Error fetching products' });
-  }
-});
-
-// Add new product
-router.post('/products', authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const { name, description, price, category, imageUrl, stock } = req.body;
-
-    if (!name || !description || !price || !category || !imageUrl || !stock) {
-      return res.status(400).json({ message: 'All fields are required' });
-    }
-
-    const product = new Product({
-      name,
-      description,
-      price: Number(price),
-      category,
-      imageUrl,
-      stock: Number(stock)
-    });
-
-    const savedProduct = await product.save();
-    res.status(201).json(savedProduct);
-  } catch (error) {
-    console.error('Error creating product:', error);
-    res.status(500).json({ message: 'Error creating product' });
-  }
-});
-
-// Delete product
-router.delete('/products/:id', authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const product = await Product.findByIdAndDelete(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-    res.json({ message: 'Product deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting product:', error);
-    res.status(500).json({ message: 'Error deleting product' });
   }
 });
 

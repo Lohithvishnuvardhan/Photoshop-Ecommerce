@@ -25,6 +25,7 @@ interface DashboardStats {
       image: string;
       price: number;
     }[];
+    paymentStatus: string;
   }[];
 }
 
@@ -64,7 +65,6 @@ export function AdminDashboard() {
         setIsDeletingAll(true);
         await api.delete('/admin/orders');
         toast.success('All orders deleted successfully');
-        // Refresh dashboard stats
         fetchDashboardStats();
       } catch (error) {
         console.error('Error deleting all orders:', error);
@@ -80,7 +80,6 @@ export function AdminDashboard() {
       if (window.confirm('Are you sure you want to delete this order?')) {
         await api.delete(`/admin/orders/${orderId}`);
         
-        // Update stats after deletion
         setStats(prevStats => ({
           ...prevStats,
           totalOrders: prevStats.totalOrders - 1,
@@ -249,6 +248,7 @@ export function AdminDashboard() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -278,6 +278,15 @@ export function AdminDashboard() {
                         'bg-red-100 text-red-800'
                       }`}>
                         {order.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                        order.paymentStatus === 'Paid' ? 'bg-green-100 text-green-800' :
+                        order.paymentStatus === 'Pending' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {order.paymentStatus}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

@@ -18,13 +18,31 @@ const shippingAddressSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema(
   {
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    user: { 
+      type: mongoose.Schema.Types.ObjectId, 
+      ref: 'User', 
+      required: true 
+    },
     orderItems: [orderItemSchema],
     shippingAddress: shippingAddressSchema,
-    totalPrice: { type: Number, required: true },
-    status: { type: String, default: 'Processing' },
+    totalPrice: { 
+      type: Number, 
+      required: true 
+    },
+    status: { 
+      type: String, 
+      default: 'Processing',
+      enum: ['Processing', 'Shipped', 'Delivered', 'Cancelled']
+    },
+    paymentStatus: {
+      type: String,
+      default: 'Paid',
+      enum: ['Paid', 'Pending', 'Failed']
+    }
   },
-  { timestamps: true }
+  { 
+    timestamps: true 
+  }
 );
 
 module.exports = mongoose.model('Order', orderSchema);
