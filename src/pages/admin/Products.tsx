@@ -98,19 +98,29 @@ export function AdminProducts() {
         return;
       }
 
+      // Validate image URL
+      if (!newProduct.imageUrl.startsWith('http')) {
+        toast.error('Please provide a valid image URL');
+        return;
+      }
+
       const productToSave = {
         ...newProduct,
         specs: newProduct.specs?.length ? newProduct.specs : getDefaultSpecs(newProduct.category),
         features: newProduct.features?.length ? newProduct.features : getDefaultFeatures(newProduct.category)
       };
 
-      const response = await api.post('/admin/products', productToSave);
-      setProducts([...products, response.data]);
-      toast.success('Product added successfully');
-      setShowAddModal(false);
-      resetNewProduct();
-    } catch (error) {
-      toast.error('Failed to add product');
+      const response = await api.post('/products', productToSave);
+      
+      if (response.data) {
+        setProducts(prev => [...prev, response.data]);
+        toast.success('Product added successfully');
+        setShowAddModal(false);
+        resetNewProduct();
+      }
+    } catch (error: any) {
+      console.error('Error adding product:', error);
+      toast.error(error.response?.data?.message || 'Failed to add product');
     } finally {
       setIsLoading(false);
     }
@@ -211,9 +221,10 @@ export function AdminProducts() {
 
   const fetchProducts = async () => {
     try {
-      const response = await api.get('/admin/products');
+      const response = await api.get('/products');
       setProducts(response.data);
     } catch (error) {
+      console.error('Error fetching products:', error);
       toast.error('Failed to fetch products');
     } finally {
       setIsLoading(false);
@@ -223,10 +234,11 @@ export function AdminProducts() {
   const handleDeleteProduct = async (productId: string) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        await api.delete(`/admin/products/${productId}`);
+        await api.delete(`/products/${productId}`);
         setProducts(products.filter(product => product._id !== productId));
         toast.success('Product deleted successfully');
       } catch (error) {
+        console.error('Error deleting product:', error);
         toast.error('Failed to delete product');
       }
     }
@@ -235,11 +247,12 @@ export function AdminProducts() {
   const handleBulkDelete = async () => {
     if (window.confirm(`Are you sure you want to delete ${selectedProducts.length} products?`)) {
       try {
-        await Promise.all(selectedProducts.map(id => api.delete(`/admin/products/${id}`)));
+        await Promise.all(selectedProducts.map(id => api.delete(`/products/${id}`)));
         setProducts(products.filter(product => !selectedProducts.includes(product._id)));
         setSelectedProducts([]);
         toast.success('Products deleted successfully');
       } catch (error) {
+        console.error('Error deleting products:', error);
         toast.error('Failed to delete products');
       }
     }
@@ -289,7 +302,7 @@ export function AdminProducts() {
       return sortOrder === 'asc' ? comparison : -comparison;
     });
 
-  const categories = Array.from(new Set(products.map(p => p.category)));
+  const categories = ['Cameras', 'Lenses', 'Accessories', 'Batteries'];
 
   if (isLoading) {
     return (
@@ -574,10 +587,9 @@ export function AdminProducts() {
                     className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   >
                     <option value="">Select category</option>
-                    <option value="Cameras">Cameras</option>
-                    <option value="Lenses">Lenses</option>
-                    <option value="Accessories">Accessories</option>
-                    <option value="Batteries">Batteries</option>
+                    {categories.map(category => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -620,6 +632,7 @@ export function AdminProducts() {
                   value={newProduct.imageUrl}
                   onChange={(e) => setNewProduct({ ...newProduct, imageUrl: e.target.value })}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  placeholder="https://example.com/image.jpg"
                 />
               </div>
 
@@ -721,7 +734,6 @@ export function AdminProducts() {
               </div>
 
               <div className="mt-6 flex justify-end space-x-3">
-                
                 <button
                   onClick={() => setShowAddModal(false)}
                   className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-500"
