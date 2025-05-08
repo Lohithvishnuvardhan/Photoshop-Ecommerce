@@ -18,7 +18,18 @@ const isAdmin = async (req, res, next) => {
   }
 };
 
-// Delete order
+// Delete all orders
+router.delete('/orders', authenticateToken, isAdmin, async (req, res) => {
+  try {
+    await Order.deleteMany({});
+    res.json({ message: 'All orders deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting orders:', error);
+    res.status(500).json({ message: 'Error deleting orders' });
+  }
+});
+
+// Delete single order
 router.delete('/orders/:orderId', authenticateToken, isAdmin, async (req, res) => {
   try {
     const order = await Order.findByIdAndDelete(req.params.orderId);

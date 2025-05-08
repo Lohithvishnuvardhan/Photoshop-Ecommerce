@@ -40,6 +40,7 @@ export function AdminDashboard() {
     recentOrders: []
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
 
   useEffect(() => {
     fetchDashboardStats();
@@ -54,6 +55,23 @@ export function AdminDashboard() {
       toast.error('Failed to fetch dashboard stats');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAllOrders = async () => {
+    if (window.confirm('Are you sure you want to delete ALL orders? This action cannot be undone!')) {
+      try {
+        setIsDeletingAll(true);
+        await api.delete('/admin/orders');
+        toast.success('All orders deleted successfully');
+        // Refresh dashboard stats
+        fetchDashboardStats();
+      } catch (error) {
+        console.error('Error deleting all orders:', error);
+        toast.error('Failed to delete orders');
+      } finally {
+        setIsDeletingAll(false);
+      }
     }
   };
 
@@ -100,8 +118,31 @@ export function AdminDashboard() {
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-gray-900">Dashboard Overview</h1>
-          <p className="mt-1 text-sm text-gray-600">Welcome to your admin dashboard</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-semibold text-gray-900">Dashboard Overview</h1>
+              <p className="mt-1 text-sm text-gray-600">Welcome to your admin dashboard</p>
+            </div>
+            <button
+              onClick={handleDeleteAllOrders}
+              disabled={isDeletingAll || stats.totalOrders === 0}
+              className={`flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors ${
+                (isDeletingAll || stats.totalOrders === 0) ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {isDeletingAll ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-5 w-5 mr-2" />
+                  Delete All Orders
+                </>
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Stats Grid */}
