@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Users, Package, ShoppingBag, DollarSign, ArrowUp, ArrowDown } from 'lucide-react';
+import { Users, Package, ShoppingBag, DollarSign, ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
 import api from '../../utils/api';
+import toast from 'react-hot-toast';
 
 interface DashboardStats {
   totalOrders: number;
@@ -50,8 +51,30 @@ export function AdminDashboard() {
       setStats(response.data);
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
+      toast.error('Failed to fetch dashboard stats');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    try {
+      if (window.confirm('Are you sure you want to delete this order?')) {
+        await api.delete(`/admin/orders/${orderId}`);
+        
+        // Update stats after deletion
+        setStats(prevStats => ({
+          ...prevStats,
+          totalOrders: prevStats.totalOrders - 1,
+          totalRevenue: prevStats.totalRevenue - (prevStats.recentOrders.find(order => order._id === orderId)?.total || 0),
+          recentOrders: prevStats.recentOrders.filter(order => order._id !== orderId)
+        }));
+
+        toast.success('Order deleted successfully');
+      }
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      toast.error('Failed to delete order');
     }
   };
 
@@ -186,6 +209,7 @@ export function AdminDashboard() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -217,6 +241,14 @@ export function AdminDashboard() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(order.date)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <button
+                        onClick={() => handleDeleteOrder(order._id)}
+                        className="text-red-600 hover:text-red-900 transition-colors"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
                     </td>
                   </tr>
                 ))}
