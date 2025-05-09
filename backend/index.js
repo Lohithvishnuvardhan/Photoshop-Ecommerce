@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
 // Route middlewares - remove /api prefix since it's in the frontend baseURL
 app.use('/auth', authRoutes);
 app.use('/products', productRoutes);
-app.use('/orders', orderRoutes);
+app.use('/api/orders', orderRoutes);
 app.use('/cart', cartRoutes);
 app.use('/admin', adminRoutes);
 app.use('/health', healthRoutes);
