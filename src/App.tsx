@@ -24,6 +24,7 @@ import { AdminProducts } from './pages/admin/Products';
 import { ForgotPassword } from './pages/ForgotPassword';
 import { ResetPassword } from './pages/ResetPassword';
 import { OrderSuccess } from './pages/OrderSuccess';
+import { ViewOrder } from './pages/ViewOrder';
 
 import { SearchProvider } from './context/SearchContext';
 import { CartProvider } from './context/Cartcontext';
@@ -65,6 +66,7 @@ function App() {
                 <Route path="contact" element={<PrivateRoute><Contact /></PrivateRoute>} />
                 <Route path="profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
                 <Route path="orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
+                <Route path="view-order" element={<PrivateRoute><ViewOrder /></PrivateRoute>} />
                 <Route path="track-order" element={<PrivateRoute><TrackOrder /></PrivateRoute>} />
                 <Route path="admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
                 <Route path="admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />

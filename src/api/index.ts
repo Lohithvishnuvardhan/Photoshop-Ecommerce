@@ -121,7 +121,10 @@ export const orderAPI = {
 
   getOrders: async (): Promise<Order[]> => {
     try {
-      const response = await api.get<Order[]>('/orders/myorders');
+      const token = localStorage.getItem('token');
+      const response = await api.get<Order[]>('/orders/myorders', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch orders');
