@@ -33,7 +33,7 @@ export function OrderSuccess() {
   }, [orderDetails, navigate]);
 
   const handleViewOrders = () => {
-    navigate('/view-order');
+    navigate('/orders');
   };
 
   if (!orderDetails) {
