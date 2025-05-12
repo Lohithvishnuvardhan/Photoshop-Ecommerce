@@ -24,6 +24,6 @@ dist-ssr
 *.sw?
 
 # Ignore unwanted folders
-.bolt/
+
 
 Photoshop-Backend/
