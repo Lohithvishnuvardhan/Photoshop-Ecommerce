@@ -10,21 +10,6 @@ interface LoginResponse {
   token: string;
 }
 
-interface OrderItem {
-  name: string;
-  quantity: number;
-  image: string;
-  price: number;
-}
-
-interface Order {
-  _id: string;
-  orderItems: OrderItem[];
-  totalPrice: number;
-  status: string;
-  createdAt: string;
-}
-
 const api: AxiosInstance = axios.create({
   baseURL: API_URL,
   headers: {
@@ -74,7 +59,8 @@ export const authAPI = {
       
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Login failed');
+      const errorMessage = error.response?.data?.message || 'Login failed';
+      throw new Error(errorMessage);
     }
   },
 
@@ -89,7 +75,8 @@ export const authAPI = {
       
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Registration failed');
+      const errorMessage = error.response?.data?.message || 'Registration failed';
+      throw new Error(errorMessage);
     }
   },
 
@@ -97,38 +84,6 @@ export const authAPI = {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('isAdmin');
-  },
-
-  resetPassword: async (token: string, newPassword: string): Promise<void> => {
-    try {
-      await api.post(`/auth/reset-password/${token}`, { newPassword });
-    } catch (error: any) {
-      throw error;
-    }
-  }
-};
-
-export const orderAPI = {
-  createOrder: async (orderData: any) => {
-    try {
-      const response = await api.post('/orders', orderData);
-      return response.data;
-    } catch (error: any) {
-      console.error('Create order error:', error.response || error);
-      throw new Error(error.response?.data?.message || 'Failed to create order');
-    }
-  },
-
-  getOrders: async (): Promise<Order[]> => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await api.get<Order[]>('/orders/myorders', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch orders');
-    }
   }
 };
 
