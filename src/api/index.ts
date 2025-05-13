@@ -122,7 +122,7 @@ export const orderAPI = {
   getOrders: async (): Promise<Order[]> => {
     try {
       const token = localStorage.getItem('token');
-      const response = await api.get<Order[]>('/api/orders/myorders', {
+      const response = await api.get<Order[]>('/orders/myorders', {
         headers: { Authorization: `Bearer ${token}` }
       });
       return response.data;
