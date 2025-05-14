@@ -5,23 +5,22 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
-  },
-  withCredentials: true
+  }
 });
 
+// Request interceptor
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    if (token && config.headers) {
+    if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
+// Response interceptor
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -37,5 +36,25 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export const authAPI = {
+  login: async (email: string, password: string) => {
+    try {
+      const response = await api.post('/auth/auth/login', { email, password });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  register: async (name: string, email: string, password: string) => {
+    try {
+      const response = await api.post('/auth/auth/register', { name, email, password });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+};
 
 export default api;

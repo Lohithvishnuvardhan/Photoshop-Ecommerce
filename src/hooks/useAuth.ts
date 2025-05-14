@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import api from '../utils/api';
+import { authAPI } from '../utils/api';
 import { User } from '../types';
 
 interface AuthState {
@@ -23,8 +23,7 @@ export const useAuth = create<AuthState>()(
       login: async (email: string, password: string) => {
         set({ loading: true });
         try {
-          const response = await api.post('/auth/login', { email, password });
-          const { data } = response;
+          const data = await authAPI.login(email, password);
           
           localStorage.setItem('token', data.token);
           localStorage.setItem('isAdmin', String(data.isAdmin));
@@ -46,8 +45,7 @@ export const useAuth = create<AuthState>()(
       register: async (name: string, email: string, password: string) => {
         set({ loading: true });
         try {
-          const response = await api.post('/auth/register', { name, email, password });
-          const { data } = response;
+          const data = await authAPI.register(name, email, password);
           
           localStorage.setItem('token', data.token);
           localStorage.setItem('userId', data._id);
