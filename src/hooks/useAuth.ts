@@ -1,20 +1,14 @@
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import api from '../utils/api';
-
-interface User {
-  user: any;
-  _id: string;
-  name: string;
-  email: string;
-  isAdmin: boolean;
-  token: string;
-}
+import { User } from '../types';
 
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  loading: boolean;
   login: (email: string, password: string) => Promise<User>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -26,27 +20,32 @@ export const useAuth = create<AuthState>()(
       user: null,
       isAuthenticated: !!localStorage.getItem('token'),
       isAdmin: localStorage.getItem('isAdmin') === 'true',
+      loading: false,
       login: async (email: string, password: string) => {
+        set({ loading: true });
         try {
           const response = await api.post<User>('/auth/login', { email, password });
           const { data } = response;
           
-          localStorage.setItem('token', data.token);
+          localStorage.setItem('token', data.token!);
           localStorage.setItem('isAdmin', String(data.isAdmin));
           localStorage.setItem('userId', data._id);
           
           set({ 
             user: data,
             isAuthenticated: true,
-            isAdmin: data.isAdmin
+            isAdmin: data.isAdmin,
+            loading: false
           });
           
           return data;
         } catch (error: any) {
+          set({ loading: false });
           throw new Error(error.response?.data?.message || 'Login failed');
         }
       },
       register: async (name: string, email: string, password: string) => {
+        set({ loading: true });
         try {
           const response = await api.post('/auth/register', { name, email, password });
           const { data } = response;
@@ -58,9 +57,11 @@ export const useAuth = create<AuthState>()(
           set({ 
             user: data,
             isAuthenticated: true,
-            isAdmin: data.isAdmin
+            isAdmin: data.isAdmin,
+            loading: false
           });
         } catch (error: any) {
+          set({ loading: false });
           throw new Error(error.response?.data?.message || 'Registration failed');
         }
       },
@@ -71,7 +72,8 @@ export const useAuth = create<AuthState>()(
         set({ 
           user: null, 
           isAuthenticated: false,
-          isAdmin: false
+          isAdmin: false,
+          loading: false
         });
       },
     }),

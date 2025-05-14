@@ -94,7 +94,8 @@ const Layout = () => {
       toast.success('Successfully logged out');
       navigate('/login');
     } catch (error) {
-      toast.error('Error logging out. Please try again.');
+      toast.error('An error occurred. Please try again.');
+      console.error('Error:', error);
     } finally {
       setIsLoading(false);
     }

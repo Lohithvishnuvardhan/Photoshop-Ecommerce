@@ -1,6 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL;
 
 interface LoginResponse {
   _id: string;
@@ -11,11 +10,12 @@ interface LoginResponse {
 }
 
 const api: AxiosInstance = axios.create({
-  baseURL: API_URL,
+  baseURL: import.meta.env.VITE_API_URL || 'https://photopixel-bd.onrender.com',
   headers: {
     'Content-Type': 'application/json',
+     'Accept': 'application/json'
   },
-  withCredentials: false
+  withCredentials: true
 });
 
 api.interceptors.request.use(

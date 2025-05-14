@@ -7,10 +7,9 @@ const {
   resetPassword 
 } = require('../controllers/authController');
 
-// Changed routes to match frontend API calls
-router.post('/register', registerUser);
-router.post('/login', loginUser);
-router.post('/forgot-password', forgotPassword);
-router.post('/reset-password/:token', resetPassword);
+router.post('/auth/register', registerUser);
+router.post('/auth/login', loginUser);
+router.post('/auth/forgot-password', forgotPassword);
+router.post('/auth/reset-password/:token', resetPassword);
 
 module.exports = router;
