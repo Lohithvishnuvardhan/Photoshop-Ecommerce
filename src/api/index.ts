@@ -7,12 +7,49 @@ const api = axios.create({
   withCredentials: true,
 });
 
+// Add request interceptor to add token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor to handle errors
+api.interceptors.response.use(
+  (response) => response.data,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const authAPI = {
-  login: (data: any) => api.post('/auth/login', data),
+ login: async (data: any): Promise<any> => {
+  const response = await api.post('/auth/login', data) as { token: string };
+  const token = response.token;
+  if (token) {
+    localStorage.setItem('token', token);
+  }
+  return response;
+},
   register: (data: any) => api.post('/auth/register', data),
-  logout: () => api.post('/auth/logout'),
+  logout: () => {
+    localStorage.removeItem('token');
+    return api.post('/auth/logout');
+  },
   getProfile: () => api.get('/auth/profile'),
 };
+
 
 export const orderAPI = {
   createOrder: (data: any) => api.post('/orders', data),
