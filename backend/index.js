@@ -30,6 +30,14 @@ const orderRoutes = require('./routes/orderRoutes');
 const cartRoutes = require('./routes/cartRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const healthRoutes = require('./routes/healthRoutes');
+
+// Route middleware
+app.use('/api', authRoutes);
+app.use('/api', productRoutes);
+app.use('/api', orderRoutes);
+app.use('/api', cartRoutes);
+app.use('/api', adminRoutes);
+app.use('/api', healthRoutes);
 const userRoutes = require('./routes/userRoutes');
 
 // Basic route for testing
