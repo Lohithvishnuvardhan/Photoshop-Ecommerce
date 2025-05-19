@@ -40,19 +40,34 @@ api.interceptors.response.use(
 export const authAPI = {
   login: async (email: string, password: string) => {
     try {
-      const response = await api.post('/auth/auth/login', { email, password });
+      const response = await api.post('/auth/login', { email, password });
+      if (!response.data.success) {
+        throw new Error(response.data.message || 'Login failed');
+      }
       return response.data;
-    } catch (error) {
-      throw error;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Login failed');
     }
   },
 
   register: async (name: string, email: string, password: string) => {
     try {
-      const response = await api.post('/auth/auth/register', { name, email, password });
+      const response = await api.post('/auth/register', { name, email, password });
+      if (!response.data.success) {
+        throw new Error(response.data.message || 'Registration failed');
+      }
       return response.data;
-    } catch (error) {
-      throw error;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Registration failed');
+    }
+  },
+
+  resetPassword: async (token: string, newPassword: string) => {
+    try {
+      const response = await api.post(`/auth/reset-password/${token}`, { newPassword });
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to reset password');
     }
   }
 };

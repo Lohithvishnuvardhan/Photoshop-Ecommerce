@@ -25,6 +25,10 @@ export const useAuth = create<AuthState>()(
         try {
           const data = await authAPI.login(email, password);
           
+          if (!data.token) {
+            throw new Error('No token received');
+          }
+          
           localStorage.setItem('token', data.token);
           localStorage.setItem('isAdmin', String(data.isAdmin));
           localStorage.setItem('userId', data._id);
@@ -39,13 +43,17 @@ export const useAuth = create<AuthState>()(
           return data;
         } catch (error: any) {
           set({ loading: false });
-          throw new Error(error.response?.data?.message || 'Login failed');
+          throw new Error(error.message || 'Login failed');
         }
       },
       register: async (name: string, email: string, password: string) => {
         set({ loading: true });
         try {
           const data = await authAPI.register(name, email, password);
+          
+          if (!data.token) {
+            throw new Error('No token received');
+          }
           
           localStorage.setItem('token', data.token);
           localStorage.setItem('userId', data._id);
@@ -59,7 +67,7 @@ export const useAuth = create<AuthState>()(
           });
         } catch (error: any) {
           set({ loading: false });
-          throw new Error(error.response?.data?.message || 'Registration failed');
+          throw new Error(error.message || 'Registration failed');
         }
       },
       logout: () => {
