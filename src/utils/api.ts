@@ -72,4 +72,27 @@ export const authAPI = {
   }
 };
 
+export const productAPI = {
+  getProducts: async (category?: string) => {
+    try {
+      const response = await api.get('/products', {
+        params: category ? { category } : undefined
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching products:', error);
+      throw new Error(error.response?.data?.message || 'Failed to fetch products');
+    }
+  },
+
+  getProduct: async (id: string) => {
+    try {
+      const response = await api.get(`/products/${id}`);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch product');
+    }
+  }
+};
+
 export default api;
