@@ -7,49 +7,27 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Add request interceptor to add token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
-
-// Add response interceptor to handle errors
-api.interceptors.response.use(
-  (response) => response.data,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error);
-  }
-);
-
 export const authAPI = {
- login: async (data: any): Promise<any> => {
-  const response = await api.post('/auth/login', data) as { token: string };
-  const token = response.token;
-  if (token) {
-    localStorage.setItem('token', token);
-  }
-  return response;
-},
-  register: (data: any) => api.post('/auth/register', data),
-  logout: () => {
-    localStorage.removeItem('token');
-    return api.post('/auth/logout');
+  login: async (data: any) => {
+    const response = await api.post('/api/auth/login', data);
+    return response.data;
   },
-  getProfile: () => api.get('/auth/profile'),
+  register: async (data: { name: string; email: string; password: string }) => {
+    const response = await api.post('/api/auth/register', data);
+    if (!response.data.success) {
+      throw new Error(response.data.message || 'Registration failed');
+    }
+    return response.data;
+  },
+  logout: async () => {
+    const response = await api.post('/api/auth/logout');
+    return response.data;
+  },
+  getProfile: async () => {
+    const response = await api.get('/api/auth/profile');
+    return response.data;
+  },
 };
-
 
 export const orderAPI = {
   createOrder: (data: any) => api.post('/orders', data),
