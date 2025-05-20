@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2, Search, Download, Filter, MoreVertical, CheckCircle, XCircle } from 'lucide-react';
-import api from '../../utils/api';
+import api, { adminAPI } from '../../utils/api';
 import toast from 'react-hot-toast';
 
 interface Product {
@@ -221,12 +221,12 @@ export function AdminProducts() {
 
   const fetchProducts = async () => {
     try {
-      const response = await api.get('/products');
-      setProducts(response.data);
+      const response = await adminAPI.getProducts();
+      setProducts(response);
+      setIsLoading(false);
     } catch (error) {
       console.error('Error fetching products:', error);
       toast.error('Failed to fetch products');
-    } finally {
       setIsLoading(false);
     }
   };

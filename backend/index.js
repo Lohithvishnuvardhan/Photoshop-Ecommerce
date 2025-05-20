@@ -36,6 +36,10 @@ app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
+app.use((req, res, next) => {
+  res.header('Cache-Control', 'no-store');
+  next();
+});
 app.use('/api/health', healthRoutes);
 
 // Basic route for testing

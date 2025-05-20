@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Users, Package, ShoppingBag, DollarSign, ArrowUp, ArrowDown, Trash2 } from 'lucide-react';
-import api from '../../utils/api';
+import api, { adminAPI } from '../../utils/api';
 import toast from 'react-hot-toast';
 
 interface DashboardStats {
@@ -49,12 +49,12 @@ export function AdminDashboard() {
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await api.get('/admin/dashboard');
-      setStats(response.data);
+      const response = await adminAPI.getDashboardStats();
+      setStats(response);
+      setIsLoading(false);
     } catch (error) {
       console.error('Error fetching dashboard stats:', error);
       toast.error('Failed to fetch dashboard stats');
-    } finally {
       setIsLoading(false);
     }
   };

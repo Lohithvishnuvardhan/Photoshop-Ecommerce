@@ -1,14 +1,13 @@
+
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://photopixel-bd.onrender.com',
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
+  baseURL: '/api',
+  withCredentials: true
 });
 
-// Request interceptor
+// Add request interceptor
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
@@ -17,69 +16,60 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
-);
-
-// Response interceptor
-api.interceptors.response.use(
-  (response) => response.data,
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('userId');
-      localStorage.removeItem('isAdmin');
-      
-      if (!window.location.pathname.includes('/login')) {
-        window.location.href = '/login';
-      }
-    }
     return Promise.reject(error);
   }
 );
 
-export const authAPI = {
-  login: async (email: string, password: string) => {
-    const response = await api.post('/api/auth/login', { email, password });
-    return response;
-  },
-
-  register: async (name: string, email: string, password: string) => {
-    const response = await api.post('/api/auth/register', { name, email, password });
-    return response;
+// Add response interceptor
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const message = error.response?.data?.message || 'An error occurred';
+    toast.error(message);
+    return Promise.reject(error);
   }
-};
-
-export const userAPI = {
-  getProfile: async () => {
-    const response = await api.get('/api/users/profile');
-    return response;
-  },
-
-  updateProfile: async (data: any) => {
-    const response = await api.put('/api/users/profile', data);
-    return response;
-  }
-};
+);
 
 export const adminAPI = {
   getDashboardStats: async () => {
-    const response = await api.get('/api/admin/dashboard');
-    return response;
+    try {
+      const response = await api.get('/admin/dashboard');
+      return response.data;
+    } catch (error) {
+      console.error('Dashboard stats error:', error);
+      throw error;
+    }
   },
 
   getProducts: async () => {
-    const response = await api.get('/api/admin/products');
-    return response;
+    try {
+      const response = await api.get('/admin/products');
+      return response.data;
+    } catch (error) {
+      console.error('Products fetch error:', error);
+      throw error;
+    }
   },
 
   deleteOrder: async (orderId: string) => {
-    const response = await api.delete(`/api/admin/orders/${orderId}`);
-    return response;
+    try {
+      const response = await api.delete(`/admin/orders/${orderId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Delete order error:', error);
+      throw error;
+    }
   },
 
   deleteAllOrders: async () => {
-    const response = await api.delete('/api/admin/orders');
-    return response;
+    try {
+      const response = await api.delete('/admin/orders');
+      return response.data;
+    } catch (error) {
+      console.error('Delete all orders error:', error);
+      throw error;
+    }
   }
 };
 
