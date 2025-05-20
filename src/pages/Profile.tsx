@@ -38,7 +38,7 @@ interface BusinessProfile {
   latestOrder?: Order;
 }
 
-export default function Profile() {
+const Profile = () => {
   const [profile, setProfile] = useState<BusinessProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -276,4 +276,6 @@ export default function Profile() {
       </div>
     </div>
   );
-}
+};
+
+export default Profile;

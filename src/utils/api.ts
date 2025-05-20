@@ -41,9 +41,6 @@ export const authAPI = {
   login: async (email: string, password: string) => {
     try {
       const response = await api.post('/auth/login', { email, password });
-      if (!response.data.success) {
-        throw new Error(response.data.message || 'Login failed');
-      }
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Login failed');
@@ -53,9 +50,6 @@ export const authAPI = {
   register: async (name: string, email: string, password: string) => {
     try {
       const response = await api.post('/auth/register', { name, email, password });
-      if (!response.data.success) {
-        throw new Error(response.data.message || 'Registration failed');
-      }
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Registration failed');
@@ -72,6 +66,26 @@ export const authAPI = {
   }
 };
 
+export const userAPI = {
+  getProfile: async () => {
+    try {
+      const response = await api.get('/users/profile');
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch profile');
+    }
+  },
+
+  updateProfile: async (data: any) => {
+    try {
+      const response = await api.put('/users/profile', data);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to update profile');
+    }
+  }
+};
+
 export const productAPI = {
   getProducts: async (category?: string) => {
     try {
@@ -80,7 +94,6 @@ export const productAPI = {
       });
       return response.data;
     } catch (error: any) {
-      console.error('Error fetching products:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch products');
     }
   },
