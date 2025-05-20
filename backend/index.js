@@ -13,46 +13,35 @@ const app = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: true,
+  origin: process.env.FRONTEND_URL || 'https://photopixelfrontend.vercel.app',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 200
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Routes
+// Import routes
 const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
 const orderRoutes = require('./routes/orderRoutes');
-const cartRoutes = require('./routes/cartRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const healthRoutes = require('./routes/healthRoutes');
 
 // Route middleware
-app.use('/api', authRoutes);
-app.use('/api', productRoutes);
-app.use('/api', orderRoutes);
-app.use('/api', cartRoutes);
-app.use('/api', adminRoutes);
-app.use('/api', healthRoutes);
-const userRoutes = require('./routes/userRoutes');
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/health', healthRoutes);
 
 // Basic route for testing
 app.get('/', (req, res) => {
   res.json({ message: 'PhotoPixel API is running!' });
 });
-
-// Route middlewares - remove /api prefix since it's in the frontend baseURL
-app.use('/auth', authRoutes);
-app.use('/products', productRoutes);
-app.use('/api/orders', orderRoutes);
-app.use('/cart', cartRoutes);
-app.use('/admin', adminRoutes);
-app.use('/health', healthRoutes);
-app.use('/users', userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

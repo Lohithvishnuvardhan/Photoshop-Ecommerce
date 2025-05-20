@@ -5,8 +5,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
-  },
-  timeout: 10000 // Set 10 second timeout
+  }
 });
 
 // Request interceptor
@@ -23,7 +22,7 @@ api.interceptors.request.use(
 
 // Response interceptor
 api.interceptors.response.use(
-  (response) => response,
+  (response) => response.data,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
@@ -40,72 +39,47 @@ api.interceptors.response.use(
 
 export const authAPI = {
   login: async (email: string, password: string) => {
-    try {
-      const response = await api.post('/auth/login', { email, password });
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Login failed');
-    }
+    const response = await api.post('/api/auth/login', { email, password });
+    return response;
   },
 
   register: async (name: string, email: string, password: string) => {
-    try {
-      const response = await api.post('/auth/register', { name, email, password });
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Registration failed');
-    }
-  },
-
-  resetPassword: async (token: string, newPassword: string) => {
-    try {
-      const response = await api.post(`/auth/reset-password/${token}`, { newPassword });
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to reset password');
-    }
+    const response = await api.post('/api/auth/register', { name, email, password });
+    return response;
   }
 };
 
 export const userAPI = {
   getProfile: async () => {
-    try {
-      const response = await api.get('/users/profile');
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch profile');
-    }
+    const response = await api.get('/api/users/profile');
+    return response;
   },
 
   updateProfile: async (data: any) => {
-    try {
-      const response = await api.put('/users/profile', data);
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to update profile');
-    }
+    const response = await api.put('/api/users/profile', data);
+    return response;
   }
 };
 
-export const productAPI = {
-  getProducts: async (category?: string) => {
-    try {
-      const response = await api.get('/products', {
-        params: category ? { category } : undefined
-      });
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch products');
-    }
+export const adminAPI = {
+  getDashboardStats: async () => {
+    const response = await api.get('/api/admin/dashboard');
+    return response;
   },
 
-  getProduct: async (id: string) => {
-    try {
-      const response = await api.get(`/products/${id}`);
-      return response.data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch product');
-    }
+  getProducts: async () => {
+    const response = await api.get('/api/admin/products');
+    return response;
+  },
+
+  deleteOrder: async (orderId: string) => {
+    const response = await api.delete(`/api/admin/orders/${orderId}`);
+    return response;
+  },
+
+  deleteAllOrders: async () => {
+    const response = await api.delete('/api/admin/orders');
+    return response;
   }
 };
 
