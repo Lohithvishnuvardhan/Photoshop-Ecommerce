@@ -3,7 +3,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/Cartcontext';
-import { useAuth } from '../hooks/useAuth';
+import useAuth from '../hooks/useAuth';
 
 export function Login() {
   const [email, setEmail] = useState('');
@@ -13,7 +13,7 @@ export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { items: cartItems } = useCart();
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, isAdmin } = useAuth();
 
   useEffect(() => {
     if (isAuthenticated && location.state?.from && location.state.from.pathname !== '/') {
@@ -26,29 +26,28 @@ export function Login() {
     setIsLoading(true);
 
     try {
-      const response = await login(email, password);
-      
+      await login(email, password); // await only login, no response returned
+
       if (cartItems && cartItems.length > 0) {
         localStorage.setItem('cart', JSON.stringify(cartItems));
       }
 
       toast.success('Login successful!');
-      
-      // Check if we were redirected from payment page
+
       const from = location.state?.from;
       const paymentData = location.state?.paymentData;
-      
-      if (response.isAdmin) {
+
+      if (isAdmin) {
         navigate('/admin/dashboard');
       } else if (from === '/payment' && paymentData) {
-        navigate('/payment', { 
-          state: { 
+        navigate('/payment', {
+          state: {
             items: paymentData.items,
-            isBuyNow: paymentData.isBuyNow
-          }
+            isBuyNow: paymentData.isBuyNow,
+          },
         });
       } else {
-        const redirectPath = location.state?.from?.pathname || '/';
+        const redirectPath = from?.pathname || '/';
         navigate(redirectPath);
       }
     } catch (error: any) {
@@ -108,7 +107,7 @@ export function Login() {
                 <input
                   id="password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
+                  type={showPassword ? 'text' : 'password'}
                   autoComplete="current-password"
                   required
                   value={password}

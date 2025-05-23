@@ -5,79 +5,55 @@ import { User } from '../types';
 
 interface AuthState {
   user: User | null;
+  token: string | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<User>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  register: (name: string, email: string, password: string) => Promise<void>;
 }
 
-export const useAuth = create<AuthState>()(
+const useAuth = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      isAuthenticated: !!localStorage.getItem('token'),
-      isAdmin: localStorage.getItem('isAdmin') === 'true',
-      loading: false,
-      login: async (email: string, password: string) => {
-        try {
-          const data = await authAPI.login(email, password);
-          
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('isAdmin', String(data.isAdmin));
-          localStorage.setItem('userId', data._id);
-          
-          set({ 
-            user: data,
-            isAuthenticated: true,
-            isAdmin: data.isAdmin,
-            loading: false
-          });
-          
-          return data;
-        } catch (error: any) {
-          set({ loading: false });
-          throw error;
-        }
+      token: null,
+      isAuthenticated: false,
+      isAdmin: false,
+
+      login: async (email, password) => {
+        const response = await authAPI.login(email, password);
+        set({
+          user: response.user,
+          token: response.token,
+          isAuthenticated: true,
+          isAdmin: response.user?.isAdmin ?? false,
+        });
       },
-      register: async (name: string, email: string, password: string) => {
-        try {
-          const data = await authAPI.register(name, email, password);
-          
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('userId', data._id);
-          localStorage.setItem('isAdmin', String(data.isAdmin));
-          
-          set({ 
-            user: data,
-            isAuthenticated: true,
-            isAdmin: data.isAdmin,
-            loading: false
-          });
-        } catch (error: any) {
-          set({ loading: false });
-          throw error;
-        }
-      },
+
       logout: () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('isAdmin');
-        set({ 
-          user: null, 
+        set({
+          user: null,
+          token: null,
           isAuthenticated: false,
           isAdmin: false,
-          loading: false
+        });
+      },
+
+      register: async (name, email, password) => {
+        const response = await authAPI.register(name, email, password);
+        set({
+          user: response.user,
+          token: response.token,
+          isAuthenticated: true,
+          isAdmin: response.user?.isAdmin ?? false,
         });
       },
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({
-        isAuthenticated: state.isAuthenticated,
-        isAdmin: state.isAdmin,
-      }),
     }
   )
 );
+
+export default useAuth;

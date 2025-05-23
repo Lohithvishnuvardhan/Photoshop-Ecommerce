@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCart, User, Search, LogOut, Camera } from 'lucide-react';
 import { useCartStore } from '../store/cart';
-import { useAuth } from '../hooks/useAuth';
+import useAuth from '../hooks/useAuth';
 import toast from 'react-hot-toast';
 
 const Layout = () => {
