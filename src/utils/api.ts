@@ -2,7 +2,7 @@ import axios from 'axios';
 import { User } from '../types';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'https://photopixel-bd.onrender.com',
+  baseURL: 'https://photopixel-bd.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -125,7 +125,7 @@ export const adminAPI = {
 
   getProducts: async (): Promise<Product[]> => {
     try {
-      const response = await api.get<Product[]>('/admin/products');
+      const response = await api.get<Product[]>('/products');
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to fetch products');
