@@ -2,7 +2,7 @@ import axios from 'axios';
 import { User } from '../types';
 
 const api = axios.create({
-  baseURL: 'https://photopixel-bd.onrender.com/api',
+  baseURL: import.meta.env.VITE_API_URL || 'https://photopixel-bd.onrender.com/api',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -119,16 +119,44 @@ export const adminAPI = {
       const response = await api.get<DashboardStats>('/admin/dashboard');
       return response.data;
     } catch (error: any) {
+      console.error('Dashboard stats error:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch dashboard stats');
     }
   },
 
   getProducts: async (): Promise<Product[]> => {
     try {
-      const response = await api.get<Product[]>('/products');
+      const response = await api.get<Product[]>('/admin/products');
       return response.data;
     } catch (error: any) {
+      console.error('Products fetch error:', error);
       throw new Error(error.response?.data?.message || 'Failed to fetch products');
+    }
+  },
+
+  createProduct: async (productData: Partial<Product>): Promise<Product> => {
+    try {
+      const response = await api.post<Product>('/admin/products', productData);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to create product');
+    }
+  },
+
+  updateProduct: async (id: string, productData: Partial<Product>): Promise<Product> => {
+    try {
+      const response = await api.put<Product>(`/admin/products/${id}`, productData);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to update product');
+    }
+  },
+
+  deleteProduct: async (id: string): Promise<void> => {
+    try {
+      await api.delete(`/admin/products/${id}`);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to delete product');
     }
   },
 
@@ -147,6 +175,26 @@ export const adminAPI = {
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to delete all orders');
+    }
+  }
+};
+
+export const orderAPI = {
+  getOrders: async () => {
+    try {
+      const response = await api.get('/orders/myorders');
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to fetch orders');
+    }
+  },
+
+  createOrder: async (orderData: any) => {
+    try {
+      const response = await api.post('/orders', orderData);
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to create order');
     }
   }
 };
