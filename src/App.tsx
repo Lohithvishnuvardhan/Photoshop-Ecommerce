@@ -17,6 +17,7 @@ import ShippingInfo from './pages/ShippingInfo';
 import Returns from './pages/Returns';
 import FAQ from './pages/FAQ';
 import Profile from './pages/Profile';
+import EditProfile from './pages/EditProfile';
 import TrackOrder from './pages/TrackOrder';
 import { AdminDashboard } from './pages/admin/Dashboard';
 import { AdminProducts } from './pages/admin/Products';
@@ -63,6 +64,7 @@ function App() {
                 <Route path="about" element={<PrivateRoute><About /></PrivateRoute>} />
                 <Route path="contact" element={<PrivateRoute><Contact /></PrivateRoute>} />
                 <Route path="profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+                <Route path="profile/edit" element={<PrivateRoute><EditProfile /></PrivateRoute>} />
                 <Route path="orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
                 <Route path="view-order" element={<PrivateRoute><ViewOrder /></PrivateRoute>} />
                 <Route path="track-order" element={<PrivateRoute><TrackOrder /></PrivateRoute>} />
