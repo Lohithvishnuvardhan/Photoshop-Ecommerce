@@ -16,7 +16,7 @@ dotenv.config();
 
 // CORS configuration
 app.use(cors({
- process.env.FRONTEND_URL || 'https://photopixelfrontend.vercel.app',
+  origin: process.env.FRONTEND_URL || 'https://photopixelfrontend.vercel.app',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
