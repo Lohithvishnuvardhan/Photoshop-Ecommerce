@@ -22,8 +22,15 @@ const useAuth = create<AuthState>()(
 
       login: async (email, password) => {
         try {
+          console.log('Attempting login with:', { email });
           const response = await api.post('/auth/login', { email, password });
-          const { token, _id, name, isAdmin } = response.data;
+          console.log('Login response:', response.data);
+          
+          const { token, _id, name, isAdmin, success } = response.data;
+          
+          if (!success || !token) {
+            throw new Error('Invalid response from server');
+          }
           
           // Set token in localStorage and axios headers
           localStorage.setItem('token', token);
@@ -36,7 +43,9 @@ const useAuth = create<AuthState>()(
             isAdmin: isAdmin || false
           });
         } catch (error: any) {
-          throw new Error(error.response?.data?.message || 'Login failed');
+          console.error('Login error:', error);
+          const errorMessage = error.response?.data?.message || error.message || 'Login failed';
+          throw new Error(errorMessage);
         }
       },
 
@@ -55,8 +64,15 @@ const useAuth = create<AuthState>()(
 
       register: async (name, email, password) => {
         try {
+          console.log('Attempting registration with:', { name, email });
           const response = await api.post('/auth/register', { name, email, password });
-          const { token, _id, isAdmin } = response.data;
+          console.log('Registration response:', response.data);
+          
+          const { token, _id, isAdmin, success } = response.data;
+          
+          if (!success || !token) {
+            throw new Error('Invalid response from server');
+          }
           
           // Set token in localStorage and axios headers
           localStorage.setItem('token', token);
@@ -69,7 +85,9 @@ const useAuth = create<AuthState>()(
             isAdmin: isAdmin || false
           });
         } catch (error: any) {
-          throw new Error(error.response?.data?.message || 'Registration failed');
+          console.error('Registration error:', error);
+          const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
+          throw new Error(errorMessage);
         }
       }
     }),

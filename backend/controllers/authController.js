@@ -65,9 +65,12 @@ exports.registerUser = async (req, res) => {
 
 exports.loginUser = async (req, res) => {
   try {
+    console.log('Login attempt:', { email: req.body.email, hasPassword: !!req.body.password });
+    
     const { email, password } = req.body;
 
     if (!email || !password) {
+      console.log('Missing credentials');
       return res.status(400).json({ 
         success: false,
         message: 'Please provide email and password' 
@@ -75,6 +78,8 @@ exports.loginUser = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
+    console.log('User found:', !!user);
+    
     if (!user) {
       return res.status(401).json({ 
         success: false,
@@ -83,6 +88,8 @@ exports.loginUser = async (req, res) => {
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('Password match:', isMatch);
+    
     if (!isMatch) {
       return res.status(401).json({ 
         success: false,
@@ -91,6 +98,7 @@ exports.loginUser = async (req, res) => {
     }
 
     const token = generateToken(user);
+    console.log('Token generated successfully');
 
     res.json({
       success: true,
