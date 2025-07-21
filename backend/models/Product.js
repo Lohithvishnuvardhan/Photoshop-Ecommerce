@@ -34,6 +34,10 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    isActive: {
+      type: Boolean,
+      default: true
+    },
     ratings: [{
       user: {
         type: mongoose.Schema.Types.ObjectId,
