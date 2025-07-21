@@ -63,7 +63,14 @@ export function Home() {
   ];
 
   const handleShopNow = () => {
+    // Temporarily navigate directly to cameras instead of checking auth
     navigate('/cameras');
+    // Original auth-dependent code (temporarily disabled):
+    // if (isAuthenticated) {
+    //   navigate('/cameras');
+    // } else {
+    //   navigate('/login');
+    // }
   };
 
   return (

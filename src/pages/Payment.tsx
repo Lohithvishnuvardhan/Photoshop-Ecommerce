@@ -14,6 +14,10 @@ export function Payment() {
   const [isLoading, setIsLoading] = useState(false);
   const [orderItems] = useState(location.state?.items || []);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  
+  // Temporarily disabled auth check
+  // const { user, isAuthenticated } = useAuth();
+  
   const [formData, setFormData] = useState({
     cardNumber: '',
     cardName: '',
@@ -26,6 +30,12 @@ export function Payment() {
   });
 
   useEffect(() => {
+    // Temporarily disabled auth check
+    // if (!isAuthenticated) {
+    //   navigate('/login');
+    //   return;
+    // }
+    
     if (!location.state?.items?.length) {
       navigate('/cart');
       return;

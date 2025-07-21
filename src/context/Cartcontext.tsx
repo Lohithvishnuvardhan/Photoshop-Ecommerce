@@ -39,6 +39,9 @@ const useCartStore = create<CartStore>()(
             };
           }
           
+          // Temporarily disabled auth-dependent toast
+          // toast.success(`${product.name} added to cart!`);
+          
           return {
             items: [...state.items, {
               _id: product._id,

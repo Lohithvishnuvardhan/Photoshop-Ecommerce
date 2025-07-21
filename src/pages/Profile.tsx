@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 import { Package, MapPin, Mail, Phone, User, Clock, ChevronRight } from 'lucide-react';
+import { TemporaryAuthNotice } from '../components/TemporaryAuthNotice';
 
 interface Order {
   _id: string;
@@ -40,15 +41,26 @@ export default function Profile() {
     orders: []
   });
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
+  
+  // Temporarily disabled auth
+  // const { user, isAuthenticated } = useAuth();
 
   useEffect(() => {
+    // Temporarily disabled auth check
+    // if (!isAuthenticated) {
+    //   navigate('/login');
+    //   return;
+    // }
     fetchProfileData();
     fetchRecentOrders();
   }, []);
 
   const fetchProfileData = async () => {
     try {
-      // Mock profile data since we removed authentication
+      // Temporarily using mock data instead of API call
+      // const response = await api.get('/users/profile');
+      // setProfileData(response.data);
+      
       const mockProfile = {
         name: 'John Doe',
         email: 'john.doe@example.com',
@@ -74,7 +86,10 @@ export default function Profile() {
 
   const fetchRecentOrders = async () => {
     try {
-      // Mock recent orders data
+      // Temporarily using mock data instead of API call
+      // const response = await orderAPI.getOrders();
+      // setRecentOrders(response.slice(0, 5));
+      
       const mockOrders = [
         {
           _id: 'order_1',
@@ -134,6 +149,7 @@ export default function Profile() {
   return (
     <div className="min-h-screen bg-gray-100 py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <TemporaryAuthNotice />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Information */}
           <div className="lg:col-span-1">
