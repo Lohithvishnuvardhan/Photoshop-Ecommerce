@@ -30,19 +30,6 @@ export function Payment() {
       navigate('/cart');
       return;
     }
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login', { 
-        state: { 
-          from: location.pathname,
-          paymentData: {
-            items: orderItems,
-            isBuyNow: location.state?.isBuyNow
-          }
-        }
-      });
-    }
   }, [navigate, location, orderItems]);
 
   const calculateTotal = () => {
@@ -105,7 +92,7 @@ export function Payment() {
         return;
       }
 
-      // Create the order
+      // Simulate order creation (since we removed backend integration)
       const orderData = {
         orderItems: orderItems.map((item: any) => ({
           name: item.name,
@@ -122,7 +109,8 @@ export function Payment() {
         }
       };
 
-      const response = await api.post('/orders', orderData);
+      // Simulate successful order creation
+      const response = { data: { _id: 'order_' + Date.now() } };
 
       if (location.state?.isBuyNow) {
         clearBuyNow();

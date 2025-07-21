@@ -63,7 +63,7 @@ export function Home() {
   ];
 
   const handleShopNow = () => {
-    navigate('/login');
+    navigate('/cameras');
   };
 
   return (

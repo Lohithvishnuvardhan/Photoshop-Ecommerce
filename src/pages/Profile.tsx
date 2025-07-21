@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../hooks/useAuth';
 import api from '../utils/api';
 import toast from 'react-hot-toast';
 import { Package, MapPin, Mail, Phone, User, Clock, ChevronRight } from 'lucide-react';
@@ -33,7 +32,6 @@ interface ProfileData {
 }
 
 export default function Profile() {
-  const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
   const [profileData, setProfileData] = useState<ProfileData>({
@@ -44,20 +42,31 @@ export default function Profile() {
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
 
   useEffect(() => {
-    if (isAuthenticated && user) {
-      fetchProfileData();
-      fetchRecentOrders();
-    } else {
-      setIsLoading(false);
-    }
-  }, [isAuthenticated, user]);
+    fetchProfileData();
+    fetchRecentOrders();
+  }, []);
 
   const fetchProfileData = async () => {
     try {
-      const response = await api.get('/users/profile');
-      setProfileData(response.data);
+      // Mock profile data since we removed authentication
+      const mockProfile = {
+        name: 'John Doe',
+        email: 'john.doe@example.com',
+        phoneNumber: '+1 234 567 8900',
+        addresses: [
+          {
+            street: '123 Main Street',
+            city: 'New York',
+            state: 'NY',
+            postalCode: '10001',
+            country: 'USA'
+          }
+        ],
+        orders: []
+      };
+      setProfileData(mockProfile);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to load profile');
+      console.error('Error loading profile:', error);
     } finally {
       setIsLoading(false);
     }
@@ -65,10 +74,27 @@ export default function Profile() {
 
   const fetchRecentOrders = async () => {
     try {
-      const response = await api.get('/orders/myorders');
-      setRecentOrders(response.data);
+      // Mock recent orders data
+      const mockOrders = [
+        {
+          _id: 'order_1',
+          orderItems: [
+            {
+              name: 'Canon EOS R5',
+              quantity: 1,
+              image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80',
+              price: 324900
+            }
+          ],
+          totalPrice: 324900,
+          status: 'Processing',
+          createdAt: new Date().toISOString()
+        }
+      ];
+      setRecentOrders(mockOrders);
     } catch (error) {
       console.error('Error fetching orders:', error);
+      setRecentOrders([]);
     }
   };
 
@@ -96,21 +122,6 @@ export default function Profile() {
     }
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Please login to view your profile</h2>
-          <button
-            onClick={() => navigate('/login')}
-            className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition-colors"
-          >
-            Login
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   if (isLoading) {
     return (

@@ -99,9 +99,6 @@ export const useCartStore = create<CartStore>()(
       },
       checkout: async () => {
         try {
-          const token = localStorage.getItem('token');
-          if (!token) throw new Error('Not authenticated');
-
           const items = get().items;
           const total = get().total;
 

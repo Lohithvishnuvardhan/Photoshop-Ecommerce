@@ -49,13 +49,11 @@ const useCartStore = create<CartStore>()(
             }],
           };
         });
-        toast.success('Added to cart');
       },
       removeFromCart: (productId) => {
         set((state) => ({
           items: state.items.filter((item) => item._id !== productId),
         }));
-        toast.success('Removed from cart');
       },
       updateQuantity: (productId, quantity) => {
         set((state) => ({

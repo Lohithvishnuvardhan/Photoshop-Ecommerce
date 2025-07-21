@@ -1,9 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, User, Search, LogOut, Camera } from 'lucide-react';
+import { ShoppingCart, User, Search, Camera } from 'lucide-react';
 import { useCartStore } from '../store/cart';
-import useAuth from '../hooks/useAuth';
-import toast from 'react-hot-toast';
 
 const Layout = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -16,8 +14,6 @@ const Layout = () => {
   const location = useLocation();
   const items = useCartStore(state => state.items);
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const { isAuthenticated, isAdmin, logout } = useAuth();
-  const [isLoading, setIsLoading] = useState(false);
   const navTimeoutRef = useRef<NodeJS.Timeout>();
   const visibilityTimeoutRef = useRef<NodeJS.Timeout>();
 
@@ -85,21 +81,6 @@ const Layout = () => {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      setIsLoading(true);
-      logout();
-      localStorage.removeItem('token');
-      localStorage.removeItem('cart');
-      toast.success('Successfully logged out');
-      navigate('/login');
-    } catch (error) {
-      toast.error('An error occurred. Please try again.');
-      console.error('Error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleNavClick = () => {
     if (visibilityTimeoutRef.current) {
@@ -150,27 +131,9 @@ const Layout = () => {
                 )}
               </Link>
 
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-4 md:space-x-6">
-                  <Link to="/profile" className="text-purple-400 hover:text-purple-300 transition-colors">
-                    <User className="h-6 w-6 md:h-8 md:w-8" />
-                  </Link>
-                  <button
-                    onClick={handleLogout}
-                    disabled={isLoading}
-                    className="text-purple-400 hover:text-purple-300 transition-colors disabled:opacity-50"
-                  >
-                    <LogOut className="h-6 w-6 md:h-8 md:w-8" />
-                  </button>
-                </div>
-              ) : (
-                <Link 
-                  to="/login"
-                  className="bg-purple-600 text-white px-6 py-2 md:px-8 md:py-3 rounded-lg hover:bg-purple-700 transition-colors text-base md:text-lg font-medium"
-                >
-                  Sign In
-                </Link>
-              )}
+              <Link to="/profile" className="text-purple-400 hover:text-purple-300 transition-colors">
+                <User className="h-6 w-6 md:h-8 md:w-8" />
+              </Link>
             </div>
           </div>
 
@@ -234,24 +197,6 @@ const Layout = () => {
                   >
                     Contact
                   </Link>
-                  {isAuthenticated && isAdmin && (
-                    <>
-                      <Link 
-                        to="/admin/dashboard" 
-                        className="text-purple-400 hover:text-purple-300 transition-colors text-base md:text-lg text-center"
-                        onClick={handleNavClick}
-                      >
-                        Admin Dashboard
-                      </Link>
-                      <Link 
-                        to="/admin/products" 
-                        className="text-purple-400 hover:text-purple-300 transition-colors text-base md:text-lg text-center"
-                        onClick={handleNavClick}
-                      >
-                        Manage Products
-                      </Link>
-                    </>
-                  )}
                 </div>
               </div>
             </div>

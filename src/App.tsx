@@ -2,8 +2,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
-import { Login } from './pages/Login';
-import { SignUp } from './pages/SignUp';
 import { Payment } from './pages/Payment';
 import { Orders } from './pages/Orders';
 import CartPage from './pages/CartPage';
@@ -19,16 +17,10 @@ import FAQ from './pages/FAQ';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 import TrackOrder from './pages/TrackOrder';
-import { AdminDashboard } from './pages/admin/Dashboard';
-import { AdminProducts } from './pages/admin/Products';
-import { ForgotPassword } from './pages/ForgotPassword';
-import { ResetPassword } from './pages/ResetPassword';
 import { OrderSuccess } from './pages/OrderSuccess';
 import { ViewOrder } from './pages/ViewOrder';
 import { SearchProvider } from './context/SearchContext';
 import { CartProvider } from './context/Cartcontext';
-import PrivateRoute from './components/PrivateRoute';
-import AdminRoute from './components/AdminRoute';
 
 function ErrorFallback({ error }: { error: Error }) {
   return (
@@ -49,33 +41,24 @@ function App() {
           <Router>
             <Routes>
               <Route path="/" element={<Layout />}>
-                {/* Public Routes */}
                 <Route index element={<Home />} />
-                <Route path="login" element={<Login />} />
-                <Route path="signup" element={<SignUp />} />
-                <Route path="forgot-password" element={<ForgotPassword />} />
-                <Route path="reset-password/:token" element={<ResetPassword />} />
-
-                {/* Protected Routes */}
-                <Route path="cameras" element={<PrivateRoute><Cameras /></PrivateRoute>} />
-                <Route path="lenses" element={<PrivateRoute><Lenses /></PrivateRoute>} />
-                <Route path="accessories" element={<PrivateRoute><Accessories /></PrivateRoute>} />
-                <Route path="batteries" element={<PrivateRoute><Batteries /></PrivateRoute>} />
-                <Route path="about" element={<PrivateRoute><About /></PrivateRoute>} />
-                <Route path="contact" element={<PrivateRoute><Contact /></PrivateRoute>} />
-                <Route path="profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
-                <Route path="profile/edit" element={<PrivateRoute><EditProfile /></PrivateRoute>} />
-                <Route path="orders" element={<PrivateRoute><Orders /></PrivateRoute>} />
-                <Route path="view-order" element={<PrivateRoute><ViewOrder /></PrivateRoute>} />
-                <Route path="track-order" element={<PrivateRoute><TrackOrder /></PrivateRoute>} />
-                <Route path="admin/dashboard" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
-                <Route path="admin/products" element={<AdminRoute><AdminProducts /></AdminRoute>} />
-                <Route path="payment" element={<PrivateRoute><Payment /></PrivateRoute>} />
-                <Route path="cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
-                <Route path="shipping" element={<PrivateRoute><ShippingInfo /></PrivateRoute>} />
-                <Route path="returns" element={<PrivateRoute><Returns /></PrivateRoute>} />
-                <Route path="faq" element={<PrivateRoute><FAQ /></PrivateRoute>} />
-                <Route path="order-success" element={<PrivateRoute><OrderSuccess /></PrivateRoute>} />
+                <Route path="cameras" element={<Cameras />} />
+                <Route path="lenses" element={<Lenses />} />
+                <Route path="accessories" element={<Accessories />} />
+                <Route path="batteries" element={<Batteries />} />
+                <Route path="about" element={<About />} />
+                <Route path="contact" element={<Contact />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="profile/edit" element={<EditProfile />} />
+                <Route path="orders" element={<Orders />} />
+                <Route path="view-order" element={<ViewOrder />} />
+                <Route path="track-order" element={<TrackOrder />} />
+                <Route path="payment" element={<Payment />} />
+                <Route path="cart" element={<CartPage />} />
+                <Route path="shipping" element={<ShippingInfo />} />
+                <Route path="returns" element={<Returns />} />
+                <Route path="faq" element={<FAQ />} />
+                <Route path="order-success" element={<OrderSuccess />} />
               </Route>
             </Routes>
           </Router>
