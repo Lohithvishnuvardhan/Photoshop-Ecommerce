@@ -22,17 +22,6 @@ import { ViewOrder } from './pages/ViewOrder';
 import { SearchProvider } from './context/SearchContext';
 import { CartProvider } from './context/Cartcontext';
 
-// Temporarily disabled authentication imports
-// import Login from './pages/Login';
-// import SignUp from './pages/SignUp';
-// import ForgotPassword from './pages/ForgotPassword';
-// import ResetPassword from './pages/ResetPassword';
-// import { AuthProvider } from './context/AuthContext';
-// import PrivateRoute from './components/PrivateRoute';
-// import AdminRoute from './components/AdminRoute';
-// import Dashboard from './pages/admin/Dashboard';
-// import Products from './pages/admin/Products';
-
 function ErrorFallback({ error }: { error: Error }) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
@@ -49,8 +38,6 @@ function App() {
     <ErrorBoundary FallbackComponent={ErrorFallback}>
       <SearchProvider>
         <CartProvider>
-          {/* Temporarily disabled AuthProvider wrapper */}
-          {/* <AuthProvider> */}
           <Router>
             <Routes>
               <Route path="/" element={<Layout />}>
@@ -73,18 +60,10 @@ function App() {
                 <Route path="faq" element={<FAQ />} />
                 <Route path="order-success" element={<OrderSuccess />} />
                 
-                {/* Temporarily disabled auth routes */}
-                {/* <Route path="login" element={<Login />} />
-                <Route path="signup" element={<SignUp />} />
-                <Route path="forgot-password" element={<ForgotPassword />} />
-                <Route path="reset-password/:token" element={<ResetPassword />} />
-                
-                <Route path="admin" element={<AdminRoute><Dashboard /></AdminRoute>} />
-                <Route path="admin/products" element={<AdminRoute><Products /></AdminRoute>} /> */}
+                {/* Frontend-only demo - no authentication routes needed */}
               </Route>
             </Routes>
           </Router>
-          {/* </AuthProvider> */}
         </CartProvider>
       </SearchProvider>
     </ErrorBoundary>

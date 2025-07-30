@@ -42,25 +42,14 @@ export default function Profile() {
   });
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   
-  // Temporarily disabled auth
-  // const { user, isAuthenticated } = useAuth();
-
   useEffect(() => {
-    // Temporarily disabled auth check
-    // if (!isAuthenticated) {
-    //   navigate('/login');
-    //   return;
-    // }
     fetchProfileData();
     fetchRecentOrders();
   }, []);
 
   const fetchProfileData = async () => {
     try {
-      // Temporarily using mock data instead of API call
-      // const response = await api.get('/users/profile');
-      // setProfileData(response.data);
-      
+      // Using mock data for frontend-only demo
       const mockProfile = {
         name: 'John Doe',
         email: 'john.doe@example.com',
@@ -86,10 +75,7 @@ export default function Profile() {
 
   const fetchRecentOrders = async () => {
     try {
-      // Temporarily using mock data instead of API call
-      // const response = await orderAPI.getOrders();
-      // setRecentOrders(response.slice(0, 5));
-      
+      // Using mock data for frontend-only demo
       const mockOrders = [
         {
           _id: 'order_1',

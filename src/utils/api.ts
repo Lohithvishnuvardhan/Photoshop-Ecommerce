@@ -1,48 +1,102 @@
-import axios from 'axios';
+// Mock API utilities for frontend-only application
+import toast from 'react-hot-toast';
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+// Mock delay to simulate network requests
+const mockDelay = (ms: number = 500) => new Promise(resolve => setTimeout(resolve, ms));
 
-  headers: {
-    'Content-Type': 'application/json',
+// Mock data
+const mockProducts = [
+  {
+    _id: '1',
+    name: 'Canon EOS R5',
+    price: 324900,
+    imageUrl: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80',
+    description: '45MP Full-Frame Mirrorless Camera',
+    category: 'Cameras',
+    stock: 10
   },
-  timeout: 10000,
-});
+  {
+    _id: '2',
+    name: 'Sony A7 IV',
+    price: 209990,
+    imageUrl: 'https://images.unsplash.com/photo-1621520291095-aa6c7137f048?auto=format&fit=crop&q=80',
+    description: '33MP Full-Frame Mirrorless Camera',
+    category: 'Cameras',
+    stock: 15
+  },
+  // Add more mock products as needed
+];
 
-// Temporarily disabled auth interceptors
-// Add request interceptor to include auth token
-// api.interceptors.request.use(
-//   (config) => {
-//     const token = localStorage.getItem('token');
-//     if (token) {
-//       config.headers.Authorization = `Bearer ${token}`;
-//     }
-//     return config;
-//   },
-//   (error) => {
-//     return Promise.reject(error);
-//   }
-// );
-
-// Add response interceptor to handle auth errors
-// api.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response?.status === 401) {
-//       localStorage.removeItem('token');
-//       window.location.href = '/login';
-//     }
-//     return Promise.reject(error);
-//   }
-// );
-// Handle response errors
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.error('API Error:', error.response?.data || error.message);
-    return Promise.reject(error);
+const mockOrders = [
+  {
+    _id: 'order_1',
+    orderItems: [
+      {
+        name: 'Canon EOS R5',
+        quantity: 1,
+        image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&q=80',
+        price: 324900
+      }
+    ],
+    totalPrice: 324900,
+    status: 'Processing',
+    createdAt: new Date().toISOString()
   }
-);
+];
+
+// Mock API object
+const api = {
+  get: async (url: string) => {
+    await mockDelay();
+    
+    if (url === '/products') {
+      return { data: mockProducts };
+    }
+    
+    if (url === '/orders/myorders') {
+      return { data: mockOrders };
+    }
+    
+    if (url === '/users/profile') {
+      return {
+        data: {
+          name: 'John Doe',
+          email: 'john.doe@example.com',
+          phoneNumber: '+1 234 567 8900'
+        }
+      };
+    }
+    
+    return { data: [] };
+  },
+  
+  post: async (url: string, data: any) => {
+    await mockDelay();
+    
+    if (url === '/orders') {
+      const newOrder = {
+        _id: 'order_' + Date.now(),
+        ...data,
+        status: 'Processing',
+        createdAt: new Date().toISOString()
+      };
+      mockOrders.unshift(newOrder);
+      return { data: newOrder };
+    }
+    
+    return { data: { success: true } };
+  },
+  
+  put: async (url: string, data: any) => {
+    await mockDelay();
+    return { data: { success: true } };
+  },
+  
+  delete: async (url: string) => {
+    await mockDelay();
+    return { data: { success: true } };
+  }
+};
 
 interface Product {
   _id: string;
@@ -61,7 +115,7 @@ export const orderAPI = {
       const response = await api.get('/orders/myorders');
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch orders');
+      throw new Error('Failed to fetch orders');
     }
   },
 
@@ -70,7 +124,7 @@ export const orderAPI = {
       const response = await api.post('/orders', orderData);
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Failed to create order');
+      throw new Error('Failed to create order');
     }
   }
 };

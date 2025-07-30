@@ -15,9 +15,6 @@ export function Payment() {
   const [orderItems] = useState(location.state?.items || []);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   
-  // Temporarily disabled auth check
-  // const { user, isAuthenticated } = useAuth();
-  
   const [formData, setFormData] = useState({
     cardNumber: '',
     cardName: '',
@@ -30,12 +27,6 @@ export function Payment() {
   });
 
   useEffect(() => {
-    // Temporarily disabled auth check
-    // if (!isAuthenticated) {
-    //   navigate('/login');
-    //   return;
-    // }
-    
     if (!location.state?.items?.length) {
       navigate('/cart');
       return;
@@ -119,7 +110,7 @@ export function Payment() {
         }
       };
 
-      // Simulate successful order creation
+      // Mock successful order creation
       const response = { data: { _id: 'order_' + Date.now() } };
 
       if (location.state?.isBuyNow) {

@@ -2,70 +2,26 @@
 
 A modern e-commerce platform for photography equipment built with React, TypeScript, and Tailwind CSS.
 
-## 🚧 Current Status: Ready for Custom Deployment
+## 🚧 Current Status: Frontend Only
 
 **Note**: 
-- Authentication is temporarily disabled for development
-- Deployment configurations removed for custom deployment
-- MongoDB connection ready and tested
-- All features work with database integration
-
-## 🗄️ Database Setup
-
-### 1. MongoDB Configuration
-
-1. **Create `.env` file in backend directory:**
-   ```bash
-   cp backend/.env.example backend/.env
-   ```
-
-2. **Update MongoDB connection string in `.env`:**
-   ```env
-   MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/photopixel?retryWrites=true&w=majority
-   ```
-
-3. **Test MongoDB connection:**
-   ```bash
-   cd backend
-   node test-mongodb.js
-   ```
-
-4. **Seed sample data:**
-   ```bash
-   cd backend
-   node seedData.js
-   ```
-
-### 2. Environment Variables Setup
-
-**Backend (.env):**
-```env
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-EMAIL_USER=your_email@gmail.com
-EMAIL_APP_PASSWORD=your_app_password
-FRONTEND_URL=http://localhost:5173
-PORT=5000
-NODE_ENV=development
-```
-
-**Frontend (.env):**
-```env
-VITE_API_URL=http://localhost:5000/api
-```
+- This is now a frontend-only application
+- Authentication is disabled for development
+- All features work with mock data
+- Backend integration removed
 
 ## Features
 
 - 🛍️ Product browsing (Cameras, Lenses, Accessories, Batteries)
 - 🛒 Shopping cart functionality
-- 💳 Payment processing
-- 📦 Order management with MongoDB
-- 👤 User profiles
+- 💳 Payment processing (mock)
+- 📦 Order management (mock data)
+- 👤 User profiles (mock)
 - 📱 Responsive design
 - 🔍 Product search
 - 🎨 Modern UI with Tailwind CSS
-- 🗄️ MongoDB integration
-- 📧 Email notifications (password reset)
+- 🗄️ Local storage for cart persistence
+- 📧 Mock notifications
 
 ## Tech Stack
 
@@ -77,87 +33,47 @@ VITE_API_URL=http://localhost:5000/api
 - **Notifications**: React Hot Toast
 - **Build Tool**: Vite
 
-**Backend:**
-- Node.js, Express.js
-- **Database**: MongoDB with Mongoose
-- **Authentication**: JWT (temporarily disabled)
-- **Email**: Nodemailer
-- **Security**: bcryptjs, CORS
-
 ## Getting Started
 
-### 1. Backend Setup
-
-```bash
-cd backend
-npm install
-
-# Setup environment variables
-cp .env.example .env
-# Edit .env with your MongoDB connection string
-
-# Test MongoDB connection
-node test-mongodb.js
-
-# Seed sample data
-node seedData.js
-
-# Start backend server
-npm run dev
-```
-
-### 2. Frontend Setup
+### Frontend Setup
 
 ```bash
 # Install dependencies
 npm install
 
-# Create .env file
-echo "VITE_API_URL=http://localhost:5000/api" > .env
-
 # Start development server
 npm run dev
 ```
 
-### 3. Production Build
+### Production Build
 
 ```bash
 # Build frontend
 npm run build
 
-# Start backend in production
-cd backend
-npm start
+# Preview production build
+npm run preview
 ```
 
 ## 🚀 Deployment Ready
 
-The project is now ready for deployment on any platform:
+The project is ready for frontend deployment on:
 
-- ✅ **Vercel/Netlify**: Frontend deployment ready
-- ✅ **Railway/Render/Heroku**: Backend deployment ready  
-- ✅ **MongoDB Atlas**: Database connection configured
-- ✅ **Custom VPS**: Full-stack deployment ready
+- ✅ **Vercel**: Frontend deployment ready
+- ✅ **Netlify**: Frontend deployment ready  
+- ✅ **GitHub Pages**: Static deployment ready
+- ✅ **Custom CDN**: Build output ready
 
 ### Deployment Checklist:
 
-1. **Database**: MongoDB Atlas cluster created and accessible
-2. **Environment Variables**: All required env vars set
-3. **CORS**: Frontend URL added to backend CORS config
-4. **Build**: Frontend builds successfully
-5. **API**: Backend API endpoints tested
+1. **Build**: Frontend builds successfully
+2. **Static Assets**: All assets properly referenced
+3. **Routing**: Client-side routing configured
+4. **Environment**: No backend dependencies
 
 ## 📁 Project Structure
 
 ```
-├── backend/                 # Node.js backend
-│   ├── config/             # Database & email config
-│   ├── controllers/        # Route controllers
-│   ├── models/            # MongoDB models
-│   ├── routes/            # API routes
-│   ├── middleware/        # Auth & validation middleware
-│   └── index.js           # Server entry point
-│
 ├── src/                   # React frontend
 │   ├── components/        # Reusable components
 │   ├── pages/            # Page components
@@ -165,6 +81,9 @@ The project is now ready for deployment on any platform:
 │   ├── store/            # Zustand stores
 │   ├── utils/            # Utility functions
 │   └── App.tsx           # Main app component
+│
+├── public/               # Static assets
+└── dist/                # Build output
 ```
 
 ## 🔧 Available Scripts
@@ -177,119 +96,39 @@ npm run preview      # Preview production build
 npm run lint         # Run ESLint
 ```
 
-**Backend:**
-```bash
-npm run dev          # Start with nodemon
-npm start            # Start production server
-node test-mongodb.js # Test database connection
-node seedData.js     # Seed sample data
-```
+## 📊 Mock Data
 
-## 🔄 To Re-enable Authentication:
+The application uses mock data for:
+- Product catalog
+- User profiles
+- Order history
+- Shopping cart (persisted in localStorage)
 
-1. **Uncomment auth imports in `src/App.tsx`**
-2. **Uncomment auth routes in `src/App.tsx`**
-3. **Uncomment auth context wrapper in `src/App.tsx`**
-4. **Uncomment auth hooks in components**
-5. **Uncomment API interceptors in `src/utils/api.ts`**
-6. **Remove mock data and restore API calls**
+## 🌐 Features
 
-## 🧪 Testing Database Connection
+**Product Browsing:**
+- Browse cameras, lenses, accessories, and batteries
+- Product search and filtering
+- Detailed product information
 
-```bash
-cd backend
-node test-mongodb.js
-```
+**Shopping Experience:**
+- Add to cart functionality
+- Cart persistence with localStorage
+- Mock checkout process
+- Order confirmation
 
-This will test:
-- ✅ MongoDB connection
-- ✅ Database read/write operations
-- ✅ Collections listing
-- ✅ Environment variables
+**User Interface:**
+- Responsive design for all devices
+- Modern UI with Tailwind CSS
+- Smooth animations and transitions
+- Professional photography theme
 
-## 📊 Sample Data
+## 🚧 Development Notes
 
-Run the seed script to populate your database:
-
-```bash
-cd backend
-node seedData.js
-```
-
-This adds sample products across all categories:
-- 📷 Cameras (Canon, Sony, Nikon)
-- 🔍 Lenses (Various focal lengths)
-- 🎒 Accessories (Straps, Tripods, etc.)
-- 🔋 Batteries (Brand-specific)
-
-## 🚧 Temporarily Disabled Features
-
-- User authentication (login/signup)
-- Protected routes  
-- Admin functionality
-- Email verification
-
-*All code is preserved and can be easily re-enabled*
-
-## 🌐 API Endpoints
-
-**Products:**
-- `GET /api/products` - Get all products
-- `GET /api/products/:id` - Get single product
-- `POST /api/products` - Create product
-- `PUT /api/products/:id` - Update product
-- `DELETE /api/products/:id` - Delete product
-
-**Orders:**
-- `POST /api/orders` - Create order
-- `GET /api/orders/myorders` - Get user orders
-
-**Users:**
-- `GET /api/users/profile` - Get user profile
-- `PUT /api/users/profile` - Update profile
-
-**Health:**
-- `GET /api/health` - API health check
-
-## 🔒 Security Features
-
-- CORS configuration
-- Input validation
-- Password hashing (bcryptjs)
-- JWT token authentication (disabled)
-- Environment variable protection
-
-## 📧 Email Configuration
-
-For password reset functionality:
-
-1. **Gmail Setup:**
-   - Enable 2-factor authentication
-   - Generate app password
-   - Add to `.env` file
-
-2. **Environment Variables:**
-   ```bash
-   EMAIL_USER=your_email@gmail.com
-   EMAIL_APP_PASSWORD=your_app_password
-   ```
-
-## 🐛 Troubleshooting
-
-**MongoDB Connection Issues:**
-1. Check connection string format
-2. Verify IP whitelist in MongoDB Atlas
-3. Confirm username/password
-4. Test with `node test-mongodb.js`
-
-**CORS Issues:**
-1. Update `FRONTEND_URL` in backend `.env`
-2. Check CORS configuration in `backend/index.js`
-
-**Build Issues:**
-1. Clear node_modules: `rm -rf node_modules && npm install`
-2. Check environment variables
-3. Verify API endpoints
+- All API calls are mocked
+- Authentication is disabled
+- Data persists only in browser storage
+- No server-side functionality
 
 ## 📝 License
 
@@ -305,67 +144,12 @@ This project is licensed under the MIT License.
 
 ---
 
-## 🎯 Ready for Deployment!
+## 🎯 Frontend-Only Application
 
-Your project is now:
-- ✅ **Database Connected**: MongoDB integration working
-- ✅ **API Ready**: All endpoints functional
-- ✅ **Frontend Built**: Production-ready React app
-- ✅ **Environment Configured**: All variables documented
-- ✅ **Deployment Clean**: No platform-specific configs
+This is now a complete frontend application with:
+- ✅ **Mock Data**: All functionality works with sample data
+- ✅ **Local Storage**: Cart and preferences saved locally
+- ✅ **No Backend**: No server dependencies
+- ✅ **Static Deployment**: Ready for any static hosting
 
 Deploy anywhere you want! 🚀
-
-   ```
-
-3. **Build for production**
-   ```bash
-   npm run build
-   ```
-
-## Project Structure
-
-```
-src/
-├── components/          # Reusable components
-├── pages/              # Page components
-├── context/            # React contexts
-├── store/              # Zustand stores
-├── utils/              # Utility functions
-├── types.ts            # TypeScript types
-└── App.tsx             # Main app component
-```
-
-## Temporarily Disabled Features
-
-- User authentication (login/signup)
-- Protected routes
-- Real API calls (using mock data)
-- Admin functionality
-
-## Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-VITE_API_URL=http://localhost:5000/api
-```
-
-## Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License.

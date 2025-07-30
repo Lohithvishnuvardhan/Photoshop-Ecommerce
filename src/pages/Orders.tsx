@@ -54,24 +54,13 @@ export function Orders() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const navigate = useNavigate();
   
-  // Temporarily disabled auth
-  // const { user, isAuthenticated } = useAuth();
-
   useEffect(() => {
-    // Temporarily disabled auth check
-    // if (!isAuthenticated) {
-    //   navigate('/login');
-    //   return;
-    // }
     fetchOrders();
   }, []);
 
   const fetchOrders = async () => {
     try {
-      // Temporarily using mock data instead of API call
-      // const response = await orderAPI.getOrders();
-      // setOrders(response);
-      
+      // Using mock data for frontend-only demo
       const mockOrders = [
         {
           _id: 'order_1',

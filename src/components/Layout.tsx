@@ -1,10 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { ShoppingCart, User, Search, Camera, LogIn } from 'lucide-react';
+import { ShoppingCart, User, Search, Camera } from 'lucide-react';
 import { useCartStore } from '../store/cart';
-
-// Temporarily disabled auth imports
-// import { useAuth } from '../hooks/useAuth';
 
 const Layout = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,10 +17,7 @@ const Layout = () => {
   const navTimeoutRef = useRef<NodeJS.Timeout>();
   const visibilityTimeoutRef = useRef<NodeJS.Timeout>();
   
-  // Temporarily disabled auth state
-  // const { user, logout, isAuthenticated } = useAuth();
-  const isAuthenticated = false; // Temporarily set to false
-  const user = null; // Temporarily set to null
+  // Frontend-only application - no authentication
 
   useEffect(() => {
     function handleMouseMove(event: MouseEvent) {
@@ -139,31 +133,13 @@ const Layout = () => {
                 )}
               </Link>
 
-              {/* Temporarily show login link instead of profile */}
-              {isAuthenticated ? (
-                <div className="flex items-center space-x-4">
-                  <Link to="/profile" className="text-purple-400 hover:text-purple-300 transition-colors">
-                    <User className="h-6 w-6 md:h-8 md:w-8" />
-                  </Link>
-                  {/* <button 
-                    onClick={logout}
-                    className="text-purple-400 hover:text-purple-300 transition-colors text-sm"
-                  >
-                    Logout
-                  </button> */}
-                </div>
-              ) : (
-                <div className="flex items-center space-x-4">
-                  <span className="text-purple-400 text-sm">Authentication Disabled</span>
-                  <Link to="/profile" className="text-purple-400 hover:text-purple-300 transition-colors">
-                    <User className="h-6 w-6 md:h-8 md:w-8" />
-                  </Link>
-                  {/* Temporarily commented out login link */}
-                  {/* <Link to="/login" className="text-purple-400 hover:text-purple-300 transition-colors">
-                    <LogIn className="h-6 w-6 md:h-8 md:w-8" />
-                  </Link> */}
-                </div>
-              )}
+              {/* Profile link - no authentication required */}
+              <div className="flex items-center space-x-4">
+                <span className="text-purple-400 text-sm hidden md:block">Demo Mode</span>
+                <Link to="/profile" className="text-purple-400 hover:text-purple-300 transition-colors">
+                  <User className="h-6 w-6 md:h-8 md:w-8" />
+                </Link>
+              </div>
             </div>
           </div>
 
