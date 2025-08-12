@@ -54,7 +54,7 @@ const useCartStore = create<CartStore>()(
         }
         )
         toast.success(`${product.name} added to cart!`);
-      }
+      },
       removeFromCart: (productId) => {
         set((state) => ({
           items: state.items.filter((item) => item._id !== productId),
