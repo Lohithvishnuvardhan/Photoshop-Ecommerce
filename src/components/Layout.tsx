@@ -203,6 +203,13 @@ const Layout = () => {
                   >
                     Contact
                   </Link>
+                  <Link 
+                    to="/blog" 
+                    className="text-purple-400 hover:text-purple-300 transition-colors text-base md:text-lg text-center"
+                    onClick={handleNavClick}
+                  >
+                    Blog
+                  </Link>
                 </div>
               </div>
             </div>
@@ -226,6 +233,7 @@ const Layout = () => {
               <ul className="space-y-2">
                 <li><Link to="/about" className="text-purple-300 hover:text-purple-200">About</Link></li>
                 <li><Link to="/contact" className="text-purple-300 hover:text-purple-200">Contact</Link></li>
+                <li><Link to="/blog" className="text-purple-300 hover:text-purple-200">Blog</Link></li>
                 <li><Link to="/faq" className="text-purple-300 hover:text-purple-200">FAQ</Link></li>
               </ul>
             </div>
@@ -235,6 +243,8 @@ const Layout = () => {
                 <li><Link to="/shipping" className="text-purple-300 hover:text-purple-200">Shipping Info</Link></li>
                 <li><Link to="/returns" className="text-purple-300 hover:text-purple-200">Returns</Link></li>
                 <li><Link to="/track-order" className="text-purple-300 hover:text-purple-200">Track Order</Link></li>
+                <li><Link to="/privacy-policy" className="text-purple-300 hover:text-purple-200">Privacy Policy</Link></li>
+                <li><Link to="/terms-conditions" className="text-purple-300 hover:text-purple-200">Terms & Conditions</Link></li>
               </ul>
             </div>
           </div>

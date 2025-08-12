@@ -19,6 +19,9 @@ import EditProfile from './pages/EditProfile';
 import TrackOrder from './pages/TrackOrder';
 import { OrderSuccess } from './pages/OrderSuccess';
 import { ViewOrder } from './pages/ViewOrder';
+import Blog from './pages/Blog';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsConditions from './pages/TermsConditions';
 import { SearchProvider } from './context/SearchContext';
 import { CartProvider } from './context/Cartcontext';
 
@@ -59,6 +62,9 @@ function App() {
                 <Route path="returns" element={<Returns />} />
                 <Route path="faq" element={<FAQ />} />
                 <Route path="order-success" element={<OrderSuccess />} />
+                <Route path="blog" element={<Blog />} />
+                <Route path="privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="terms-conditions" element={<TermsConditions />} />
                 
                 {/* Frontend-only demo - no authentication routes needed */}
               </Route>
