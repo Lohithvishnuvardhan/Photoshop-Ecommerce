@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, User, ArrowRight, Search, Tag } from 'lucide-react';
 
 interface BlogPost {
@@ -87,6 +88,7 @@ const categories = ['All', 'Photography Tips', 'Camera Reviews', 'Gear Guide', '
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const navigate = useNavigate();
 
   const filteredPosts = blogPosts.filter(post => {
     const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
@@ -101,6 +103,10 @@ const Blog = () => {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const handleReadMore = (postId: string) => {
+    navigate(`/blog/${postId}`);
   };
 
   return (
@@ -187,7 +193,10 @@ const Blog = () => {
                   {post.excerpt}
                 </p>
                 
-                <button className="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium">
+                <button 
+                  onClick={() => handleReadMore(post.id)}
+                  className="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium"
+                >
                   Read More
                   <ArrowRight className="h-4 w-4 ml-1" />
                 </button>

@@ -260,40 +260,5 @@ export function Home() {
         </div>
       </div>
     </div>
-      {/* Newsletter Subscription Section */}
-      <div className="bg-gray-800 py-16 border-t border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-4xl font-bold text-white mb-6">Stay Updated</h2>
-            <p className="text-xl text-gray-300 mb-8">
-              Subscribe to our newsletter to receive updates and exclusive offers.
-            </p>
-            <div className="max-w-md mx-auto">
-              <div className="flex flex-col space-y-4">
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  className="w-full px-6 py-4 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                />
-                <button className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-gray-900 font-semibold px-8 py-4 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                  Subscribe
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Company Info Section */}
-      <div className="bg-gray-900 py-12 border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">Photo Pixel</h2>
-            <p className="text-lg text-gray-300 max-w-3xl mx-auto">
-              Elevating your shopping experience with premium products and exceptional service.
-            </p>
-          </div>
-        </div>
-      </div>
   );
 }

@@ -20,6 +20,7 @@ import TrackOrder from './pages/TrackOrder';
 import { OrderSuccess } from './pages/OrderSuccess';
 import { ViewOrder } from './pages/ViewOrder';
 import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsConditions from './pages/TermsConditions';
 import { SearchProvider } from './context/SearchContext';
@@ -63,6 +64,7 @@ function App() {
                 <Route path="faq" element={<FAQ />} />
                 <Route path="order-success" element={<OrderSuccess />} />
                 <Route path="blog" element={<Blog />} />
+                <Route path="blog/:id" element={<BlogPost />} />
                 <Route path="privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="terms-conditions" element={<TermsConditions />} />
                 

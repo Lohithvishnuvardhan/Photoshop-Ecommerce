@@ -11,7 +11,7 @@ const staticAccessories = [
     id: 9,
     name: 'Peak Design Camera Strap',
     price: 5990,
-    image: "https://i.postimg.cc/bJKvvYjp/Access1.avif",
+    image: "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?auto=format&fit=crop&q=80",
     description: 'Professional Camera Strap with Quick-Release System',
     specs: [
       'Quick-Release System for Easy Attachment',
@@ -55,7 +55,7 @@ const staticAccessories = [
     id: 11,
     name: 'Godox V1 Flash',
     price: 32990,
-    image: "https://i.postimg.cc/6psQKpf0/godox.avif",
+    image: "https://images.unsplash.com/photo-1582555172866-f73bb12a2ab3?auto=format&fit=crop&q=80",
     description: 'Professional Round Head Flash with Advanced Features',
     specs: [
       'Round Head Design',
@@ -77,7 +77,7 @@ const staticAccessories = [
     id: 12,
     name: 'Peak Design Everyday Backpack',
     price: 21990,
-    image: "https://i.postimg.cc/fLFNv8HK/access2.avif",
+    image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80",
     description: 'Professional Camera Backpack with Innovative Design',
     specs: [
       '30L Capacity',

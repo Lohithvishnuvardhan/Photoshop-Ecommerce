@@ -11,7 +11,7 @@ const staticBatteries = [
     id: 13,
     name: 'Canon LP-E6NH Battery',
     price: 14000,
-    image: "https://i.postimg.cc/mrkZN1LT/battery.avif",
+    image: "https://images.unsplash.com/photo-1609592806596-4d8b5b3c4b3a?auto=format&fit=crop&q=80",
     description: 'High Capacity Battery for Canon EOS R Series',
     specs: [
       '2130mAh Capacity',
@@ -33,7 +33,7 @@ const staticBatteries = [
     id: 14,
     name: 'Sony NP-FZ100 Battery',
     price: 12990,
-    image: "https://i.postimg.cc/yYT7MyWV/battery1.avif",
+    image: "https://images.unsplash.com/photo-1609592806596-4d8b5b3c4b3a?auto=format&fit=crop&q=80",
     description: 'Professional Battery for Sony Alpha Cameras',
     specs: [
       '2280mAh Capacity',
@@ -55,7 +55,7 @@ const staticBatteries = [
     id: 15,
     name: 'Nikon EN-EL15c Battery',
     price: 11990,
-    image: "https://i.postimg.cc/L43d56SD/battery2.avif",
+    image: "https://images.unsplash.com/photo-1609592806596-4d8b5b3c4b3a?auto=format&fit=crop&q=80",
     description: 'Advanced Battery for Nikon Z Series',
     specs: [
       '2280mAh Capacity',
@@ -77,7 +77,7 @@ const staticBatteries = [
     id: 16,
     name: 'Fujifilm NP-W235 Battery',
     price: 9990,
-    image: "https://i.postimg.cc/JnCg7SdS/battery3.avif",
+    image: "https://images.unsplash.com/photo-1609592806596-4d8b5b3c4b3a?auto=format&fit=crop&q=80",
     description: 'High-Performance Battery for Fujifilm Cameras',
     specs: [
       '2200mAh Capacity',

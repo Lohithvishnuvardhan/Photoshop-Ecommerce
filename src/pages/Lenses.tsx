@@ -35,7 +35,7 @@ const staticLenses = [
     _id: '6',
     name: 'Sony FE 70-200mm f/2.8 GM II',
     price: 259990,
-    imageUrl: "https://i.ytimg.com/vi/A5W5tfLbhWY/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLDNe-Y5ppM1BB7xqgjKbmMdjcnYIQ",
+    imageUrl: "https://images.unsplash.com/photo-1617005082133-548c4dd27f35?auto=format&fit=crop&q=80",
     description: 'Professional Telephoto Zoom Lens',
     specs: [
       'Constant f/2.8 Aperture',
@@ -58,7 +58,7 @@ const staticLenses = [
     _id: '7',
     name: 'Nikon Z 50mm f/1.2 S',
     price: 199990,
-    imageUrl: "https://i.pcmag.com/imagery/reviews/00qMwxhCghOfgOKvnS8WRTM-1..v1613771781.jpg",
+    imageUrl: "https://images.unsplash.com/photo-1617005082133-548c4dd27f35?auto=format&fit=crop&q=80",
     description: 'Professional Prime Lens',
     specs: [
       'Ultra-Fast f/1.2 Aperture',
