@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, User, ArrowRight, Search, Tag } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface BlogPost {
   id: string;
@@ -86,6 +87,7 @@ const blogPosts: BlogPost[] = [
 const categories = ['All', 'Photography Tips', 'Camera Reviews', 'Gear Guide', 'Photography Basics', 'Industry News'];
 
 const Blog = () => {
+  const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const navigate = useNavigate();
@@ -114,9 +116,9 @@ const Blog = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Photography Blog</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('blog.title')}</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Discover the latest photography tips, gear reviews, and industry insights from our expert team.
+            {t('blog.subtitle')}
           </p>
         </div>
 
@@ -128,7 +130,7 @@ const Blog = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
               <input
                 type="text"
-                placeholder="Search articles..."
+                placeholder={t('blog.search')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
@@ -197,7 +199,7 @@ const Blog = () => {
                   onClick={() => handleReadMore(post.id)}
                   className="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium"
                 >
-                  Read More
+                  {t('blog.readMore')}
                   <ArrowRight className="h-4 w-4 ml-1" />
                 </button>
               </div>
@@ -211,28 +213,10 @@ const Blog = () => {
             <div className="text-gray-400 mb-4">
               <Search className="h-16 w-16 mx-auto" />
             </div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">No articles found</h3>
-            <p className="text-gray-600">Try adjusting your search or filter criteria.</p>
+            <h3 className="text-xl font-medium text-gray-900 mb-2">{t('blog.noResults')}</h3>
+            <p className="text-gray-600">{t('blog.noResultsDesc')}</p>
           </div>
         )}
-
-        {/* Newsletter Subscription */}
-        <div className="mt-16 bg-gradient-to-r from-purple-600 to-blue-500 rounded-2xl p-8 text-center">
-          <h3 className="text-2xl font-bold text-white mb-4">Stay Updated</h3>
-          <p className="text-purple-100 mb-6">
-            Subscribe to our newsletter for the latest photography tips and gear reviews.
-          </p>
-          <div className="max-w-md mx-auto flex gap-4">
-            <input
-              type="email"
-              placeholder="Your email address"
-              className="flex-1 px-4 py-3 rounded-lg border-0 focus:ring-2 focus:ring-white focus:ring-opacity-50"
-            />
-            <button className="bg-white text-purple-600 px-6 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors">
-              Subscribe
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );

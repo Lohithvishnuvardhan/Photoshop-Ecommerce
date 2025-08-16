@@ -2,8 +2,10 @@ import { useNavigate } from 'react-router-dom';
 import { Minus, Plus, X, ShoppingBag, Package } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useCart } from '../context/Cartcontext';
+import { useLanguage } from '../context/LanguageContext';
 
 const CartPage = () => {
+  const { t } = useLanguage();
   const { items = [], removeFromCart, updateQuantity } = useCart();
   const navigate = useNavigate();
 
@@ -35,12 +37,12 @@ const CartPage = () => {
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
           <ShoppingBag className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('cart.empty')}</h2>
           <button
             onClick={() => navigate('/')}
             className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700"
           >
-            Continue Shopping
+            {t('cart.continueShopping')}
           </button>
         </div>
       </div>
@@ -108,25 +110,25 @@ const CartPage = () => {
 
           <div className="lg:col-span-4">
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">{t('cart.orderSummary')}</h2>
               <div className="space-y-4">
                 <div className="flex justify-between text-gray-600">
-                  <span>Subtotal</span>
+                  <span>{t('cart.subtotal')}</span>
                   <span>₹{total.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
-                  <span>Shipping</span>
-                  <span>{shipping === 0 ? 'Free' : `₹${shipping}`}</span>
+                  <span>{t('cart.shipping')}</span>
+                  <span>{shipping === 0 ? t('cart.free') : `₹${shipping}`}</span>
                 </div>
                 <div className="border-t pt-4 flex justify-between text-lg font-semibold">
-                  <span>Total</span>
+                  <span>{t('cart.total')}</span>
                   <span>₹{finalTotal.toLocaleString()}</span>
                 </div>
                 <button
                   onClick={handleCheckout}
                   className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
                 >
-                  Proceed to Checkout
+                  {t('cart.checkout')}
                 </button>
               </div>
             </div>

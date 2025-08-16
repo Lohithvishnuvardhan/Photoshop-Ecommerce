@@ -1,7 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Star, Shield, Truck, Clock, Camera, Award, Users, DollarSign, Heart } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export function Home() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   const featuredProducts = [
@@ -56,10 +58,10 @@ export function Home() {
   ];
 
   const stats = [
-    { icon: Users, label: "Happy Customers", value: "10,000+" },
-    { icon: Camera, label: "Products Available", value: "5,000+" },
-    { icon: Award, label: "Years of Excellence", value: "15+" },
-    { icon: Heart, label: "5-Star Reviews", value: "25,000+" }
+    { icon: Users, label: t("home.stats.customers"), value: "10,000+" },
+    { icon: Camera, label: t("home.stats.products"), value: "5,000+" },
+    { icon: Award, label: t("home.stats.years"), value: "15+" },
+    { icon: Heart, label: t("home.stats.reviews"), value: "25,000+" }
   ];
 
   const handleShopNow = () => {
@@ -85,24 +87,24 @@ export function Home() {
           <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
             <div className="max-w-xl">
               <h1 className="text-5xl font-bold text-white mb-4 animate-fade-in">
-                <span className="italic">Turn Pixels into Profit.</span>
+                <span className="italic">{t('home.hero.title')}</span>
               </h1>
               <p className="text-lg text-gray-200 mb-6">
-                Professional photography equipment for every level of expertise. From beginners to pros, find your perfect gear.
+                {t('home.hero.subtitle')}
               </p>
               <div className="flex gap-4">
                 <button
                   onClick={handleShopNow}
                   className="inline-flex items-center bg-gradient-to-r from-purple-600 to-blue-500 text-white px-6 py-2 rounded-lg hover:from-purple-700 hover:to-blue-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                 >
-                  Shop Now
+                  {t('home.hero.shopNow')}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </button>
                 <Link
                   to="/about"
                   className="inline-flex items-center bg-white bg-opacity-20 text-white px-6 py-2 rounded-lg hover:bg-opacity-30 transition-all duration-300"
                 >
-                  Learn More
+                  {t('home.hero.learnMore')}
                 </Link>
               </div>
             </div>
@@ -132,29 +134,29 @@ export function Home() {
             <div className="flex items-center justify-center">
               <Shield className="h-8 w-8 text-purple-500 mr-3" />
               <div>
-                <h3 className="text-white font-semibold">Secure Shopping</h3>
-                <p className="text-gray-400 text-sm">100% Protected Payments</p>
+                <h3 className="text-white font-semibold">{t('home.trust.secure')}</h3>
+                <p className="text-gray-400 text-sm">{t('home.trust.secureDesc')}</p>
               </div>
             </div>
             <div className="flex items-center justify-center">
               <Truck className="h-8 w-8 text-purple-500 mr-3" />
               <div>
-                <h3 className="text-white font-semibold">Free Shipping</h3>
-                <p className="text-gray-400 text-sm">On orders over ₹50,000</p>
+                <h3 className="text-white font-semibold">{t('home.trust.shipping')}</h3>
+                <p className="text-gray-400 text-sm">{t('home.trust.shippingDesc')}</p>
               </div>
             </div>
             <div className="flex items-center justify-center">
               <Clock className="h-8 w-8 text-purple-500 mr-3" />
               <div>
-                <h3 className="text-white font-semibold">24/7 Support</h3>
-                <p className="text-gray-400 text-sm">Dedicated customer care</p>
+                <h3 className="text-white font-semibold">{t('home.trust.support')}</h3>
+                <p className="text-gray-400 text-sm">{t('home.trust.supportDesc')}</p>
               </div>
             </div>
             <div className="flex items-center justify-center">
               <DollarSign className="h-8 w-8 text-purple-500 mr-3" />
               <div>
-                <h3 className="text-white font-semibold">Price Match</h3>
-                <p className="text-gray-400 text-sm">Best price guaranteed</p>
+                <h3 className="text-white font-semibold">{t('home.trust.price')}</h3>
+                <p className="text-gray-400 text-sm">{t('home.trust.priceDesc')}</p>
               </div>
             </div>
           </div>
@@ -164,7 +166,7 @@ export function Home() {
       {/* Featured Products */}
       <div className="py-16 bg-gray-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-white mb-8">Featured Products</h2>
+          <h2 className="text-3xl font-bold text-white mb-8">{t('home.featured')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredProducts.map((product) => (
               <div key={product.id} className="bg-gray-800 rounded-lg overflow-hidden transform transition duration-300 hover:scale-105">
@@ -215,7 +217,7 @@ export function Home() {
       {/* Testimonials Section */}
       <div className="bg-gray-800 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-white mb-12 text-center">What Our Customers Say</h2>
+          <h2 className="text-3xl font-bold text-white mb-12 text-center">{t('home.testimonials')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <div key={index} className="bg-gray-900 p-6 rounded-lg">

@@ -2,8 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { ShoppingCart, User, Search, Camera } from 'lucide-react';
 import { useCartStore } from '../store/cart';
+import { LanguageSelector } from './LanguageSelector';
+import { useLanguage } from '../context/LanguageContext';
 
 const Layout = () => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [, setShowResults] = useState(false);
   const [, setSearchResults] = useState<any[]>([]);
@@ -102,7 +105,7 @@ const Layout = () => {
             <Link to="/" className="flex items-center space-x-3">
               <Camera className="h-8 w-8 md:h-12 md:w-12 text-amber-500" strokeWidth={1.5} />
               <span className="text-3xl md:text-5xl font-extrabold italic bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 text-transparent bg-clip-text font-sans tracking-tight hover:from-amber-500 hover:via-amber-600 hover:to-amber-700 transition-all duration-300">
-                Photo Pixel
+                {t('header.title')}
               </span>
             </Link>
 
@@ -113,7 +116,7 @@ const Layout = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => handleSearch(e.target.value)}
-                  placeholder="Search for cameras, lenses, accessories..."
+                  placeholder={t('header.search')}
                   className="w-full pl-10 md:pl-12 pr-4 py-2 md:py-3 bg-gray-800 border border-purple-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 text-base md:text-lg"
                 />
               </div>
@@ -123,7 +126,7 @@ const Layout = () => {
               <Link 
                 to="/cart" 
                 className="relative text-purple-400 hover:text-purple-300 transition-colors"
-                aria-label="Shopping cart"
+                aria-label={t('header.cart')}
               >
                 <ShoppingCart className="h-6 w-6 md:h-8 md:w-8" />
                 {itemCount > 0 && (
@@ -135,8 +138,9 @@ const Layout = () => {
 
               {/* Profile link - no authentication required */}
               <div className="flex items-center space-x-4">
-                <span className="text-purple-400 text-sm hidden md:block">Demo Mode</span>
-                <Link to="/profile" className="text-purple-400 hover:text-purple-300 transition-colors">
+                <LanguageSelector />
+                <span className="text-purple-400 text-sm hidden md:block">{t('header.demo')}</span>
+                <Link to="/profile" className="text-purple-400 hover:text-purple-300 transition-colors" aria-label={t('header.profile')}>
                   <User className="h-6 w-6 md:h-8 md:w-8" />
                 </Link>
               </div>
@@ -166,49 +170,49 @@ const Layout = () => {
                     className="text-purple-400 hover:text-purple-300 transition-colors text-base md:text-lg text-center"
                     onClick={handleNavClick}
                   >
-                    Cameras
+                    {t('nav.cameras')}
                   </Link>
                   <Link 
                     to="/lenses" 
                     className="text-purple-400 hover:text-purple-300 transition-colors text-base md:text-lg text-center"
                     onClick={handleNavClick}
                   >
-                    Lenses
+                    {t('nav.lenses')}
                   </Link>
                   <Link 
                     to="/accessories" 
                     className="text-purple-400 hover:text-purple-300 transition-colors text-base md:text-lg text-center"
                     onClick={handleNavClick}
                   >
-                    Accessories
+                    {t('nav.accessories')}
                   </Link>
                   <Link 
                     to="/batteries" 
                     className="text-purple-400 hover:text-purple-300 transition-colors text-base md:text-lg text-center"
                     onClick={handleNavClick}
                   >
-                    Batteries
+                    {t('nav.batteries')}
                   </Link>
                   <Link 
                     to="/about" 
                     className="text-purple-400 hover:text-purple-300 transition-colors text-base md:text-lg text-center"
                     onClick={handleNavClick}
                   >
-                    About
+                    {t('nav.about')}
                   </Link>
                   <Link 
                     to="/contact" 
                     className="text-purple-400 hover:text-purple-300 transition-colors text-base md:text-lg text-center"
                     onClick={handleNavClick}
                   >
-                    Contact
+                    {t('nav.contact')}
                   </Link>
                   <Link 
                     to="/blog" 
                     className="text-purple-400 hover:text-purple-300 transition-colors text-base md:text-lg text-center"
                     onClick={handleNavClick}
                   >
-                    Blog
+                    {t('nav.blog')}
                   </Link>
                 </div>
               </div>
@@ -225,31 +229,31 @@ const Layout = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-              <h3 className="text-white font-semibold mb-4">About Us</h3>
-              <p className="text-purple-300">Professional photography equipment for every level of expertise.</p>
+              <h3 className="text-white font-semibold mb-4">{t('footer.aboutUs')}</h3>
+              <p className="text-purple-300">{t('footer.aboutDesc')}</p>
             </div>
             <div>
-              <h3 className="text-white font-semibold mb-4">Quick Links</h3>
+              <h3 className="text-white font-semibold mb-4">{t('footer.quickLinks')}</h3>
               <ul className="space-y-2">
-                <li><Link to="/about" className="text-purple-300 hover:text-purple-200">About</Link></li>
-                <li><Link to="/contact" className="text-purple-300 hover:text-purple-200">Contact</Link></li>
-                <li><Link to="/blog" className="text-purple-300 hover:text-purple-200">Blog</Link></li>
-                <li><Link to="/faq" className="text-purple-300 hover:text-purple-200">FAQ</Link></li>
+                <li><Link to="/about" className="text-purple-300 hover:text-purple-200">{t('nav.about')}</Link></li>
+                <li><Link to="/contact" className="text-purple-300 hover:text-purple-200">{t('nav.contact')}</Link></li>
+                <li><Link to="/blog" className="text-purple-300 hover:text-purple-200">{t('nav.blog')}</Link></li>
+                <li><Link to="/faq" className="text-purple-300 hover:text-purple-200">{t('footer.faq')}</Link></li>
               </ul>
             </div>
             <div>
-              <h3 className="text-white font-semibold mb-4">Customer Service</h3>
+              <h3 className="text-white font-semibold mb-4">{t('footer.customerService')}</h3>
               <ul className="space-y-2">
-                <li><Link to="/shipping" className="text-purple-300 hover:text-purple-200">Shipping Info</Link></li>
-                <li><Link to="/returns" className="text-purple-300 hover:text-purple-200">Returns</Link></li>
-                <li><Link to="/track-order" className="text-purple-300 hover:text-purple-200">Track Order</Link></li>
-                <li><Link to="/privacy-policy" className="text-purple-300 hover:text-purple-200">Privacy Policy</Link></li>
-                <li><Link to="/terms-conditions" className="text-purple-300 hover:text-purple-200">Terms & Conditions</Link></li>
+                <li><Link to="/shipping" className="text-purple-300 hover:text-purple-200">{t('footer.shippingInfo')}</Link></li>
+                <li><Link to="/returns" className="text-purple-300 hover:text-purple-200">{t('footer.returns')}</Link></li>
+                <li><Link to="/track-order" className="text-purple-300 hover:text-purple-200">{t('footer.trackOrder')}</Link></li>
+                <li><Link to="/privacy-policy" className="text-purple-300 hover:text-purple-200">{t('footer.privacyPolicy')}</Link></li>
+                <li><Link to="/terms-conditions" className="text-purple-300 hover:text-purple-200">{t('footer.termsConditions')}</Link></li>
               </ul>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-gray-700 text-center text-purple-300">
-            <p>&copy; 2024 Photo Pixel. All rights reserved.</p>
+            <p>{t('footer.copyright')}</p>
           </div>
         </div>
       </footer>

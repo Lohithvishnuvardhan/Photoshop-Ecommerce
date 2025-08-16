@@ -25,6 +25,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsConditions from './pages/TermsConditions';
 import { SearchProvider } from './context/SearchContext';
 import { CartProvider } from './context/Cartcontext';
+import { LanguageProvider } from './context/LanguageContext';
 
 function ErrorFallback({ error }: { error: Error }) {
   return (
@@ -40,40 +41,42 @@ function ErrorFallback({ error }: { error: Error }) {
 function App() {
   return (
     <ErrorBoundary FallbackComponent={ErrorFallback}>
-      <SearchProvider>
-        <CartProvider>
-          <Router>
-            <Routes>
-              <Route path="/" element={<Layout />}>
-                <Route index element={<Home />} />
-                <Route path="cameras" element={<Cameras />} />
-                <Route path="lenses" element={<Lenses />} />
-                <Route path="accessories" element={<Accessories />} />
-                <Route path="batteries" element={<Batteries />} />
-                <Route path="about" element={<About />} />
-                <Route path="contact" element={<Contact />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="profile/edit" element={<EditProfile />} />
-                <Route path="orders" element={<Orders />} />
-                <Route path="view-order" element={<ViewOrder />} />
-                <Route path="track-order" element={<TrackOrder />} />
-                <Route path="payment" element={<Payment />} />
-                <Route path="cart" element={<CartPage />} />
-                <Route path="shipping" element={<ShippingInfo />} />
-                <Route path="returns" element={<Returns />} />
-                <Route path="faq" element={<FAQ />} />
-                <Route path="order-success" element={<OrderSuccess />} />
-                <Route path="blog" element={<Blog />} />
-                <Route path="blog/:id" element={<BlogPost />} />
-                <Route path="privacy-policy" element={<PrivacyPolicy />} />
-                <Route path="terms-conditions" element={<TermsConditions />} />
-                
-                {/* Frontend-only demo - no authentication routes needed */}
-              </Route>
-            </Routes>
-          </Router>
-        </CartProvider>
-      </SearchProvider>
+      <LanguageProvider>
+        <SearchProvider>
+          <CartProvider>
+            <Router>
+              <Routes>
+                <Route path="/" element={<Layout />}>
+                  <Route index element={<Home />} />
+                  <Route path="cameras" element={<Cameras />} />
+                  <Route path="lenses" element={<Lenses />} />
+                  <Route path="accessories" element={<Accessories />} />
+                  <Route path="batteries" element={<Batteries />} />
+                  <Route path="about" element={<About />} />
+                  <Route path="contact" element={<Contact />} />
+                  <Route path="profile" element={<Profile />} />
+                  <Route path="profile/edit" element={<EditProfile />} />
+                  <Route path="orders" element={<Orders />} />
+                  <Route path="view-order" element={<ViewOrder />} />
+                  <Route path="track-order" element={<TrackOrder />} />
+                  <Route path="payment" element={<Payment />} />
+                  <Route path="cart" element={<CartPage />} />
+                  <Route path="shipping" element={<ShippingInfo />} />
+                  <Route path="returns" element={<Returns />} />
+                  <Route path="faq" element={<FAQ />} />
+                  <Route path="order-success" element={<OrderSuccess />} />
+                  <Route path="blog" element={<Blog />} />
+                  <Route path="blog/:id" element={<BlogPost />} />
+                  <Route path="privacy-policy" element={<PrivacyPolicy />} />
+                  <Route path="terms-conditions" element={<TermsConditions />} />
+                  
+                  {/* Frontend-only demo - no authentication routes needed */}
+                </Route>
+              </Routes>
+            </Router>
+          </CartProvider>
+        </SearchProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   );
 }
